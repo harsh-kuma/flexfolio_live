@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* this line is only for template 5 */
+@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
