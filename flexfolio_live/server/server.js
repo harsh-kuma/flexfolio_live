@@ -13,9 +13,6 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// static folder (images)
-app.use("/uploads", express.static("uploads"));
-
 // routes
 app.use("/api/portfolio", require("./routes/portfolioRoutes"));
 
