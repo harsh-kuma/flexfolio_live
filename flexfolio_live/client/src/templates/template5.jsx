@@ -1,5 +1,4 @@
 "use client";
-import { getImageUrl } from "@/utils/getImageUrl";
 import { useEffect, useState } from "react";
 import { getInitials } from "../utils/getInitials";
 
@@ -197,7 +196,7 @@ export default function TemplateNeoBrutalist({ data }) {
           <div className="w-full md:w-1/2 flex justify-center relative">
             <div className="w-72 h-72 md:w-96 md:h-96 border-8 border-black bg-[#90BAFE] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transform rotate-3 overflow-hidden">
               <img
-                src={getImageUrl(data?.image)}
+                src={data?.image}
                 alt={data?.fullName}
                 className="w-full h-full object-cover filter contrast-125"
               />

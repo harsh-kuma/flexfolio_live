@@ -16,7 +16,7 @@ I’ve worked on production-grade systems handling thousands of users, focusing 
 I’m passionate about solving real-world problems through technology, continuously learning new tools, and pushing the boundaries of web development. 
 My core expertise lies in the MERN stack, but I also explore system design, DevOps, and AI integrations to build future-ready applications.`,
 
-  image: "alex.png",
+  image: "https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
 
   email: "alex@example.com",
   phone: "+91 XXXXXXXXXX",

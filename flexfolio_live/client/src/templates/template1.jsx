@@ -1,6 +1,5 @@
 
 "use client";
-import { getImageUrl } from "@/utils/getImageUrl";
 export default function Template1({ data }) {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 flex justify-center">
@@ -9,7 +8,7 @@ export default function Template1({ data }) {
         {/* PROFILE */}
         <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
           <img
-            src={getImageUrl(data?.image)}
+            src={data?.image}
             alt="profile"
             className="w-32 h-32 rounded-full object-cover border"
           />
