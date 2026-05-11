@@ -1,31 +1,113 @@
 import { getPortfolio } from "@/lib/api";
 import { templates } from "@/lib/templates";
 
-export default async function PortfolioPage({ params }) {
+import PortfolioNotFound from "@/components/portfolio/PortfolioNotFound";
+import TemplateNotFound from "@/components/portfolio/TemplateNotFound";
+
+export async function generateMetadata({ params }) {
   const { username } = await params;
+
   const portfolio = await getPortfolio(username);
 
   if (!portfolio) {
-    return (
-      <div className="text-center mt-10 text-xl">
-        Portfolio Not Found
-      </div>
-    );
+    return {
+      title: "Portfolio Not Found",
+    };
+  }
+
+  const data = portfolio.data;
+
+  return {
+    title: `${data?.fullName} - ${data?.title || "Portfolio"}`,
+
+    description:
+      data?.bio ||
+      data?.about ||
+      `Explore ${data?.fullName}'s portfolio.`,
+
+    keywords: [
+      data?.fullName,
+      data?.title,
+      "portfolio",
+      "developer portfolio",
+      "web developer",
+      "software engineer",
+    ],
+
+    openGraph: {
+      title: `${data?.fullName} Portfolio`,
+      description:
+        data?.bio ||
+        data?.about ||
+        `Explore ${data?.fullName}'s portfolio.`,
+      images: [
+        {
+          url: data?.image || "/default-og.png",
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${data?.fullName} Portfolio`,
+      description:
+        data?.bio ||
+        data?.about ||
+        `Explore ${data?.fullName}'s portfolio.`,
+      images: [data?.image || "/default-og.png"],
+    },
+
+    icons: {
+      icon: data?.image || "/favicon.ico",
+    },
+
+    alternates: {
+      canonical: `https://yourdomain.com/portfolio/${username}`,
+    },
+  };
+}
+
+export default async function PortfolioPage({ params }) {
+  const { username } = await params;
+
+  const portfolio = await getPortfolio(username);
+
+  if (!portfolio) {
+    return <PortfolioNotFound />;
   }
 
   const template = templates[portfolio.templateKey];
 
   if (!template) {
-    return (
-      <div className="text-center mt-10 text-xl">
-        Template Not Found
-      </div>
-    );
+    return <TemplateNotFound />;
   }
 
-  // Dynamic component
   const TemplateComponent = template.component;
+
   return (
-    <TemplateComponent data={portfolio.data} />
+    <>
+      {/* JSON-LD SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            name: portfolio?.data?.fullName,
+            jobTitle: portfolio?.data?.title,
+            image: portfolio?.data?.image,
+            email: portfolio?.data?.email,
+            sameAs: [
+              portfolio?.data?.github,
+              portfolio?.data?.linkedin,
+            ].filter(Boolean),
+          }),
+        }}
+      />
+
+      <TemplateComponent data={portfolio.data} />
+    </>
   );
 }

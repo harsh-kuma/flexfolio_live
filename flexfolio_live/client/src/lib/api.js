@@ -21,4 +21,9 @@ export const getCompany = async (query) => {
   return res.data;
 };
 
+export const sendContactMessage = async (data) => {
+  const res = await api.post("/contact", data);
+  return res.data;
+};
+
 export default api;

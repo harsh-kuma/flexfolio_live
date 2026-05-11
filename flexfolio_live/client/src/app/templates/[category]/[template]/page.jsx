@@ -9,12 +9,10 @@ import { useState } from "react";
 export const dummyData = {
   fullName: "Alex Carter",
   title: "Senior Full Stack Developer",
-  bio: `Results-driven Full Stack Developer with 4+ years of experience building scalable, high-performance web applications. 
-I specialize in crafting seamless user experiences with modern frontend frameworks and designing robust backend architectures. 
-I’ve worked on production-grade systems handling thousands of users, focusing on performance optimization, clean code practices, and maintainable architecture.
+  bio: `Full Stack Developer with 4+ years of experience building scalable and high-performance web applications using the MERN stack. Passionate about clean code, modern UI, and future-ready solutions.`,
+  about:`I’m a Full Stack Developer who enjoys building modern, scalable, and user-focused web applications. Over the years, I’ve worked on a variety of projects ranging from dynamic frontend interfaces to complex backend systems, always aiming to deliver smooth performance and clean user experiences.
 
-I’m passionate about solving real-world problems through technology, continuously learning new tools, and pushing the boundaries of web development. 
-My core expertise lies in the MERN stack, but I also explore system design, DevOps, and AI integrations to build future-ready applications.`,
+My primary expertise lies in the MERN stack, where I build responsive frontend applications with React and develop powerful backend services using Node.js, Express, and MongoDB. Beyond web development, I’m deeply interested in system design, DevOps practices, and AI integrations that help create smarter and more efficient applications.`,
 
   image: "https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
 
