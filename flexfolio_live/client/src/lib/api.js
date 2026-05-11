@@ -22,7 +22,7 @@ export const getCompany = async (query) => {
 };
 
 export const sendContactMessage = async (data) => {
-  const res = await api.post("/contact", data);
+  const res = await api.post("/owner/contact", data);
   return res.data;
 };
 

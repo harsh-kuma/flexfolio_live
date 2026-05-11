@@ -18,6 +18,7 @@ app.use("/api/portfolio", require("./routes/portfolioRoutes"));
 
 // company suggest route
 app.use("/api/company", require("./routes/companyRoutes"));
+app.use("/api/owner", require("./routes/contactRoutes"));
 
 // server
 const PORT = process.env.PORT || 5000;

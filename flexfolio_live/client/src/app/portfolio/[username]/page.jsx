@@ -64,7 +64,7 @@ export async function generateMetadata({ params }) {
     },
 
     alternates: {
-      canonical: `https://yourdomain.com/portfolio/${username}`,
+      canonical: `https://flexfolio-live.vercel.app/portfolio/${username}`,
     },
   };
 }
