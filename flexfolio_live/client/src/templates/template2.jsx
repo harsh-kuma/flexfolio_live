@@ -1,6 +1,7 @@
 "use client";
 import { sendContactMessage } from "@/lib/api";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Separate component to handle individual project state (View More / View Less)
@@ -128,7 +129,7 @@ export default function Template2({ data }) {
         ownerName: data?.fullName,
       });
 
-      alert("Message sent successfully!");
+      toast("Message sent successfully!");
 
       setFormData({
         name: "",
@@ -137,7 +138,7 @@ export default function Template2({ data }) {
       });
     } catch (error) {
       console.error(error);
-      alert("Failed to send message");
+      toast("Failed to send message");
     } finally {
       setLoading(false);
     }
