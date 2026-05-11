@@ -6,7 +6,7 @@ import { getInitials } from "../utils/getInitials";
 // Separate component to handle individual project state (View More / View Less)
 const ProjectCard = ({ p }) => {
   const [expanded, setExpanded] = useState(false);
-  const isLongText = p.description?.length > 100;
+  const isLongText = p.description?.length > 106;
 
   return (
     <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm hover:shadow-xl transition-shadow flex flex-col group overflow-hidden">
