@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getPortfolio } from "@/lib/api";
 import { templates } from "@/lib/templates";
 
