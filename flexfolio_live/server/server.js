@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-require("dns").setDefaultResultOrder("ipv4first");
 require("dotenv").config();
 
 const connectDB = require("./config/db");

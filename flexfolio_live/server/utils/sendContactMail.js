@@ -1,12 +1,6 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.sendContactMail = async ({
   ownerEmail,
@@ -15,11 +9,10 @@ exports.sendContactMail = async ({
   senderEmail,
   message,
 }) => {
-
-  await transporter.sendMail({
-    from: `"Flexfolio Contact" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: "Flexfolio Contact <onboarding@resend.dev>",
     to: ownerEmail,
-    replyTo: senderEmail,
+    reply_to: senderEmail,
     subject: `New Portfolio Message from ${senderName}`,
 
     html: `
@@ -53,29 +46,21 @@ exports.sendContactMail = async ({
             <div style="margin-top:24px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:22px;">
 
               <div style="margin-bottom:18px;">
-                <p style="margin:0;font-size:12px;color:#6b7280;">
-                  Sender Name
-                </p>
-
+                <p style="margin:0;font-size:12px;color:#6b7280;">Sender Name</p>
                 <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#111827;">
                   ${senderName}
                 </p>
               </div>
 
               <div style="margin-bottom:18px;">
-                <p style="margin:0;font-size:12px;color:#6b7280;">
-                  Sender Email
-                </p>
-
+                <p style="margin:0;font-size:12px;color:#6b7280;">Sender Email</p>
                 <p style="margin:4px 0 0;font-size:15px;font-weight:600;color:#2563eb;">
                   ${senderEmail}
                 </p>
               </div>
 
               <div>
-                <p style="margin:0;font-size:12px;color:#6b7280;">
-                  Message
-                </p>
+                <p style="margin:0;font-size:12px;color:#6b7280;">Message</p>
 
                 <div style="margin-top:8px;background:#ffffff;border-radius:10px;padding:16px;border:1px solid #e5e7eb;">
                   <p style="margin:0;color:#374151;font-size:14px;line-height:1.8;white-space:pre-line;">
@@ -88,23 +73,12 @@ exports.sendContactMail = async ({
 
             <!-- CTA -->
             <div style="margin-top:28px;text-align:center;">
-
               <a
                 href="mailto:${senderEmail}"
-                style="
-                  display:inline-block;
-                  background:#2563eb;
-                  color:#ffffff;
-                  text-decoration:none;
-                  padding:12px 24px;
-                  border-radius:10px;
-                  font-size:14px;
-                  font-weight:600;
-                "
+                style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;"
               >
                 Reply to ${senderName}
               </a>
-
             </div>
 
             <p style="margin-top:30px;color:#9ca3af;font-size:12px;text-align:center;">
@@ -125,5 +99,4 @@ exports.sendContactMail = async ({
       </div>
     `,
   });
-
 };
