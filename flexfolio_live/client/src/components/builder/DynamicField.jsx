@@ -23,9 +23,9 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
 
     const handleAuto = (val) => {
         onChange(field.name, val, itemIndex);
-        
+
         if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-        
+
         if (val.trim().length > 2) {
             setLoading(true);
             debounceTimeout.current = setTimeout(async () => {
@@ -59,51 +59,51 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
 
     // 🔹 FILE (IMAGE)
     // 🔹 FILE (IMAGE)
-if (field.type === "file") {
-    // Generate a preview URL if the value is a File object (newly uploaded) or a string (existing image URL)
-    const previewUrl = value instanceof File 
-        ? URL.createObjectURL(value) 
-        : (typeof value === "string" && value.length > 0 ? value : null);
+    if (field.type === "file") {
+        // Generate a preview URL if the value is a File object (newly uploaded) or a string (existing image URL)
+        const previewUrl = value instanceof File
+            ? URL.createObjectURL(value)
+            : (typeof value === "string" && value.length > 0 ? value : null);
 
-    return (
-        <div className="w-full md:col-span-2">
-            {field.label && <label className={labelStyle}>{field.label}</label>}
-            
-            <div className="flex items-center gap-5 p-4 border border-slate-200 rounded-xl bg-slate-50">
-                {/* 1. The Image Preview Box */}
-                <div className="w-20 h-20 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                    {previewUrl ? (
-                        <img 
-                            src={previewUrl} 
-                            alt="Profile Preview" 
-                            className="w-full h-full object-cover" 
+        return (
+            <div className="w-full md:col-span-2">
+                {field.label && <label className={labelStyle}>{field.label}</label>}
+
+                <div className="flex items-center gap-5 p-4 border border-slate-200 rounded-xl bg-slate-50">
+                    {/* 1. The Image Preview Box */}
+                    <div className="w-20 h-20 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                        {previewUrl ? (
+                            <img
+                                src={previewUrl}
+                                alt="Profile Preview"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-xs text-slate-400 font-medium text-center">No<br />Image</span>
+                        )}
+                    </div>
+
+                    {/* 2. The File Input */}
+                    <div className="flex-1">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    onChange(field.name, file, itemIndex);
+                                }
+                            }}
+                            className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-blue-700 file:shadow-sm hover:file:bg-blue-50 transition cursor-pointer"
                         />
-                    ) : (
-                        <span className="text-xs text-slate-400 font-medium text-center">No<br/>Image</span>
-                    )}
-                </div>
-
-                {/* 2. The File Input */}
-                <div className="flex-1">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                                onChange(field.name, file, itemIndex);
-                            }
-                        }}
-                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-blue-700 file:shadow-sm hover:file:bg-blue-50 transition cursor-pointer"
-                    />
-                    <p className="text-xs text-slate-400 mt-2 ml-1">
-                        Recommended: Square image (1:1), max 2MB.
-                    </p>
+                        <p className="text-xs text-slate-400 mt-2 ml-1">
+                            Recommended: Square image (1:1), max 2MB.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-}
+        );
+    }
 
     // 🔹 TEXT / EMAIL / TEL
     if (["text", "email", "tel"].includes(field.type)) {
@@ -213,11 +213,20 @@ if (field.type === "file") {
                     <input
                         placeholder={value?.length > 0 ? "Add another..." : "Type & press Enter"}
                         className="bg-transparent outline-none text-sm flex-1 min-w-[120px] py-1"
+                        enterKeyHint="done"
                         onKeyDown={(e) => {
-                            if (e.key === "Enter" && e.target.value.trim()) {
+                            if (e.key === "Enter") {
                                 e.preventDefault();
-                                onChange(field.name, e.target.value.trim(), itemIndex, "addTag");
-                                e.target.value = "";
+                                e.stopPropagation();
+                                const input = e.currentTarget;
+                                const value = e.target.value.trim()
+                                if (value) {
+                                    onChange(field.name, value, itemIndex, "addTag");
+                                    input.value = "";
+                                    requestAnimationFrame(() => {
+                                        input.focus();
+                                    });
+                                }
                             }
                         }}
                     />
@@ -257,7 +266,7 @@ if (field.type === "file") {
                                     src={s.logo || `https://img.logo.dev/${s.domain}?token=pk_BxQc27sjQO-zNmnI6_yF7Q`}
                                     alt={s.name}
                                     className="w-8 h-8 rounded-lg bg-slate-100 object-contain p-1 border border-slate-200"
-                                    onError={(e) => e.target.style.display = 'none'} 
+                                    onError={(e) => e.target.style.display = 'none'}
                                 />
                                 <div>
                                     <p className="text-sm font-semibold text-slate-800">{s.name}</p>

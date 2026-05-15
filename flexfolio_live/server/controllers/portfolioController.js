@@ -1,5 +1,6 @@
 const Portfolio = require("../models/Portfolio");
 const generateUsername = require("../utils/generateUsername");
+const User = require("../models/User");
 
 // CREATE
 exports.createPortfolio = async (req, res) => {
@@ -22,9 +23,20 @@ exports.createPortfolio = async (req, res) => {
 
     const username = await generateUsername(data.fullName);
 
+    const id = req.user.id;
+
+    const user = await User.findById(id);
+
+    if (!user || !user.isVerified) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized Creation",
+      });
+    }
+
     // Create portfolio
     const newPortfolio = new Portfolio({
-      user: req.user._id,
+      user: id,
       username,
       templateKey,
       category,
