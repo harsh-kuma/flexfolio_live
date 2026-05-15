@@ -1,7 +1,8 @@
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import NextAuthProvider from "@/components/providers/NextAuthProvider";
 import ToastProvider from "@/components/providers/ToastProvider";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,9 +25,13 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ToastProvider/>
-        {children}
-        </body>
+        <NextAuthProvider>
+          <AuthProvider>
+            <ToastProvider />
+            {children}
+          </AuthProvider>
+        </NextAuthProvider>
+      </body>
     </html>
   );
 }

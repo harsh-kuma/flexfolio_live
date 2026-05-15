@@ -63,7 +63,7 @@ const AnimatedProjectCard = ({ p }) => {
   );
 };
 
-export default function Template4Animated({ data }) {
+export default function Template4Animated({ data ,owner_key }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);

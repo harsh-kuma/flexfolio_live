@@ -64,7 +64,7 @@ const NeoProjectCard = ({ p, index }) => {
   );
 };
 
-export default function TemplateNeoBrutalist({ data }) {
+export default function TemplateNeoBrutalist({ data ,owner_key}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {

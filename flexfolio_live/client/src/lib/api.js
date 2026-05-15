@@ -2,9 +2,66 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 });
 
-// ✅ CREATE PORTFOLIO
+
+// AUTH
+
+export const registerUser = async (data) => {
+  const res = await api.post("/auth/register", data);
+  return res.data;
+};
+
+export const verifyOTP = async (data) => {
+  const res = await api.post("/auth/verify-otp", data);
+  return res.data;
+};
+
+export const loginUser = async (data) => {
+  const res = await api.post("/auth/login", data);
+  return res.data;
+};
+
+export const logoutUser = async () => {
+  const res = await api.post("/auth/logout");
+  return res.data;
+};
+
+export const getCurrentUser = async () => {
+  const res = await api.get("/auth/me");
+  return res.data;
+};
+
+export const checkOtpAllowed = async (email) => {
+  const res = await api.post("/auth/check-otp", { email });
+  return res.data;
+};
+
+export const checkResetOtpAllowed = async (email) => {
+  const res = await api.post("/auth/check-reset-otp", { email });
+  return res.data;
+};
+
+// FORGOT PASSWORD
+
+export const forgotPassword = async (data) => {
+  const res = await api.post("/auth/forgot-password", data);
+  return res.data;
+};
+
+export const resetPassword = async (data) => {
+  const res = await api.post("/auth/reset-password", data);
+  return res.data;
+};
+
+export const googleLogin = async (data) => {
+  const res = await api.post("/auth/google-login", data);
+  return res.data;
+};
+
+
+//  CREATE PORTFOLIO
 export const createPortfolio = async (data) => {
   const res = await api.post("/portfolio", data);
   return res.data;

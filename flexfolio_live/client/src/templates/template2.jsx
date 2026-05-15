@@ -66,7 +66,7 @@ const ProjectCard = ({ p }) => {
   );
 };
 
-export default function Template2({ data }) {
+export default function Template2({ data , owner_key}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const scrollTo = (id) => {
@@ -124,9 +124,8 @@ export default function Template2({ data }) {
       setLoading(true);
 
       await sendContactMessage({
+        portfolioId: owner_key,
         ...formData,
-        ownerEmail: data?.email,
-        ownerName: data?.fullName,
       });
 
       toast("Message sent successfully!");

@@ -5,15 +5,15 @@ const generateUsername = require("../utils/generateUsername");
 exports.createPortfolio = async (req, res) => {
   try {
 
-    // 🔥 Parse dynamic form data
+    // Parse dynamic form data
     const data = JSON.parse(req.body.data || "{}");
 
-    // 🔥 Template info
+    // Template info
     const templateKey = req.body.templateKey;
 
     const [category, templateSlug] = templateKey.split("-");
 
-    // 🔥 Image handling
+    // Image handling
     if (req.file) {
       data.image = req.file.path;
       data.public_id = req.file.filename;
@@ -22,8 +22,9 @@ exports.createPortfolio = async (req, res) => {
 
     const username = await generateUsername(data.fullName);
 
-    // 🔥 Create portfolio
+    // Create portfolio
     const newPortfolio = new Portfolio({
+      user: req.user._id,
       username,
       templateKey,
       category,

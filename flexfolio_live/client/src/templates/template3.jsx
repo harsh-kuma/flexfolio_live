@@ -60,7 +60,7 @@ const DarkProjectCard = ({ p }) => {
   );
 };
 
-export default function Template3({ data }) {
+export default function Template3({ data,owner_key }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Prevent background scrolling when mobile menu is open

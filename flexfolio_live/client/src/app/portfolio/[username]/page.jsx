@@ -106,8 +106,7 @@ export default async function PortfolioPage({ params }) {
           }),
         }}
       />
-
-      <TemplateComponent data={portfolio.data} />
+      <TemplateComponent data={portfolio.data} owner_key={portfolio._id} />
     </>
   );
 }

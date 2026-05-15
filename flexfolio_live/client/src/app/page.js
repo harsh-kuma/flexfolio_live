@@ -1,9 +1,35 @@
+"use client";
+
 import Link from "next/link";
 
+import { signOut } from "next-auth/react";
+
+import { logoutUser } from "@/lib/api";
+
 export default function Home() {
+
+  const handleLogout = async () => {
+    try {
+
+      // 🔥 CLEAR JWT COOKIE
+      await logoutUser();
+
+      // 🔥 CLEAR GOOGLE SESSION
+      await signOut({
+        redirect: false,
+      });
+
+      // 🔥 REDIRECT
+      window.location.href = "/auth/login";
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 md:px-8 bg-white">
-      
+
       {/* TITLE */}
       <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
         Build Your Portfolio in Minutes 🚀
@@ -17,21 +43,24 @@ export default function Home() {
 
       {/* BUTTONS */}
       <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full sm:w-auto">
-        
-        <Link href="/templates" className="w-full sm:w-auto">
+
+        <Link
+          href="/templates"
+          className="w-full sm:w-auto"
+        >
           <button className="w-full sm:w-auto px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition">
             Browse Templates
           </button>
         </Link>
 
-        <Link href="/builder" className="w-full sm:w-auto">
-          <button className="w-full sm:w-auto px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
-            Start from Scratch
-          </button>
-        </Link>
+        <button
+          onClick={handleLogout}
+          className="w-full sm:w-auto px-6 py-3 border border-black rounded-lg hover:bg-gray-100 transition"
+        >
+          Logout
+        </button>
 
       </div>
-
     </div>
   );
 }

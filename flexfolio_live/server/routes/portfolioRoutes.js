@@ -10,6 +10,8 @@ const {
   getPortfolio,
 } = require("../controllers/portfolioController");
 
+const { protect, } = require("../middlewares/authMiddleware");
+
 // Cloudinary storage
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -22,7 +24,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 // Routes
-router.post("/", upload.single("image"), createPortfolio);
+router.post("/", upload.single("image"),protect, createPortfolio);
 router.get("/:username", getPortfolio);
 
 module.exports = router;
