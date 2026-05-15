@@ -27,13 +27,13 @@ const {
 const {requireFields} =require("../middlewares/requireFields");
 
 const router = express.Router();
+router.get("/me", protect, getMe);
 router.use(authLimiter);
 
 router.post("/register", requireFields(["name", "email"]), otpLimiter, register);
 router.post("/verify-otp", requireFields(["email", "otp" ,"password"]),verifyOtpLimiter, verifyOTP);
 router.post("/login",requireFields(["email","password"]),loginLimiter, login);
 router.post("/logout", logout);
-router.get("/me", protect, getMe);
 router.post("/check-otp",requireFields(["email"]),verifyOtpLimiter,checkOtpAllowed);
 router.post("/forgot-password",requireFields(["email"]),otpLimiter,forgotPassword);
 router.post("/reset-password",requireFields(["email","otp","password"]),verifyOtpLimiter,resetPassword);
