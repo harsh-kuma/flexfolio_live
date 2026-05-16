@@ -21,9 +21,25 @@ connectDB();
 // MIDDLEWARES
 // =========================
 
+// Define the allowed origins as an array
+const allowedOrigins = [
+  'https://flexfolio.online',
+  'https://www.flexfolio.online',
+  'http://localhost:3000' // Keeps your local development working!
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, or server-to-server requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+      }
+    },
     credentials: true,
   })
 );
