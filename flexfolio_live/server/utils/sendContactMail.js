@@ -10,7 +10,7 @@ exports.sendContactMail = async ({
   message,
 }) => {
   await resend.emails.send({
-    from: "Flexfolio Contact <onboarding@resend.dev>",
+    from: "Flexfolio Contact <contact@flexfolio.online>",
     to: ownerEmail,
     reply_to: senderEmail,
     subject: `New Portfolio Message from ${senderName}`,

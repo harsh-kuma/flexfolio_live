@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.sendOTP = async (email, otp) => {
   await resend.emails.send({
-    from: "Flexfolio Security <onboarding@resend.dev>",
+    from: "Flexfolio Security <security@flexfolio.online>",
     to: email,
     subject: "Your Flexfolio Verification Code",
     html: `
