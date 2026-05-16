@@ -129,6 +129,10 @@ export default function VerifyOTPPage() {
           error={errors.otp}
           placeholder="123456"
           disabled={loading}
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="\d*"
           onKeyDown={handleKeyDown}
           onChange={(e) => {
             setForm({ ...form, otp: e.target.value, });
