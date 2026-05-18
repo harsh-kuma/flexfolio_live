@@ -15,6 +15,7 @@ import AuthRedirect from "@/components/auth/AuthRedirect";
 
 import { checkResetOtpAllowed, resetPassword } from "@/lib/api";
 
+import Loader from "@/components/common/loader/Loader";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { validateResetPassword } from "@/lib/validations/resetPasswordValidation";
 
@@ -117,9 +118,7 @@ export default function ResetPasswordPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
+      <Loader/>
     );
   }
 

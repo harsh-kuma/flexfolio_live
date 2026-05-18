@@ -2,6 +2,7 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Loader from "../common/loader/Loader";
 
 export default function AuthRedirect({ children, }) {
 
@@ -22,9 +23,7 @@ export default function AuthRedirect({ children, }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                Loading...
-            </div>
+            <Loader/>
         );
     }
 

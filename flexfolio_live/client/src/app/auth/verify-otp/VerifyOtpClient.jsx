@@ -10,6 +10,7 @@ import AuthLayout from "@/components/auth/AuthLayout";
 import AuthRedirect from "@/components/auth/AuthRedirect";
 import { validateOTP } from "@/lib/validations/otpValidation";
 
+import Loader from "@/components/common/loader/Loader";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { checkOtpAllowed, verifyOTP } from "@/lib/api";
 
@@ -106,9 +107,7 @@ export default function VerifyOTPPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
+      <Loader/>
     );
   }
 
