@@ -24,7 +24,7 @@ export default function GoogleSuccessPage() {
         if (authLoading || status === "loading") return;
         //  already logged in
         if (user) {
-          router.replace("/");
+          router.push("/");
           return;
         }
 
@@ -56,7 +56,7 @@ export default function GoogleSuccessPage() {
           err?.response?.data?.message || "Google login failed"
         );
 
-        router.push("/auth/login");
+        router.replace("/auth/login");
       } finally {
         if (isActive) {
           setLoading(false);

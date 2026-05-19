@@ -39,7 +39,7 @@ export default function VerifyOTPPage() {
     const validateOtpAccess = async () => {
       try {
         if (user) {
-          router.replace("/");
+          router.push("/");
           return;
         }
 
@@ -99,7 +99,7 @@ export default function VerifyOTPPage() {
 
     } catch (err) {
       toast.error(err?.response?.data?.message || "Verification failed");
-      router.push("/auth/signup");
+      router.replace("/auth/signup");
     } finally {
       setLoading(false);
     }

@@ -32,7 +32,7 @@ function BuilderForm() {
                 await getCurrentUser();
                 setCheckingAuth(false);
             } catch (err) {
-                router.push("/auth/login");
+                router.replace("/auth/login");
             }
         };
 

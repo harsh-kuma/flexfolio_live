@@ -47,7 +47,7 @@ export default function LoginPage() {
       if (data?.code === "NOT_VERIFIED") {
         toast.error("Please verify your email first");
 
-        router.push(
+        router.replace(
           `${data.redirectTo}?email=${data.email}`
         );
 
@@ -91,7 +91,7 @@ export default function LoginPage() {
         <div className="flex items-center justify-between text-sm">
           <button
             type="button"
-            onClick={() => router.push("/auth/forgot-password")}
+            onClick={() => router.replace("/auth/forgot-password")}
             className="text-slate-500 hover:text-black transition"
           >
             Forgot password?
@@ -99,7 +99,7 @@ export default function LoginPage() {
 
           <button
             type="button"
-            onClick={() => router.push("/auth/signup")}
+            onClick={() => router.replace("/auth/signup")}
             className="font-medium text-black hover:opacity-70 transition"
           >
             Create account

@@ -1,45 +1,75 @@
 "use client";
-import { useEffect, useState } from "react";
+import { sendContactMessage } from "@/lib/api";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Neo-Brutalist Project Card
 const NeoProjectCard = ({ p, index }) => {
+  const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
-  const isLongText = p?.description?.length > 100;
+  const [height, setHeight] = useState("0px");
+  const [showButton, setShowButton] = useState(false);
 
-  // Alternate card colors based on index
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    const isOverflowing = el.scrollHeight > 72;
+    setShowButton(isOverflowing);
+
+    setHeight(expanded ? `${el.scrollHeight}px` : "72px");
+  }, [expanded, p.description]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = contentRef.current;
+      if (!el) return;
+
+      setHeight(expanded ? `${el.scrollHeight}px` : "72px");
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [expanded]);
+
   const colors = ["bg-[#FF90E8]", "bg-[#FFC900]", "bg-[#90BAFE]"];
   const cardColor = colors[index % colors.length];
 
   return (
-    <div className={`border-4 border-black p-6 flex flex-col transition-transform duration-200 hover:-translate-y-2 hover:-translate-x-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${cardColor}`}>
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="font-black text-black text-2xl uppercase tracking-tight line-clamp-1 border-b-4 border-black pb-1" title={p?.title}>
-          {p?.title || "Untitled Project"}
-        </h3>
+    <div className={`max-w-full border-4 border-black p-6 flex flex-col overflow-hidden transition-transform duration-200 hover:-translate-y-2 hover:-translate-x-2 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] ${cardColor}`}>
+      <div className="flex justify-between items-start mb-4 gap-3 min-w-0">
+        {p?.title && (
+          <h3 className="min-w-0 font-black text-black text-xl uppercase tracking-tight line-clamp-2 border-b-4 border-black pb-1 break-words" title={p?.title}>
+            {p.title}
+          </h3>
+        )}
         {p?.year && (
           <span className="bg-white border-2 border-black text-black text-xs font-bold px-3 py-1 shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             {p.year}
           </span>
         )}
       </div>
-
-      <div className="flex-1 mb-5 bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <p className={`text-black font-medium text-sm leading-relaxed ${expanded ? '' : 'line-clamp-3'}`}>
-          {p?.description || "No description provided."}
-        </p>
-        {isLongText && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="text-black font-black uppercase text-xs mt-3 hover:underline decoration-4 underline-offset-4"
-          >
-            {expanded ? "Show Less" : "Read More ->"}
-          </button>
-        )}
-      </div>
+      {p?.description && (
+        <div className="flex-1 mb-5 bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div ref={contentRef} style={{ height }} className="overflow-hidden transition-all duration-500 ease-in-out">
+            <p className="text-black font-medium text-sm leading-relaxed">
+              {p?.description}
+            </p>
+          </div>
+          {showButton && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-black font-black uppercase text-xs mt-3 hover:underline decoration-4 underline-offset-4"
+            >
+              {expanded ? "Show Less" : "Read More ->"}
+            </button>
+          )}
+        </div>
+      )}
 
       {p?.skills && p.skills.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex overflow-x-auto gap-2 mb-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {p.skills.map((s, idx) => (
             <span key={idx} className="bg-white border-2 border-black text-black font-bold text-[11px] uppercase px-2.5 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
               {s}
@@ -64,13 +94,8 @@ const NeoProjectCard = ({ p, index }) => {
   );
 };
 
-export default function TemplateNeoBrutalist({ data ,owner_key}) {
+export default function TemplateNeoBrutalist({ data, owner_key, working }) {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (menuOpen) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'unset';
-  }, [menuOpen]);
 
   const scrollTo = (id) => {
     document.querySelector(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -83,11 +108,16 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
     return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
   };
 
-  const hasAbout = !!data?.bio;
+  const hasAbout = !!data?.about;
   const hasExperience = data?.experience?.length > 0;
   const isSingleExperience = data?.experience?.length === 1;
   const hasProjects = data?.projects?.length > 0;
   const hasSkills = data?.skills?.length > 0;
+
+  const aboutExpLayoutClass = (hasExperience && isSingleExperience)
+    ? "grid grid-cols-1space-y-8"
+    : "grid grid-col-1 md:grid-cols-2  md:gap-8 space-y-8";
+
 
   const navLinks = [
     { id: "#hero", label: "Home", show: true },
@@ -98,6 +128,53 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
     { id: "#contact", label: "Contact", show: true },
   ];
 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      if (working) {
+        await sendContactMessage({
+          portfolioId: owner_key,
+          ...formData,
+        });
+      }
+
+      toast("Message sent successfully!");
+
+      setFormData({
+        name: "",
+        email: "",
+        message: "",
+      });
+    } catch (error) {
+      toast("Failed to send message");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (menuOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+  }, [menuOpen]);
+
   return (
     <div className="bg-[#fdfbf7] text-black font-sans min-h-screen pb-10 selection:bg-[#FFC900] selection:text-black font-medium ">
 
@@ -106,10 +183,10 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex justify-between items-center relative z-50">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollTo("#hero")}>
             <div className="w-12 h-12 bg-[#FF90E8] border-4 border-black text-black flex items-center justify-center font-black text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all">
-              {getInitials(data?.fullName || "Dev")}
+              {getInitials(data?.fullName)}
             </div>
             <h1 className="font-black text-black uppercase tracking-tighter text-xl hidden sm:block bg-[#FFC900] px-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-              {data?.fullName || "PORTFOLIO"}
+              {data?.fullName || "F"}
             </h1>
           </div>
 
@@ -151,7 +228,7 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
         )}
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 md:px-12 pt-32">
+      <main className="max-w-7xl mx-auto px-6 md:px-12 pt-24">
 
         {/* HERO SECTION - Updated flex-col-reverse for mobile image top */}
         <div id="hero" className="scroll-mt-32 flex flex-col-reverse md:flex-row items-center justify-between gap-12 py-10 md:py-20 border-b-4 border-black pb-20">
@@ -161,20 +238,24 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
               🚨 Available for hire
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-black text-black tracking-tighter leading-[0.9] uppercase">
+            <h1 className="text-3xl md:text-5xl font-black text-black tracking-tighter leading-[0.9] uppercase">
               Hi, I'm <br />
               <span className="bg-[#FFC900] px-2 border-4 border-black inline-block mt-2 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                {data?.fullName?.split(" ")[0] || "There"}
+                {data?.fullName?.split(" ")[0]}
               </span>
             </h1>
 
-            <h2 className="text-2xl md:text-4xl font-black uppercase text-black">
-              &gt; {data?.title || "Software Developer"}
-            </h2>
+            {data?.title && (
+              <h2 className="text-2xl md:text-4xl font-black uppercase text-black">
+                &gt; {data.title}
+              </h2>
+            )}
 
-            <p className="text-black font-bold text-lg md:text-xl max-w-xl leading-relaxed border-l-8 border-black pl-4">
-              {data?.bio || "Building next-generation applications with a focus on seamless user experiences."}
-            </p>
+            {data?.bio && (
+              <p className="text-black font-bold text-lg md:text-xl max-w-xl leading-relaxed border-l-8 border-black pl-4">
+                {data.bio}
+              </p>
+            )}
 
             <div className="flex flex-wrap gap-5 pt-4">
               {hasProjects &&
@@ -192,18 +273,19 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
               )}
             </div>
           </div>
-
-          <div className="w-full md:w-1/2 flex justify-center relative">
-            <div className="w-72 h-72 md:w-96 md:h-96 border-8 border-black bg-[#90BAFE] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transform rotate-3 overflow-hidden">
-              <img
-                src={data?.image}
-                alt={data?.fullName}
-                className="w-full h-full object-cover filter contrast-125"
-              />
+          {data?.image && (
+            <div className="w-full md:w-1/2 flex justify-center relative">
+              <div className="w-72 h-72 md:w-96 md:h-96 border-8 border-black bg-[#90BAFE] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transform rotate-3 overflow-hidden">
+                <img
+                  src={data.image}
+                  alt={data?.fullName}
+                  className="w-full h-full object-cover filter contrast-125"
+                />
+              </div>
+              {/* Decorative shapes */}
+              <div className="absolute -z-10 -bottom-10 -left-10 w-40 h-40 bg-[#FFC900] border-4 border-black rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"></div>
             </div>
-            {/* Decorative shapes */}
-            <div className="absolute -z-10 -bottom-10 -left-10 w-40 h-40 bg-[#FFC900] border-4 border-black rounded-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"></div>
-          </div>
+          )}
         </div>
 
         {/* ABOUT & EXPERIENCE SPLIT - Updated logic for single experience */}
@@ -217,7 +299,7 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
                 </div>
                 <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
                   <p className="text-black font-bold text-lg leading-relaxed">
-                    {data?.bio}
+                    {data?.about}
                   </p>
                 </div>
               </div>
@@ -229,8 +311,8 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
                   Experience
                 </div>
 
-                <div className="space-y-8">
-                  {data.experience.map((exp, i) => (
+                <div className={aboutExpLayoutClass}>
+                  {data?.experience?.map((exp, i) => (
                     <div key={i} className="bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-transform">
                       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-4 border-b-4 border-black pb-4">
                         <div className="flex items-center gap-4">
@@ -242,17 +324,21 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
                             )}
                           </div>
                           <div>
-                            <h3 className="font-black text-black text-xl uppercase leading-tight">{exp.role}</h3>
-                            <p className="text-black font-bold border-b-2 border-black w-max mt-1">{exp.company}</p>
+                            {exp.role && (<h3 className="font-black text-black text-xl uppercase leading-tight">{exp.role}</h3>)}
+                            {exp.company && (<p className="text-black font-bold border-b-2 border-black w-max mt-1">{exp.company}</p>)}
                           </div>
                         </div>
-                        <span className="bg-[#FFC900] border-2 border-black font-bold px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs uppercase shrink-0">
-                          {formatDate(exp.startDate)} - {exp.current ? "NOW" : formatDate(exp.endDate)}
-                        </span>
+                        {exp.startDate && (
+                          <span className="bg-[#FFC900] border-2 border-black font-bold px-3 py-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs uppercase shrink-0">
+                            {formatDate(exp.startDate)} - {exp.current ? "NOW" : formatDate(exp.endDate)}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-black font-medium leading-relaxed">
-                        {exp.description}
-                      </p>
+                      {exp.description && (
+                        <p className="text-black font-medium leading-relaxed">
+                          {exp.description}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -263,13 +349,13 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
 
         {/* PROJECTS */}
         {hasProjects && (
-          <div id="projects" className="scroll-mt-32 py-20 border-b-4 border-black">
+          <div id="projects" className="scroll-mt-24 py-20 border-b-4 border-black">
             <div className="bg-[#90BAFE] text-black px-6 py-3 border-4 border-black w-max font-black uppercase text-3xl mb-12 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
               Selected Work
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {data.projects.map((p, i) => (
+              {data?.projects?.map((p, i) => (
                 <NeoProjectCard key={i} index={i} p={p} />
               ))}
             </div>
@@ -278,13 +364,13 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
 
         {/* SKILLS */}
         {hasSkills && (
-          <div id="skills" className="scroll-mt-32 py-20 border-b-4 border-black">
+          <div id="skills" className="scroll-mt-24 py-20 border-b-4 border-black">
             <div className="bg-black text-white px-6 py-3 border-4 border-black w-max font-black uppercase text-3xl mb-12 transform -rotate-1">
               Tech Stack
             </div>
 
             <div className="flex flex-wrap gap-4">
-              {data.skills.map((skill, i) => (
+              {data?.skills?.map((skill, i) => (
                 <span
                   key={i}
                   className="bg-white border-4 border-black text-black px-6 py-3 font-black text-lg uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-transform cursor-default"
@@ -297,8 +383,8 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
         )}
 
         {/* CONTACT */}
-        <div id="contact" className="scroll-mt-32 py-20">
-          <div className="bg-[#FFC900] border-8 border-black p-8 md:p-16 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
+        <div id="contact" className="scroll-mt-24 py-20">
+          <div className="bg-[#FFC900] border-8 border-black p-4 md:p-16 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
 
             <div className="grid lg:grid-cols-2 gap-12 relative z-10">
               {/* Left: Info */}
@@ -325,21 +411,45 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
               </div>
 
               {/* Right: Form */}
-              <form suppressHydrationWarning className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-6 flex flex-col justify-between">
+              <form suppressHydrationWarning onSubmit={handleSubmit} className="bg-white border-4 border-black p-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] space-y-6 flex flex-col justify-between">
                 <div className="space-y-2">
                   <label className="font-black uppercase text-sm">Your Name</label>
-                  <input placeholder="JOHN DOE" className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors" />
+                  <input
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="John Doe"
+                    required
+                    className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors" />
                 </div>
                 <div className="space-y-2">
                   <label className="font-black uppercase text-sm">Your Email</label>
-                  <input placeholder="JOHN@EMAIL.COM" type="email" className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors" />
+                  <input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="john@example.com"
+                    required
+                    className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors" />
                 </div>
                 <div className="space-y-2">
                   <label className="font-black uppercase text-sm">Message</label>
-                  <textarea placeholder="LET'S BUILD SOMETHING COOL" rows="4" className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors resize-none"></textarea>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Write your message here..."
+                    required
+                    rows={4}
+                    className="w-full bg-[#fdfbf7] border-4 border-black p-4 font-bold focus:outline-none focus:bg-[#FF90E8]/20 transition-colors resize-none"></textarea>
                 </div>
-                <button type="button" className="w-full bg-black text-white font-black uppercase py-4 text-xl hover:bg-[#FF90E8] hover:text-black border-4 border-black hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all active:translate-y-2 active:translate-x-2 active:shadow-none mt-2">
-                  Submit Form
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-black text-white font-black uppercase py-4 text-xl hover:bg-[#FF90E8] hover:text-black border-4 border-black hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all active:translate-y-2 active:translate-x-2 active:shadow-none mt-2">
+                  {loading ? "Sending..." : "Send Message"}
                 </button>
               </form>
 
@@ -353,10 +463,18 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
         <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6 border-b-8 border-black">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-black text-white flex items-center justify-center font-black">
-              {getInitials(data?.fullName || "Dev")}
+              {getInitials(data?.fullName)}
             </div>
             <p className="font-black uppercase">
-              © {new Date().getFullYear()} {data?.fullName}.
+              © {new Date().getFullYear()} {data?.fullName}. All rights reserved.
+              <a
+                href="https://flexfolio.online"
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Built with Flexfolio
+              </a>
             </p>
           </div>
 
@@ -369,7 +487,7 @@ export default function TemplateNeoBrutalist({ data ,owner_key}) {
         {/* Scrolling Marquee inside footer for extra brutalist flair */}
         <div className="bg-[#23A094] border-b-4 border-black overflow-hidden py-3 whitespace-nowrap flex text-white font-black uppercase tracking-widest text-xl">
           <span className="animate-[marquee_20s_linear_infinite] inline-block">
-            AVAILABLE FOR WORK • FULL STACK DEVELOPER • LET'S BUILD SOMETHING • AVAILABLE FOR WORK • FULL STACK DEVELOPER • LET'S BUILD SOMETHING •
+            AVAILABLE FOR WORK • LET'S BUILD SOMETHING • AVAILABLE FOR WORK • LET'S BUILD SOMETHING •AVAILABLE FOR WORK • LET'S BUILD SOMETHING • AVAILABLE FOR WORK • LET'S BUILD SOMETHING •
           </span>
         </div>
       </footer>

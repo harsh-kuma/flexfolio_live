@@ -1,6 +1,6 @@
 "use client";
 
-export default function Template1({ data ,owner_key}) {
+export default function Template1({ data, owner_key, working}) {
   // Prevent crash if data is not passed
   if (!data) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 

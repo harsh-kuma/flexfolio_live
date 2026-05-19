@@ -43,7 +43,7 @@ export default function ResetPasswordPage() {
     const validateResetOtpAccess = async () => {
       try {
         if (user) {
-          router.replace("/");
+          router.push("/");
           return;
         }
         if (!email) {
@@ -99,12 +99,12 @@ export default function ResetPasswordPage() {
 
       toast.success(res.message || "Password reset successful");
 
-      router.push("/auth/login");
+      router.replace("/auth/login");
 
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || "Reset failed";
       toast.error(message);
-      router.push("/auth/forgot-password");
+      router.replace("/auth/forgot-password");
     } finally {
       setLoading(false);
     }

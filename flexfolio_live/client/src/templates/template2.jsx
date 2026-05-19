@@ -1,13 +1,37 @@
 "use client";
 import { sendContactMessage } from "@/lib/api";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Separate component to handle individual project state (View More / View Less)
 const ProjectCard = ({ p }) => {
+  const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
-  const isLongText = p.description?.length > 106;
+  const [height, setHeight] = useState("0px");
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    const isOverflowing = el.scrollHeight > 72;
+    setShowButton(isOverflowing);
+
+    setHeight(expanded ? `${el.scrollHeight}px` : "72px");
+  }, [expanded, p.description]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = contentRef.current;
+      if (!el) return;
+
+      setHeight(expanded ? `${el.scrollHeight}px` : "72px");
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [expanded]);
 
   return (
     <div className="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm hover:shadow-xl transition-shadow flex flex-col group overflow-hidden">
@@ -25,12 +49,12 @@ const ProjectCard = ({ p }) => {
       {p.title && (<h3 className="font-bold text-slate-800 text-lg mb-2 line-clamp-1" title={p.title}>{p.title}</h3>)}
       {p.description && (
         <div className="flex-1 mb-4">
-          <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expanded ? 'max-h-96' : 'max-h-[72px]'}`}>
+          <div ref={contentRef} style={{ height }} className="overflow-hidden transition-all duration-500 ease-in-out">
             <p className="text-slate-500 text-sm leading-6">
               {p.description}
             </p>
           </div>
-          {isLongText && (
+          {showButton && (
             <button
               onClick={() => setExpanded(!expanded)}
               className="text-blue-600 text-xs font-semibold mt-1.5 hover:text-blue-800 focus:outline-none transition-colors"
@@ -66,7 +90,7 @@ const ProjectCard = ({ p }) => {
   );
 };
 
-export default function Template2({ data , owner_key}) {
+export default function Template2({ data, owner_key, working }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const scrollTo = (id) => {
@@ -123,10 +147,12 @@ export default function Template2({ data , owner_key}) {
     try {
       setLoading(true);
 
-      await sendContactMessage({
-        portfolioId: owner_key,
-        ...formData,
-      });
+      if (working) {
+        await sendContactMessage({
+          portfolioId: owner_key,
+          ...formData,
+        });
+      }
 
       toast("Message sent successfully!");
 
@@ -136,12 +162,19 @@ export default function Template2({ data , owner_key}) {
         message: "",
       });
     } catch (error) {
-      console.error(error);
       toast("Failed to send message");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [menuOpen]);
 
   return (
     <div className="bg-[#f8fafc] text-slate-800 font-sans min-h-screen">
@@ -154,7 +187,7 @@ export default function Template2({ data , owner_key}) {
             </div>
             <div>
               <h1 className="font-bold text-white tracking-wide">{data?.fullName?.split(" ")[0]?.toUpperCase() || "PORTFOLIO"}</h1>
-              <p className="text-[10px] tracking-wider text-slate-400">{data?.title}</p>
+              {data?.title && (<p className="text-[10px] tracking-wider text-slate-400">{data.title}</p>)}
             </div>
           </div>
 
@@ -217,15 +250,15 @@ export default function Template2({ data , owner_key}) {
               {data?.title && (
                 <>
                   <span className="text-slate-800">I'm a </span>
-                  <span className="text-blue-600">{data?.title}</span>
+                  <span className="text-blue-600">{data.title}</span>
                 </>
               )}
             </h1>
-
+            {data?.bio && (
             <p className="text-slate-600 text-md max-w-xl leading-relaxed line-clamp-3" title={data?.bio}>
-              {data?.bio || "I build scalable web applications and backend systems that solve real-world problems. I have industry experience working on large-scale platforms and love turning ideas into impactful products."}
+              {data?.bio}
             </p>
-
+            )}
             <div className="flex flex-wrap gap-4 pt-2">
               {hasProjects && (
                 <button onClick={() => scrollTo("#projects")} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg shadow-blue-200">
@@ -328,8 +361,8 @@ export default function Template2({ data , owner_key}) {
                             </div>
                           )}
                           <div>
-                            <h3 className="font-bold text-slate-800 text-base">{exp.role}</h3>
-                            <p className="text-blue-600 font-medium text-xs">{exp.company}</p>
+                            {exp.role && (<h3 className="font-bold text-slate-800 text-base">{exp.role}</h3>)}
+                            {exp.company && (<p className="text-blue-600 font-medium text-xs">{exp.company}</p>)}
                           </div>
                         </div>
                         {exp.startDate && (
@@ -339,7 +372,7 @@ export default function Template2({ data , owner_key}) {
                           </div>
                         )}
                       </div>
-                      <p className="text-slate-600 text-sm leading-relaxed">{exp.description}</p>
+                      {exp.description && (<p className="text-slate-600 text-sm leading-relaxed">{exp.description}</p>)}
                     </div>
                   ))}
                 </div>
@@ -501,8 +534,17 @@ export default function Template2({ data , owner_key}) {
       {/* FOOTER */}
       <footer className="bg-[#0B1120] text-slate-400 py-6 mt-6">
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs">
-            © {new Date().getFullYear()} {data?.fullName || "Portfolio"}. All rights reserved.
+          <p className="text-xs flex flex-wrap items-center gap-1 text-slate-400">
+            © {new Date().getFullYear()} {data?.fullName || "Portfolio"}.
+            All rights reserved.
+            <a
+              href="https://flexfolio.online"
+              target="_blank"
+              rel="noreferrer"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Built with Flexfolio
+            </a>
           </p>
           <div className="flex gap-5 text-slate-500">
             {data?.linkedin && <a href={data.linkedin} target="_blank" rel="noreferrer" className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}

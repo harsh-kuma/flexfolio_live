@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
 
       toast.success(res.message);
 
-      router.push(
+      router.replace(
         `${res.redirectTo}?email=${res.email}`
       );
 
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
 
           <button
             type="button"
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.replace("/auth/login")}
             className="font-medium text-black hover:opacity-70 transition"
           >
             Login

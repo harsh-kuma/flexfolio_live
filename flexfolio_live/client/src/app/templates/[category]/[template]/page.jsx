@@ -1,11 +1,12 @@
 "use client";
 
+import TemplateNotFound from "@/components/portfolio/TemplateNotFound";
 import { templates } from "@/lib/templates";
 import { Monitor, Smartphone, Tablet } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-// ✅ Dummy Data
+//  Dummy Data
 export const dummyData = {
   fullName: "Alex Carter",
   title: "Senior Full Stack Developer",
@@ -16,12 +17,12 @@ My primary expertise lies in the MERN stack, where I build responsive frontend a
 
   image: "https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
 
-  email: "alex@example.com",
+  email: "alex@flexfolio.com",
   phone: "+91 XXXXXXXXXX",
   location: "Jaipur, India",
 
-  github: "https://github.com/alex",
-  linkedin: "https://linkedin.com/in/alex",
+  github: "https://github.com",
+  linkedin: "https://linkedin.com",
   resume: "#",
 
   skills: [
@@ -48,8 +49,8 @@ Implemented secure authentication, dynamic product management, real-time cart sy
 Optimized performance using lazy loading, caching strategies, and API optimization, resulting in a 40% faster load time.`,
       year: "2025",
       skills: ["React", "Redux", "Node.js", "MongoDB", "Stripe"],
-      github: "https://github.com/alex/ecommerce",
-      live: "https://ecommerce-demo.com"
+      github: "https://github.com",
+      live: "https://flexfolio.online"
     },
     {
       title: "Portfolio Builder SaaS",
@@ -58,18 +59,16 @@ Developed a dynamic template engine, live preview system, and real-time editing 
 Integrated authentication, database persistence, and deployment pipeline for instant portfolio publishing.`,
       year: "2025",
       skills: ["Next.js", "Tailwind", "Express", "MongoDB"],
-      github: "https://github.com/alex/portfolio-builder",
-      live: "https://portfolio-builder.com"
+      github: "https://github.com",
+      live: "https://flexfolio.online"
     },
     {
       title: "Real-Time Chat Application",
-      description: `Developed a real-time messaging app with WebSocket integration, supporting one-to-one and group chats. 
-Implemented typing indicators, message status tracking, and media sharing. 
-Ensured scalability using efficient event handling and optimized backend architecture.`,
+      description: `Developed a real-time messaging app with WebSocket integration, supporting one-to-one and group chats.`,
       year: "2024",
       skills: ["React", "Node.js", "Socket.io"],
-      github: "https://github.com/alex/chat-app",
-      live: "https://chat-demo.com"
+      github: "https://github.com",
+      live: "https://flexfolio.online"
     }
   ],
 
@@ -113,16 +112,16 @@ export default function TemplatePreview() {
   const key = `${params.category}-${params.template}`;
   const template = templates[key];
 
-  if (!template) return <div className="p-10">Template Not Found</div>;
+  if (!template) return <TemplateNotFound/>;
 
   const Template = template.component;
 
-  // ✅ iframe render
+  //  iframe render
   if (isIframe) {
-    return <Template data={dummyData} />;
+    return <Template data={dummyData} working={false} />;
   }
 
-  // ✅ device state
+  //  device state
   const [device, setDevice] = useState("desktop");
 
   const deviceConfig = {

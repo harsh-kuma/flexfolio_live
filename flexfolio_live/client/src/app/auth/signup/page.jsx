@@ -85,7 +85,7 @@ export default function SignupPage() {
 
           <button
             type="button"
-            onClick={() => router.push("/auth/login")}
+            onClick={() => router.replace("/auth/login")}
             className="ml-2 font-semibold text-black hover:opacity-70 transition"
           >
             Login
