@@ -9,6 +9,7 @@ const { sendOTP } = require("../utils/sendOTP");
 const { cookieOptions } = require("../utils/cookieOptions");
 const { getSafeUser } = require("../utils/getSafeUser");
 const { generateOTP } = require("../utils/generateOTP");
+const cloudinary = require("../config/cloudinary");
 
 const createToken = (user) => {
   return jwt.sign(
@@ -454,6 +455,11 @@ exports.googleLogin = async (req, res) => {
 
     let user = await User.findOne({ email });
 
+    const googleProfile = profile?.replace(
+      /=s\d+-c$/,
+      "=s400-c"
+    );
+
     // CASE 1: USER EXISTS
     if (user) {
       if (!user.providers) {
@@ -464,12 +470,27 @@ exports.googleLogin = async (req, res) => {
         user.providers.push("google");
       }
       user.isVerified = true;
-      user.profile = profile;
+      if (!user.profile) {
+        const uploadedImage = await cloudinary.uploader.upload(
+          googleProfile,
+          {
+            folder: "flexfolio/avatars",
+          }
+        );
+        user.profile = uploadedImage.secure_url;
+      }
       await user.save();
     }
 
     // CASE 2: NEW USER
     else {
+      const uploadedImage = await cloudinary.uploader.upload(
+        googleProfile,
+        {
+          folder: "flexfolio/avatars",
+        }
+      );
+
       const baseUsername = email.split("@")[0];
 
       const username = name
@@ -479,7 +500,7 @@ exports.googleLogin = async (req, res) => {
       user = await User.create({
         name,
         email,
-        profile,
+        profile:uploadedImage.secure_url,
         username,
         providers: ["google"],
         isVerified: true,

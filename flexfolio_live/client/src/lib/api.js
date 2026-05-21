@@ -5,7 +5,16 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error(
+      error.response?.data?.message || error.message
+    );
 
+    return Promise.reject(error);
+  }
+);
 // AUTH
 
 export const registerUser = async (data) => {

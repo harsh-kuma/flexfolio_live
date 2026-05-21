@@ -1,0 +1,54 @@
+import { Plus } from "lucide-react";
+import Link from "next/link";
+
+export default function DashboardPage() {
+  // Mock data for production map rendering
+  const stats = [
+    { label: "Total Portfolios", value: "0" },
+    { label: "Published", value: "0" },
+    { label: "Total Views", value: "0" },
+  ];
+
+  return (
+    <div className="space-y-8 text-black"> {/* Removed text-black */}
+      
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-black">
+            Dashboard
+          </h1>
+          <p className="text-neutral-400 mt-1 text-sm sm:text-base">
+            Manage your portfolios and templates.
+          </p>
+        </div>
+
+        <Link
+          href="/dashboard/portfolios/create"
+          className="bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium shadow-lg shadow-violet-600/20 hover:shadow-violet-600/40 active:scale-95"
+        >
+          <Plus size={18} strokeWidth={2.5} />
+          Create Portfolio
+        </Link>
+      </div>
+
+      {/* STATS GRID */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+        {stats.map((stat, idx) => (
+          <div 
+            key={idx} 
+            className="bg-[#111111]/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-[#151515] transition-colors duration-300"
+          >
+            <h3 className="text-neutral-400 text-sm font-medium mb-2">
+              {stat.label}
+            </h3>
+            <p className="text-4xl font-bold tracking-tight text-black">
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </div>
+      
+    </div>
+  );
+}

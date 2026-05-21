@@ -2,7 +2,8 @@
 
 import DynamicField from "@/components/builder/DynamicField";
 import RepeatableSection from "@/components/builder/RepeatableSection";
-import { createPortfolio, getCurrentUser } from "@/lib/api";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { createPortfolio } from "@/lib/api";
 import { verifyTemplate } from "@/lib/verifyTemplate";
 import { templates } from "@/utils/templates";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -26,18 +27,17 @@ function BuilderForm() {
         ? templates[category]
         : null;
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                await getCurrentUser();
-                setCheckingAuth(false);
-            } catch (err) {
-                router.replace("/auth/login");
-            }
-        };
+    const { user, loading: authLoading } = useAuth();
 
-        checkAuth();
-    }, [router]);
+    useEffect(() => {
+        if (authLoading) return;
+
+        if (!user) {
+            router.replace("/auth/login");
+        } else {
+            setCheckingAuth(false);
+        }
+    }, [user, authLoading, router]);
 
     useEffect(() => {
         if (template) {

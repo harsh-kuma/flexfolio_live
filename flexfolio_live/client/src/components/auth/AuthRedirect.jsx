@@ -15,7 +15,7 @@ export default function AuthRedirect({ children, }) {
 
     useEffect(() => {
         if (!loading && user) {
-            router.push("/");
+            router.replace("/");
         }
     }, [user, loading, router]);
 

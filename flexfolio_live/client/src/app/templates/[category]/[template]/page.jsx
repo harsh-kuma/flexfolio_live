@@ -171,6 +171,7 @@ export default function TemplatePreview() {
       <div className="flex-1 flex justify-center mt-4">
         <div style={{ width, maxWidth: "100%" }}>
           <iframe
+            title="Template Preview"
             src={`/templates/${params.category}/${params.template}?view=true`}
             className="w-full border-0"
             style={{ height: "calc(100vh - 80px)" }}

@@ -6,6 +6,8 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 
 const app = express();
+const helmet = require("helmet");
+const compression = require("compression");
 app.set("trust proxy", 1);
 
 
@@ -15,6 +17,9 @@ app.set("trust proxy", 1);
 
 connectDB();
 
+app.use(helmet());
+
+app.use(compression());
 
 
 // =========================
@@ -81,6 +86,14 @@ app.get("/", (req, res) => {
 // =========================
 // SERVER
 // =========================
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 const PORT = process.env.PORT || 5000;
 

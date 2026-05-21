@@ -14,10 +14,12 @@ export default function Loader() {
     ];
     let index = 0;
     const interval = setInterval(() => {
-      if (index < phrases.length) {
-        setLoadingText(phrases[index]);
-        index++;
+      if (index >= phrases.length) {
+        index = 0;
       }
+
+      setLoadingText(phrases[index]);
+      index++;
     }, 1200);
     return () => clearInterval(interval);
   }, []);

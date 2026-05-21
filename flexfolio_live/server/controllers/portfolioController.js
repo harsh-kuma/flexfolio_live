@@ -5,10 +5,16 @@ const User = require("../models/User");
 // CREATE
 exports.createPortfolio = async (req, res) => {
   try {
-
     // Parse dynamic form data
-    const data = JSON.parse(req.body.data || "{}");
-
+    let data = {};
+    try {
+      data = JSON.parse(req.body.data || "{}");
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid form data",
+      });
+    }
     // Template info
     const templateKey = req.body.templateKey;
 

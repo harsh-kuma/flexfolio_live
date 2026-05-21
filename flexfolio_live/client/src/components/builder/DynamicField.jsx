@@ -8,7 +8,31 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     const [loading, setLoading] = useState(false);
     const wrapperRef = useRef(null);
     const debounceTimeout = useRef(null);
+    useEffect(() => {
+        return () => {
+            if (debounceTimeout.current) {
+                clearTimeout(debounceTimeout.current);
+            }
+        };
+    }, []);
     const today = new Date().toISOString().split("T")[0];
+
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        if (value instanceof File) {
+            const url = URL.createObjectURL(value);
+            setPreviewUrl(url);
+
+            return () => URL.revokeObjectURL(url);
+        }
+
+        if (typeof value === "string" && value.length > 0) {
+            setPreviewUrl(value);
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [value]);
 
     // ✅ Click outside to close autocomplete
     useEffect(() => {
@@ -38,7 +62,7 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
                 } finally {
                     setLoading(false);
                 }
-            }, 400); // 400ms debounce
+            }, 700); // 700ms debounce
         } else {
             setSuggestions([]);
             setLoading(false);
@@ -61,9 +85,6 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     // 🔹 FILE (IMAGE)
     if (field.type === "file") {
         // Generate a preview URL if the value is a File object (newly uploaded) or a string (existing image URL)
-        const previewUrl = value instanceof File
-            ? URL.createObjectURL(value)
-            : (typeof value === "string" && value.length > 0 ? value : null);
 
         return (
             <div className="w-full md:col-span-2">
@@ -219,9 +240,9 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
                                 e.preventDefault();
                                 e.stopPropagation();
                                 const input = e.currentTarget;
-                                const value = e.target.value.trim()
-                                if (value) {
-                                    onChange(field.name, value, itemIndex, "addTag");
+                                const tagValue = e.target.value.trim()
+                                if (tagValue) {
+                                    onChange(field.name, tagValue, itemIndex, "addTag");
                                     input.value = "";
                                     requestAnimationFrame(() => {
                                         input.focus();

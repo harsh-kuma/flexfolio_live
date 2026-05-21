@@ -60,7 +60,6 @@ export default function VerifyOTPPage() {
 
       } catch (err) {
         if (!isActive) return;
-        console.log("*****************");
         toast.error(err?.response?.data?.message ||"Something went wrong");
         router.replace("/auth/signup");
       } finally {
@@ -95,7 +94,7 @@ export default function VerifyOTPPage() {
 
       toast.success("Account verified");
 
-      router.push("/");
+      router.replace("/");
 
     } catch (err) {
       toast.error(err?.response?.data?.message || "Verification failed");
