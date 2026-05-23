@@ -1,9 +1,12 @@
 "use client";
 
-import { Layers, LayoutGrid, Settings } from "lucide-react";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { House, Layers, LayoutGrid, Settings } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function DashboardSidebar({ user }) {
+export default function DashboardSidebar() {
+  const { user } = useAuth();
   const pathname = usePathname();
 
   const fullName = user?.name || "user";
@@ -11,9 +14,14 @@ export default function DashboardSidebar({ user }) {
 
   const navItems = [
     {
+      name: "Home",
+      icon: House,
+      path: "/dashboard",
+    },
+    {
       name: "Sites",
       icon: LayoutGrid,
-      path: "/dashboard/portfolio",
+      path: "/dashboard/portfolios",
     },
     {
       name: "Templates",
@@ -23,7 +31,7 @@ export default function DashboardSidebar({ user }) {
     {
       name: "Settings",
       icon: Settings,
-      path: "/dashboard/setting",
+      path: "/dashboard/settings",
     },
   ];
 
@@ -48,21 +56,22 @@ export default function DashboardSidebar({ user }) {
           const isActive = pathname === item.path;
 
           return (
-            <button
+            <Link
+              href={item.path}
               key={item.name}
               className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+                w-full flex items-center gap-3 px-3 mb-2 py-2.5 rounded-lg text-sm
                 transition-all duration-200
 
                 ${isActive
-                  ? "bg-black text-white"
+                  ? "bg-purple-500 text-white"
                   : "text-gray-700 hover:bg-gray-100 hover:text-black"
                 }
               `}
             >
               <Icon size={18} />
               {item.name}
-            </button>
+            </Link>
           );
         })}
 

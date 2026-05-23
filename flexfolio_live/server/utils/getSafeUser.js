@@ -4,7 +4,5 @@ exports.getSafeUser = (user) => ({
   email: user.email,
   username: user.username,
   profile: user.profile,
-  provider: user.provider,
   isVerified: user.isVerified,
-  createdAt: user.createdAt,
 });

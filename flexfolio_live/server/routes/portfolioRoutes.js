@@ -8,6 +8,10 @@ const cloudinary = require("../config/cloudinary");
 const {
   createPortfolio,
   getPortfolio,
+  getMyPortfolios,
+  deletePortfolio,
+  getPortfolioById,
+  updatePortfolio,
 } = require("../controllers/portfolioController");
 
 const { protect, } = require("../middlewares/authMiddleware");
@@ -37,6 +41,10 @@ const upload = multer({
 
 // Routes
 router.post("/", upload.single("image"),protect, createPortfolio);
+router.get("/me",protect,getMyPortfolios);
+router.get("/manage/:id",protect,getPortfolioById);
+router.put("/:id",protect,updatePortfolio);
+router.delete("/:id",protect,deletePortfolio);
 router.get("/:username", getPortfolio);
 
 module.exports = router;

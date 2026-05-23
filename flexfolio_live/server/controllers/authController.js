@@ -261,7 +261,7 @@ exports.getMe = async (req, res) => {
 
   try {
     const user = await User.findById(req.user.id)
-      .select("-password -otp -otpExpiry -resetPasswordOtp -resetPasswordOtpExpiry -__v");
+      .select("-password -otp -otpExpiry -resetPasswordOtp -resetPasswordOtpExpiry -__v -providers -createdAt -updatedAt");
 
     if (!user) {
       return res.status(404).json({

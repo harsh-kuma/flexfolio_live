@@ -14,6 +14,8 @@ const portfolioSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
+    lowercase: true,
+    trim: true,
   },
 
   templateKey: {
@@ -31,7 +33,23 @@ const portfolioSchema = new mongoose.Schema({
     required: true,
   },
 
-  // 🔥 COMPLETE TEMPLATE DATA
+  // DASHBOARD
+    title: {
+      type: String,
+      default: "Untitled Portfolio",
+    },
+
+    thumbnail: {
+      type: String,
+      default: "",
+    },
+
+    isPublished: {
+      type: Boolean,
+      default: false,
+    },
+
+  // COMPLETE TEMPLATE DATA
   data: {
     type: mongoose.Schema.Types.Mixed,
     required: true,

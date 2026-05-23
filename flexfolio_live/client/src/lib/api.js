@@ -76,7 +76,7 @@ export const createPortfolio = async (data) => {
   return res.data;
 };
 
-// ✅ GET PORTFOLIO
+// GET PORTFOLIO
 export const getPortfolio = async (username) => {
   const res = await api.get(`/portfolio/${username}`);
   return res.data;
@@ -89,6 +89,26 @@ export const getCompany = async (query) => {
 
 export const sendContactMessage = async (data) => {
   const res = await api.post("/owner/contact", data);
+  return res.data;
+};
+
+export const getMyPortfolios = async () => {
+  const res = await api.get("/portfolio/me");
+  return res.data;
+};
+
+export const getPortfolioById = async (id) => {
+  const res = await api.get(`/portfolio/manage/${id}`);
+  return res.data;
+};
+
+export const updatePortfolio = async (id,data) => {
+  const res = await api.put(`/portfolio/${id}`,data);
+  return res.data;
+};
+
+export const deletePortfolio = async (id) => {
+  const res = await api.delete(`/portfolio/${id}`);
   return res.data;
 };
 

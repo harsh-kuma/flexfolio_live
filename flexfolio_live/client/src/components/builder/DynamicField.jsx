@@ -78,7 +78,7 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     if (field.type === "hidden") return null;
 
     // ✅ COMMON STYLES
-    const baseInput = "w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm";
+    const baseInput = "w-full p-3 bg-slate-50 text-slate-900  border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm";
     const labelStyle = "text-xs font-semibold text-slate-700 mb-1.5 block ml-1 uppercase tracking-wide";
 
     // 🔹 FILE (IMAGE)

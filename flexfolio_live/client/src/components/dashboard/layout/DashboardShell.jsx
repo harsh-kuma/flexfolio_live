@@ -1,44 +1,24 @@
 "use client";
 
 import Loader from "@/components/common/loader/Loader";
-import { getCurrentUser } from "@/lib/api";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 import DashboardNavbar from "./DashboardNavbar";
 import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashbordShell({ children }) {
-    const router = useRouter();
-
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const res = await getCurrentUser();
-                setUser(res.user);
-                setLoading(false);
-            } catch (err) {
-                router.replace("/auth/login");
-            }
-        };
-
-        checkAuth();
-    }, [router]);
+    const { loading } = useAuth();
 
     if (loading) {
         return (
             <Loader/>
         );
     }
-     console.log("Dashboard Layout Render");
     return (
         <div className="h-screen w-full flex flex-col bg-[#0a0a0a] text-white overflow-hidden">
 
             {/* TOP NAVBAR */}
             <div className="shrink-0 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md z-50">
-                <DashboardNavbar user={user}  />
+                <DashboardNavbar/>
             </div>
 
             {/* MAIN LAYOUT */}
@@ -46,7 +26,7 @@ export default function DashbordShell({ children }) {
 
                 {/* SIDEBAR */}
                 <aside className="hidden md:flex">
-                    <DashboardSidebar user={user} />
+                    <DashboardSidebar/>
                 </aside>
 
                 {/* CONTENT AREA */}

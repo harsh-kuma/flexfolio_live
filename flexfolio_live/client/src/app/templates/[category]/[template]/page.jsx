@@ -160,7 +160,7 @@ export default function TemplatePreview() {
         </div>
 
         <button
-          onClick={() => router.push(`/builder?template=${key}`)}
+          onClick={() => router.push(`/dashboard/builder?template=${key}`)}
           className="bg-black text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
         >
           Use Template
