@@ -10,7 +10,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8 text-black"> {/* Removed text-black */}
+    <div className="space-y-8 text-black bg-white max-w-7xl mx-auto p-6 pb-12 min-h-screen "> {/* Removed text-black */}
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-6">
@@ -39,9 +39,9 @@ export default function DashboardPage() {
         {stats.map((stat, idx) => (
           <div
             key={idx}
-            className="bg-[#111111]/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-[#151515] transition-colors duration-300"
+            className="bg-gray-200 backdrop-blur-sm border border-white rounded-2xl p-6 hover:bg-white hover:border hover:border-gray-200 transition-colors duration-300"
           >
-            <h3 className="text-neutral-400 text-sm font-medium mb-2">
+            <h3 className="text-black text-sm font-medium mb-2">
               {stat.label}
             </h3>
             <p className="text-4xl font-bold tracking-tight text-black">

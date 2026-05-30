@@ -117,7 +117,7 @@ export default function Home() {
             )}
             {user && (
               <Link href="/dashboard" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-8 py-4 bg-purple-700 hover:bg-slate-50 text-white font-semibold rounded-xl border border-slate-200 shadow-sm transform hover:-translate-y-0.5 transition duration-200">
+                <button className="w-full sm:w-auto px-8 py-4 bg-purple-700 hover:bg-purple-600 text-white font-semibold rounded-xl border border-slate-200 shadow-sm transform hover:-translate-y-0.5 transition duration-200">
                   Dashboard
                 </button>
               </Link>
