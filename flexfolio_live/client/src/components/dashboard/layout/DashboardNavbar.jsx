@@ -1,46 +1,80 @@
 "use client";
 
-import { Bell, ChevronDown, Loader2, LogOut, Newspaper } from "lucide-react";
+import { Bell, ChevronDown, Loader2, LogOut, Menu, Newspaper } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 // NOTE: Ensure you import your logout functions here based on your file structure.
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import { signOut } from "next-auth/react";
+import MobileMenu from "./MobileMenu";
 
 export default function DashboardNavbar() {
   const { user } = useAuth();
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navRef = useRef(null);
+  const scrollRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const firstLetter = user?.name?.charAt(0)?.toUpperCase() || "U";
 
   // 1. Handle clicking outside to close dropdowns
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (navRef.current && !navRef.current.contains(event.target)) {
-        setActiveDropdown(null);
-      }
+  function handleClickOutside(event) {
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    if (navRef.current && !navRef.current.contains(event.target)) {
+      setActiveDropdown(null);
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+
+    if (
+      mobileMenuOpen &&
+      mobileMenu &&
+      !mobileMenu.contains(event.target) &&
+      navRef.current &&
+      !navRef.current.contains(event.target)
+    ) {
+      setMobileMenuOpen(false);
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [mobileMenuOpen]);
 
   // 2. Handle 'Escape' key to close dropdowns (Accessibility feature)
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setActiveDropdown(null);
+        setMobileMenuOpen(false);
       }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const mainContent = document.querySelector("main");
+
+    if (mobileMenuOpen && mainContent) {
+      mainContent.style.overflow = "hidden";
+    } else if (mainContent) {
+      mainContent.style.overflow = "auto";
+    }
+
+    return () => {
+      if (mainContent) {
+        mainContent.style.overflow = "auto";
+      }
+    };
+  }, [mobileMenuOpen]);
 
   const toggleDropdown = (dropdown) => {
     setActiveDropdown((prev) => (prev === dropdown ? null : dropdown));
@@ -50,7 +84,7 @@ export default function DashboardNavbar() {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      
+
       // CLEAR JWT COOKIE (Ensure logoutUser is imported or passed in)
       await logoutUser();
 
@@ -68,23 +102,23 @@ export default function DashboardNavbar() {
   };
 
   return (
-    <header 
+    <header
       ref={navRef}
       className="h-16 px-4 md:px-8 bg-white text-gray-900 flex items-center justify-between border-b border-gray-200 sticky top-0 z-40 shadow-sm"
     >
-      
+
       {/* LEFT - Logo */}
       <div className="flex items-center gap-2 cursor-pointer group rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-        <img 
-          src="/flexfolio_full.jpeg" 
-          alt="Flexfolio Logo" 
-          className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-200 ease-out" 
+        <img
+          src="/flexfolio_full.jpeg"
+          alt="Flexfolio Logo"
+          className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-200 ease-out"
         />
       </div>
 
       {/* RIGHT - Actions */}
       <div className="flex items-center gap-2 sm:gap-4">
-        
+
         {/* ========================================= */}
         {/* 1. BELL NOTIFICATIONS                       */}
         {/* ========================================= */}
@@ -93,29 +127,26 @@ export default function DashboardNavbar() {
             <button
               type="button"
               onClick={() => toggleDropdown('bell')}
-              className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                activeDropdown === 'bell' 
-                  ? 'bg-gray-100 text-gray-900' 
-                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-              }`}
+              className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'bell'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                }`}
               aria-label="Notifications"
               aria-expanded={activeDropdown === 'bell'}
             >
               <Bell size={20} className="stroke-[1.5]" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            
+
             {/* Tooltip hides when dropdown is active */}
-            <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] font-medium rounded transition-all duration-200 whitespace-nowrap z-50 pointer-events-none shadow-sm ${
-              activeDropdown === 'bell' ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'
-            }`}>
+            <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] font-medium rounded transition-all duration-200 whitespace-nowrap z-50 pointer-events-none shadow-sm ${activeDropdown === 'bell' ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'
+              }`}>
               Notifications
             </span>
           </div>
 
-          <div className={`absolute right-0 mt-3 top-full flex flex-col w-72 sm:w-80 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${
-            activeDropdown === 'bell' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
-          }`}>
+          <div className={`absolute right-0 mt-3 top-full flex flex-col w-72 sm:w-80 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${activeDropdown === 'bell' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
+            }`}>
             <div className="p-4 border-b border-gray-100 bg-gray-50/80">
               <h3 className="text-sm font-semibold text-gray-800">Notifications</h3>
             </div>
@@ -139,29 +170,26 @@ export default function DashboardNavbar() {
             <button
               type="button"
               onClick={() => toggleDropdown('news')}
-              className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                activeDropdown === 'news' 
-                  ? 'bg-gray-100 text-gray-900' 
-                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
-              }`}
+              className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'news'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
+                }`}
               aria-label="News Center"
               aria-expanded={activeDropdown === 'news'}
             >
               <Newspaper size={20} className="stroke-[1.5]" />
             </button>
-            
+
             {/* Tooltip hides when dropdown is active */}
-            <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] font-medium rounded transition-all duration-200 whitespace-nowrap z-50 pointer-events-none shadow-sm ${
-              activeDropdown === 'news' ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'
-            }`}>
+            <span className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-[11px] font-medium rounded transition-all duration-200 whitespace-nowrap z-50 pointer-events-none shadow-sm ${activeDropdown === 'news' ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'
+              }`}>
               News Center
             </span>
           </div>
 
-          <div className={`absolute right-0 mt-3 top-full flex flex-col w-72 sm:w-80 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${
-            activeDropdown === 'news' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
-          }`}>
-             <div className="p-4 border-b border-gray-100 bg-gray-50/80 flex justify-between items-center">
+          <div className={`absolute right-0 mt-3 top-full flex flex-col w-72 sm:w-80 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${activeDropdown === 'news' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
+            }`}>
+            <div className="p-4 border-b border-gray-100 bg-gray-50/80 flex justify-between items-center">
               <h3 className="text-sm font-semibold text-gray-800">News Center</h3>
               <span className="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">New</span>
             </div>
@@ -176,18 +204,17 @@ export default function DashboardNavbar() {
         </div>
 
         {/* SEPARATOR */}
-        <div className="h-6 w-px bg-gray-200 mx-1 block" aria-hidden="true" />
+        <div className="h-6 w-px hidden md:flex  bg-gray-200 mx-1" aria-hidden="true" />
 
         {/* ========================================= */}
         {/* 3. PROFILE                                  */}
         {/* ========================================= */}
-        <div className="relative flex items-center justify-center">
+        <div className="relative hidden md:flex  items-center justify-center">
           <button
             type="button"
             onClick={() => toggleDropdown('profile')}
-            className={`flex items-center gap-2 pl-2 pr-1 py-1 rounded-full transition-colors duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-              activeDropdown === 'profile' ? 'bg-gray-100' : 'hover:bg-gray-100'
-            }`}
+            className={`flex items-center gap-2 pl-2 pr-1 py-1 rounded-full transition-colors duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'profile' ? 'bg-gray-100' : 'hover:bg-gray-100'
+              }`}
             aria-haspopup="true"
             aria-expanded={activeDropdown === 'profile'}
           >
@@ -205,15 +232,14 @@ export default function DashboardNavbar() {
             <ChevronDown size={16} className={`text-gray-500 transition-transform duration-200 ${activeDropdown === 'profile' ? 'rotate-180' : ''}`} />
           </button>
 
-          <div className={`absolute right-0 mt-3 top-full flex flex-col w-64 sm:w-72 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${
-            activeDropdown === 'profile' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
-          }`}>
-            
+          <div className={`absolute right-0 mt-3 top-full flex flex-col w-64 sm:w-72 min-h-[250px] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden transform transition-all duration-200 origin-top-right ease-out ${activeDropdown === 'profile' ? 'scale-100 opacity-100 visible' : 'scale-95 opacity-0 invisible pointer-events-none'
+            }`}>
+
             {/* Header info */}
             <div className="p-4 bg-gray-50/80">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-300 shrink-0 bg-white flex items-center justify-center text-gray-600 font-bold shadow-sm">
-                   {user?.profile ? (
+                  {user?.profile ? (
                     <img src={user.profile} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <span>{firstLetter}</span>
@@ -234,14 +260,14 @@ export default function DashboardNavbar() {
 
             {/* Empty space pushes the logout button to the bottom */}
             <div className="flex-1 p-2">
-               {/* Add settings/profile links here in the future */}
+              {/* Add settings/profile links here in the future */}
             </div>
 
             <div className="h-px bg-gray-200 w-full mt-auto" />
 
             {/* Interactive Logout Area */}
             <div className="p-2 bg-gray-50/50">
-              <button 
+              <button
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
@@ -255,11 +281,23 @@ export default function DashboardNavbar() {
                 {isLoggingOut ? 'Signing out...' : 'Sign out'}
               </button>
             </div>
-            
+
           </div>
         </div>
 
+        <div className="relative flex items-center justify-center">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
       </div>
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
     </header>
   );
 }
