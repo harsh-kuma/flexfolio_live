@@ -63,7 +63,7 @@ export default function TemplatesPage() {
                       </Link>
 
                       {/* LIVE PREVIEW */}
-                      <Link href={`/templates/${category}/${template}`} className="w-full max-w-[200px]">
+                      <Link target="_blank" rel="noopener noreferrer" href={`/templates/${category}/${template}`} className="w-full max-w-[200px]">
                         <button className="w-full bg-black/70 backdrop-blur-md border border-white/20 text-white font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 hover:bg-black active:scale-[0.98] transition">
                           <Eye size={16} />
                           Live Preview
