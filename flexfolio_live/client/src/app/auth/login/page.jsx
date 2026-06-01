@@ -19,6 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { fetchUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [isCredentialLogin, setIsCredentialLogin] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -33,6 +34,8 @@ export default function LoginPage() {
         setErrors(validationErrors);
         return;
       }
+      if (loading) return;
+      setIsCredentialLogin(true);
       setLoading(true);
       const res = await loginUser(form);
       await fetchUser();
@@ -66,7 +69,7 @@ export default function LoginPage() {
         title="Welcome back"
         subtitle="Login to continue building"
       >
-        <AuthInput
+        <AuthInput disabled={loading}
           label="Email"
           type="email"
           error={errors.email}
@@ -78,6 +81,7 @@ export default function LoginPage() {
         />
 
         <AuthInput
+          disabled={loading}
           label="Password"
           type="password"
           error={errors.password}
@@ -90,6 +94,7 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-between text-sm">
           <button
+            disabled={loading}
             type="button"
             onClick={() => router.replace("/auth/forgot-password")}
             className="text-slate-500 hover:text-black transition"
@@ -107,6 +112,7 @@ export default function LoginPage() {
         </div>
         <AuthButton
           loading={loading}
+          isCredentialLogin={isCredentialLogin}
           onClick={handleLogin}
         >
           Login
@@ -123,7 +129,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <SocialLogin />
+        <SocialLogin loading={loading} setLoading={setLoading} />
       </AuthLayout>
     </AuthRedirect>
   );

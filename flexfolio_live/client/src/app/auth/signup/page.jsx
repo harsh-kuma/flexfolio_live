@@ -17,6 +17,7 @@ export default function SignupPage() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [isCredentialLogin, setIsCredentialLogin] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -31,6 +32,8 @@ export default function SignupPage() {
         setErrors(validationErrors);
         return;
       }
+      if (loading) return;
+      setIsCredentialLogin(true);
       setLoading(true);
 
       const res = await registerUser(form);
@@ -57,6 +60,7 @@ export default function SignupPage() {
         subtitle="Start building your portfolio today"
       >
         <AuthInput
+          disabled={loading}
           label="Full Name"
           placeholder="John Doe"
           error={errors.name}
@@ -67,6 +71,7 @@ export default function SignupPage() {
         />
 
         <AuthInput
+          disabled={loading}
           label="Email"
           type="email"
           error={errors.email}
@@ -84,6 +89,7 @@ export default function SignupPage() {
           </p>
 
           <button
+            disabled={loading}
             type="button"
             onClick={() => router.replace("/auth/login")}
             className="ml-2 font-semibold text-black hover:opacity-70 transition"
@@ -92,7 +98,9 @@ export default function SignupPage() {
           </button>
         </div>
         <AuthButton
+          disabled={loading}
           loading={loading}
+          isCredentialLogin={isCredentialLogin}
           onClick={handleSignup}
         >
           Create Account
@@ -109,7 +117,7 @@ export default function SignupPage() {
           </div>
         </div>
 
-        <SocialLogin />
+        <SocialLogin loading={loading} setLoading={setLoading} />
       </AuthLayout>
     </AuthRedirect>
   );

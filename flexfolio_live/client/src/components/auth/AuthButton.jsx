@@ -2,6 +2,7 @@ export default function AuthButton({
   children,
   loading,
   disabled,
+  isCredentialLogin,
   ...props
 }) {
   return (
@@ -16,7 +17,7 @@ export default function AuthButton({
         disabled:cursor-not-allowed
       "
     >
-      {loading ? "Please wait..." : children}
+      {loading && isCredentialLogin ? "Please wait..." : children}
     </button>
   );
 }
