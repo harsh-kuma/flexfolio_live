@@ -3,6 +3,7 @@
 import TemplateNotFound from "@/components/portfolio/TemplateNotFound";
 import { templates } from "@/lib/templates";
 import { Monitor, Smartphone, Tablet } from "lucide-react";
+import Image from "next/image";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -151,8 +152,18 @@ export default function TemplatePreview() {
 
       {/* HEADER */}
       <div className="flex items-center justify-between px-4 md:px-8 py-3 bg-white shadow sticky top-0 z-50">
-        <div onClick={() => router.push("/")} className="font-bold text-lg cursor-pointer">
-          FlexFolio
+        <div
+            onClick={() => router.push("/")}
+            className="cursor-pointer flex items-center"
+          >
+            <Image
+              src="/flexfolio_full.jpeg"
+              alt="FlexFolio"
+              width={100}
+              height={40}
+              priority
+              className="object-contain"
+            />
         </div>
 
         <div className="hidden md:flex items-center gap-2">

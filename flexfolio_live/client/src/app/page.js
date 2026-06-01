@@ -4,6 +4,7 @@ import Loader from "@/components/common/loader/Loader";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -32,25 +33,30 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans flex flex-col relative w-full overflow-x-hidden selection:bg-indigo-600/10">
-      
+
       {/* 1. BACKGROUND CANVAS MESH */}
       <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:2rem_2rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />
 
       {/* 2. RIGID PREMIUM STICKY HEADER */}
       <header className="w-full max-w-full bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="text-xl font-black tracking-tight flex items-center gap-2 shrink-0">
-            Flexfolio<span className="text-indigo-600">.</span>
-          </Link>
-          
+          <Image
+            src="/flexfolio_full.jpeg"
+            alt="FlexFolio"
+            width={100}
+            height={40}
+            priority
+            className="object-contain"
+          />
+
           <nav className="flex items-center gap-3 sm:gap-4 min-w-0">
             {user ? (
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1.5 rounded-full max-w-[140px] sm:max-w-none truncate">
                   {user.email}
                 </span>
-                <button 
-                  onClick={handleLogout} 
+                <button
+                  onClick={handleLogout}
                   className="text-xs font-medium text-slate-400 hover:text-rose-600 transition shrink-0"
                 >
                   Sign Out
@@ -67,7 +73,7 @@ export default function Home() {
 
       {/* 3. HERO & FLOW INTERACTIVE SECTION */}
       <main className="flex-1 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 items-center gap-12 px-4 sm:px-6 pt-12 pb-16 lg:pt-20 lg:pb-24 z-10">
-        
+
         {/* Left Side: Dynamic App Introduction */}
         <div className="lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100/80 rounded-full mb-6 mx-auto lg:mx-0 w-max">
@@ -83,7 +89,7 @@ export default function Home() {
               generated in 3 steps.
             </span>
           </h1>
-          
+
           {/* Detailed Platform Flow */}
           <div className="mt-8 space-y-4 max-w-md mx-auto lg:mx-0 text-left">
             <div className="flex items-start gap-3">
@@ -127,7 +133,7 @@ export default function Home() {
 
         {/* Right Side: Step-by-Step Visual Live Form Mockup */}
         <div className="lg:col-span-6 flex flex-col gap-4 relative w-full max-w-xl mx-auto">
-          
+
           {/* Visual Canvas 1: The Build/Form State */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xl shadow-slate-100 relative group">
             <div className="flex items-center justify-between mb-4">
@@ -137,7 +143,7 @@ export default function Home() {
               </div>
               <span className="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-500 font-medium">Canvas Selected</span>
             </div>
-            
+
             <div className="space-y-3">
               <div>
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Portfolio Slug Name</label>
@@ -162,7 +168,7 @@ export default function Home() {
                 ⚡ Flexfolio.online/portfolio/johndoe
               </span>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center text-sm">✨</div>
               <div>
