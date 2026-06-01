@@ -320,7 +320,7 @@ export default function Template4Animated({ data, owner_key, working }) {
           </div>
 
           {/* Floarting Hero Image */}
-          {data?.image && (
+          {data?.image?.url && (
             <div className="relative flex justify-center lg:justify-end w-full lg:w-1/2">
               {/* Pulsing Aura Rings */}
               <div className="absolute inset-0 bg-violet-600 rounded-full blur-[100px] opacity-20 w-[300px] h-[300px] m-auto animate-[pulse_4s_infinite]"></div>
@@ -328,7 +328,7 @@ export default function Template4Animated({ data, owner_key, working }) {
 
               <div className="relative z-10 w-64 h-64 md:w-96 md:h-96 rounded-[2rem] overflow-hidden border-2 border-slate-700 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform hover:rotate-2 hover:scale-105 transition-all duration-500 animate-[bounce_6s_infinite]">
                 <img
-                  src={data?.image}
+                  src={data?.image?.url}
                   alt={data?.fullName}
                   className="w-full h-full object-cover"
                 />

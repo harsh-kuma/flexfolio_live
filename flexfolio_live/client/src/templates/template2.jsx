@@ -298,12 +298,12 @@ export default function Template2({ data, owner_key, working }) {
           </div>
 
           {/* Right Image */}
-          {data?.image && (
+          {data?.image?.url && (
             <div className="flex-1 flex justify-center relative">
               <div className="absolute inset-0 bg-blue-100 rounded-full blur-3xl opacity-50 w-64 h-64 m-auto -z-10"></div>
               <div className="relative">
                 <img
-                  src={data?.image}
+                  src={data?.image?.url}
                   alt={data?.fullName}
                   className="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover shadow-2xl border-4 border-white"
                 />

@@ -17,9 +17,9 @@ export default function Template1({ data, owner_key, working}) {
         
         {/* PROFILE HEADER */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
-          {data.image && (
+          {data?.image?.url && (
             <img
-              src={data.image}
+              src={data.image.url}
               alt={`${data.fullName || "Profile"} image`}
               className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-gray-100 shadow-sm shrink-0"
             />

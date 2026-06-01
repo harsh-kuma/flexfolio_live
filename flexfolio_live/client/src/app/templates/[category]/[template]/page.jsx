@@ -15,7 +15,9 @@ export const dummyData = {
 
 My primary expertise lies in the MERN stack, where I build responsive frontend applications with React and develop powerful backend services using Node.js, Express, and MongoDB. Beyond web development, I’m deeply interested in system design, DevOps practices, and AI integrations that help create smarter and more efficient applications.`,
 
-  image: "https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
+  image:{
+    url:"https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
+  },
 
   email: "alex@flexfolio.com",
   phone: "+91 XXXXXXXXXX",

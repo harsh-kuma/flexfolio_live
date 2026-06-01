@@ -273,11 +273,11 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
               )}
             </div>
           </div>
-          {data?.image && (
+          {data?.image?.url && (
             <div className="w-full md:w-1/2 flex justify-center relative">
               <div className="w-72 h-72 md:w-96 md:h-96 border-8 border-black bg-[#90BAFE] shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transform rotate-3 overflow-hidden">
                 <img
-                  src={data.image}
+                  src={data.image.url}
                   alt={data?.fullName}
                   className="w-full h-full object-cover filter contrast-125"
                 />

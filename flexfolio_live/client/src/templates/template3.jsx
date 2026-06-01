@@ -237,11 +237,11 @@ export default function Template3({ data, owner_key, working }) {
 
         {/* HERO SECTION */}
         <div id="hero" className="scroll-mt-32 flex flex-col items-center text-center py-10 md:py-16">
-          {data?.image && (
+          {data?.image?.url && (
             <div className="relative mb-8">
               <div className="absolute inset-0 bg-emerald-500 rounded-full blur-3xl opacity-20 w-full h-full"></div>
               <img
-                src={data.image}
+                src={data.image.url}
                 alt={data.fullName}
                 className="w-64 h-64 rounded-full object-cover shadow-2xl border-2 border-neutral-800 relative z-10"
               />

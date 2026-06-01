@@ -1,6 +1,8 @@
 const Portfolio = require("../models/Portfolio");
 const generateUsername = require("../utils/generateUsername");
 const User = require("../models/User");
+const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
+const Contact = require("../models/ContactMessage");
 
 // CREATE
 exports.createPortfolio = async (req, res) => {
@@ -22,8 +24,10 @@ exports.createPortfolio = async (req, res) => {
 
     // Image handling
     if (req.file) {
-      data.image = req.file.path;
-      data.public_id = req.file.filename;
+      data.image = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
     }
 
 
@@ -48,7 +52,7 @@ exports.createPortfolio = async (req, res) => {
       category,
       templateSlug,
       title: data.fullName || "Untitled Portfolio",
-      thumbnail: data.image || "",
+      thumbnail: data.image?.url || "",
       data,
     });
 
@@ -112,7 +116,7 @@ exports.getMyPortfolios = async (req, res) => {
 exports.deletePortfolio = async (req, res) => {
   try {
     const portfolio =
-      await Portfolio.findOneAndDelete({
+      await Portfolio.findOne({
         _id: req.params.id,
         user: req.user.id,
       });
@@ -123,6 +127,19 @@ exports.deletePortfolio = async (req, res) => {
         message: "Portfolio not found",
       });
     }
+
+    // delete cloudinary image first
+    await deleteCloudinaryImage(
+      portfolio.data?.image?.public_id
+    );
+
+    // delete all contacts related to portfolio
+    await Contact.deleteMany({
+      portfolio: portfolio._id,
+    });
+
+    // then delete portfolio
+    await portfolio.deleteOne();
 
     res.json({
       success: true,
@@ -176,17 +193,31 @@ exports.updatePortfolio = async (req, res) => {
       });
     }
 
-    const { data, title } = req.body;
+    let data = req.body.data;
 
-    if (data) {
-      portfolio.data = data;
-
-      portfolio.thumbnail =
-        data.image || portfolio.thumbnail;
+    if (typeof data === "string") {
+      data = JSON.parse(data);
     }
 
-    if (title) {
-      portfolio.title = title;
+    if (req.file) {
+      if (portfolio.data?.image?.public_id) {
+        await deleteCloudinaryImage(
+          portfolio.data.image.public_id
+        );
+      }
+
+      data.image = {
+        url: req.file.path,
+        public_id: req.file.filename,
+      };
+    }
+
+    portfolio.data = data || portfolio.data;
+    portfolio.thumbnail =
+      data?.image?.url || portfolio.thumbnail;
+
+    if (req.body.title) {
+      portfolio.title = req.body.title;
     }
 
     await portfolio.save();

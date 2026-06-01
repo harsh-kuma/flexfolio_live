@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-export default function PortfolioEditor({templateKey,initialData,mode = "create",portfolioId = null}) {
+export default function PortfolioEditor({ templateKey, initialData, mode = "create", portfolioId = null }) {
   const router = useRouter();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -17,11 +17,14 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        ...initialData,
+        image: initialData.image?.url || "",
+      });
     }
   }, [initialData]);
 
-  const handleChange = (key,value,index,action) => {
+  const handleChange = (key, value, index, action) => {
     setFormData((prev) => {
       if (action === "addTag") {
         const existing = Array.isArray(
@@ -115,11 +118,20 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
 
       // EDIT
       else {
+        const payload = new FormData();
+
+        if (formData.image instanceof File) {
+          payload.append("image", formData.image);
+        }
+
+        payload.append(
+          "data",
+          JSON.stringify(formData)
+        );
+
         await updatePortfolio(
           portfolioId,
-          {
-            data: formData,
-          }
+          payload
         );
 
         toast(
@@ -180,7 +192,7 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
                       field={field}
                       value={
                         formData[
-                          field.name
+                        field.name
                         ]
                       }
                       onChange={
@@ -197,7 +209,7 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
                 section={section}
                 data={
                   formData[
-                    section.key
+                  section.key
                   ] || []
                 }
                 setData={(val) =>
@@ -217,7 +229,7 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
       )}
 
       {/* BUTTON */}
-      <div className="sticky bottom-6 mt-10 z-50">
+      <div className="sticky bottom-6 mt-10 z-40">
 
         <button
           onClick={handleSubmit}
@@ -234,8 +246,8 @@ export default function PortfolioEditor({templateKey,initialData,mode = "create"
               ? "Publishing Portfolio..."
               : "Saving Changes..."
             : mode === "create"
-            ? "Publish Portfolio"
-            : "Save Changes"}
+              ? "Publish Portfolio"
+              : "Save Changes"}
 
         </button>
       </div>

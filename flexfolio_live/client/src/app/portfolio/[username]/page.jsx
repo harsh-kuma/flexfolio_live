@@ -43,7 +43,7 @@ export async function generateMetadata({ params }) {
         `Explore ${data?.fullName}'s portfolio.`,
       images: [
         {
-          url: data?.image || "/default-og.png",
+          url: data?.image?.url || "/default-og.png",
           width: 1200,
           height: 630,
         },
@@ -57,11 +57,11 @@ export async function generateMetadata({ params }) {
         data?.bio ||
         data?.about ||
         `Explore ${data?.fullName}'s portfolio.`,
-      images: [data?.image || "/default-og.png"],
+      images: [data?.image?.url || "/default-og.png"],
     },
 
     icons: {
-      icon: data?.image || "/favicon.ico",
+      icon: data?.image?.url || "/favicon.ico",
     },
 
     alternates: {
@@ -98,7 +98,7 @@ export default async function PortfolioPage({ params }) {
             "@type": "Person",
             name: portfolio?.data?.fullName,
             jobTitle: portfolio?.data?.title,
-            image: portfolio?.data?.image,
+            image: portfolio?.data?.image?.url,
             email: portfolio?.data?.email,
             sameAs: [
               portfolio?.data?.github,

@@ -1,9 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("../config/cloudinary");
 
 const {
   createPortfolio,
@@ -17,33 +13,13 @@ const {
 const { protect, } = require("../middlewares/authMiddleware");
 
 // Cloudinary storage
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "flexfolio",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 2 * 1024 * 1024,
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"), false);
-    }
-  },
-});
+const upload = require("../middlewares/uploadMiddleware");
 
 // Routes
 router.post("/", upload.single("image"),protect, createPortfolio);
 router.get("/me",protect,getMyPortfolios);
 router.get("/manage/:id",protect,getPortfolioById);
-router.put("/:id",protect,updatePortfolio);
+router.put("/:id",protect,upload.single("image"),updatePortfolio);
 router.delete("/:id",protect,deletePortfolio);
 router.get("/:username", getPortfolio);
 

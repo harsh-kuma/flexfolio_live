@@ -233,7 +233,7 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
                     ))}
                     <input
                         placeholder={value?.length > 0 ? "Add another..." : "Type & press Enter"}
-                        className="bg-transparent outline-none text-sm flex-1 min-w-[120px] py-1"
+                        className="bg-transparent text-black outline-none text-sm flex-1 min-w-[120px] py-1"
                         enterKeyHint="done"
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
