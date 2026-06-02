@@ -71,7 +71,8 @@ app.use("/api/company", require("./routes/companyRoutes"));
 // CONTACT
 app.use("/api/owner", require("./routes/contactRoutes"));
 
-
+// ANALYTICS FREE
+app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
 // =========================
 // TEST ROUTE

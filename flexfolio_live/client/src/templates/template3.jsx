@@ -1,5 +1,5 @@
 "use client";
-import { sendContactMessage } from "@/lib/api";
+import { sendContactMessage, trackAnalyticsEvent } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
@@ -76,12 +76,12 @@ const DarkProjectCard = ({ p }) => {
 
       <div className="flex gap-3 mt-auto relative z-10">
         {p?.github && (
-          <a href={p.github} target="_blank" rel="noreferrer" className="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
+          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
             Code
           </a>
         )}
         {p?.live && (
-          <a href={p.live} target="_blank" rel="noreferrer" className="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">
             Live Demo
           </a>
         )}
@@ -126,6 +126,20 @@ export default function Template3({ data, owner_key, working }) {
 
   const [loading, setLoading] = useState(false);
 
+  // new analytics 
+  const trackClick = (meta) => {
+    if (working) {
+      const visitorId = sessionStorage.getItem("visitorId");
+      if (!visitorId || !owner_key) return;
+      trackAnalyticsEvent({
+        portfolioId: owner_key,
+        visitorId,
+        eventType: "click",
+        meta,
+      });
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -144,6 +158,8 @@ export default function Template3({ data, owner_key, working }) {
           portfolioId: owner_key,
           ...formData,
         });
+
+        trackClick("contact_form");
       }
 
       toast("Message sent successfully!");
@@ -267,7 +283,7 @@ export default function Template3({ data, owner_key, working }) {
               Get In Touch
             </button>
             {data?.resume && (
-              <a href={data.resume} target="_blank" rel="noreferrer" className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-8 py-3 rounded-full font-medium transition-colors">
+              <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-8 py-3 rounded-full font-medium transition-colors">
                 Resume
               </a>
             )}
@@ -276,17 +292,17 @@ export default function Template3({ data, owner_key, working }) {
           {/* Social Links under Hero */}
           <div className="flex gap-6 mt-12">
             {data?.github && (
-              <a href={data.github} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white transition-colors">
+              <a href={data.github} onClick={() => trackClick("github")} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-white transition-colors">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
               </a>
             )}
             {data?.linkedin && (
-              <a href={data.linkedin} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-[#0a66c2] transition-colors">
+              <a href={data.linkedin} onClick={() => trackClick("linkedin")} target="_blank" rel="noreferrer" className="text-neutral-500 hover:text-[#0a66c2] transition-colors">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
               </a>
             )}
             {data?.email && (
-              <a href={`mailto:${data.email}`} className="text-neutral-500 hover:text-emerald-400 transition-colors">
+              <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="text-neutral-500 hover:text-emerald-400 transition-colors">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
               </a>
             )}
@@ -443,9 +459,9 @@ export default function Template3({ data, owner_key, working }) {
             </a>
           </p>
           <div className="flex gap-5 text-slate-500">
-            {data?.linkedin && <a href={data.linkedin} target="_blank" rel="noreferrer" className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}
-            {data?.github && <a href={data.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg></a>}
-            {data?.email && <a href={`mailto:${data.email}`} className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
+            {data?.linkedin && <a href={data.linkedin} onClick={() => trackClick("linkedin")} target="_blank" rel="noreferrer" className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}
+            {data?.github && <a href={data.github} onClick={() => trackClick("github")} target="_blank" rel="noreferrer" className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg></a>}
+            {data?.email && <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="hover:text-white transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
           </div>
         </div>
       </footer>

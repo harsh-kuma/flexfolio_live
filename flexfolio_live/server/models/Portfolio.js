@@ -46,7 +46,7 @@ const portfolioSchema = new mongoose.Schema({
 
     isPublished: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
   // COMPLETE TEMPLATE DATA

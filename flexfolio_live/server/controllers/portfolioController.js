@@ -1,6 +1,7 @@
 const Portfolio = require("../models/Portfolio");
 const generateUsername = require("../utils/generateUsername");
 const User = require("../models/User");
+const Analytics = require("../models/Analytics");
 const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
 const Contact = require("../models/ContactMessage");
 
@@ -136,6 +137,11 @@ exports.deletePortfolio = async (req, res) => {
     // delete all contacts related to portfolio
     await Contact.deleteMany({
       portfolio: portfolio._id,
+    });
+
+    // delete all analytics related to portfolio
+    await Analytics.deleteMany({
+      portfolioId: portfolio._id,
     });
 
     // then delete portfolio

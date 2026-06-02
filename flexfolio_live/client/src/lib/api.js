@@ -112,4 +112,21 @@ export const deletePortfolio = async (id) => {
   return res.data;
 };
 
+
+// New Free Analytics 
+export const trackAnalyticsEvent = async (data) => {
+  const res = await api.post("/analytics/track", data);
+  return res.data;
+};
+
+export const getAnalyticsSummary = async (portfolioId) => {
+  const res = await api.get(`/analytics/summary/${portfolioId}`);
+  return res.data;
+};
+
+export const getMyAnalyticsSummary = async () => {
+  const res = await api.get("/analytics/me");
+  return res.data;
+};
+
 export default api;

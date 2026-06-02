@@ -1,4 +1,19 @@
 "use client";
+import { trackAnalyticsEvent } from "@/lib/api";
+
+// new analytics 
+  const trackClick = (meta) => {
+    if (working) {
+      const visitorId = sessionStorage.getItem("visitorId");
+      if (!visitorId || !owner_key) return;
+      trackAnalyticsEvent({
+        portfolioId: owner_key,
+        visitorId,
+        eventType: "click",
+        meta,
+      });
+    }
+  };
 
 export default function Template1({ data, owner_key, working}) {
   // Prevent crash if data is not passed
@@ -146,12 +161,12 @@ export default function Template1({ data, owner_key, working}) {
 
                   <div className="flex gap-4 mt-5 pt-4 border-t border-gray-200">
                     {p.github && (
-                      <a href={p.github} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
+                      <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
                         GitHub ↗
                       </a>
                     )}
                     {p.live && (
-                      <a href={p.live} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
+                      <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
                         Live Demo ↗
                       </a>
                     )}
@@ -165,17 +180,17 @@ export default function Template1({ data, owner_key, working}) {
         {/* SOCIAL LINKS / FOOTER */}
         <div className="flex flex-wrap gap-4 mt-12 pt-8 border-t border-gray-200">
           {data.github && (
-            <a href={data.github} target="_blank" rel="noopener noreferrer" className="bg-gray-900 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors">
+            <a href={data.github} onClick={() => trackClick("github")} target="_blank" rel="noopener noreferrer" className="bg-gray-900 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-800 transition-colors">
               GitHub Profile
             </a>
           )}
           {data.linkedin && (
-            <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">
+            <a href={data.linkedin} onClick={() => trackClick("linkedin")} target="_blank" rel="noopener noreferrer" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">
               LinkedIn Profile
             </a>
           )}
           {data.resume && data.resume !== "#" && (
-            <a href={data.resume} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-900 border border-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors">
+            <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-900 border border-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors">
               Download Resume
             </a>
           )}

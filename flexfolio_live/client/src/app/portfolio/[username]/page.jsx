@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { getPortfolio } from "@/lib/api";
 import { templates } from "@/lib/templates";
 
+import PortfolioAnalytics from "@/components/analytics/PortfolioAnalytics";
 import PortfolioNotFound from "@/components/portfolio/PortfolioNotFound";
 import TemplateNotFound from "@/components/portfolio/TemplateNotFound";
 
@@ -107,6 +108,7 @@ export default async function PortfolioPage({ params }) {
           }),
         }}
       />
+      <PortfolioAnalytics portfolioId={String(portfolio?._id)} />
       <TemplateComponent data={portfolio.data} owner_key={portfolio._id} working={true} />
     </>
   );

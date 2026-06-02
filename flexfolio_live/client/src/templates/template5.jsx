@@ -1,5 +1,5 @@
 "use client";
-import { sendContactMessage } from "@/lib/api";
+import { sendContactMessage, trackAnalyticsEvent } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
@@ -80,12 +80,12 @@ const NeoProjectCard = ({ p, index }) => {
 
       <div className="flex gap-4 mt-auto">
         {p?.github && (
-          <a href={p.github} target="_blank" rel="noreferrer" className="flex-1 text-center bg-white border-2 border-black hover:bg-black hover:text-white text-black py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-white border-2 border-black hover:bg-black hover:text-white text-black py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Code
           </a>
         )}
         {p?.live && (
-          <a href={p.live} target="_blank" rel="noreferrer" className="flex-1 text-center bg-[#23A094] border-2 border-black hover:bg-[#1a7a71] text-white py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-[#23A094] border-2 border-black hover:bg-[#1a7a71] text-white py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Live Demo
           </a>
         )}
@@ -136,6 +136,21 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
 
   const [loading, setLoading] = useState(false);
 
+  
+  // new analytics 
+  const trackClick = (meta) => {
+    if (working) {
+      const visitorId = sessionStorage.getItem("visitorId");
+      if (!visitorId || !owner_key) return;
+      trackAnalyticsEvent({
+        portfolioId: owner_key,
+        visitorId,
+        eventType: "click",
+        meta,
+      });
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -154,6 +169,8 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
           portfolioId: owner_key,
           ...formData,
         });
+
+        trackClick("contact_form");
       }
 
       toast("Message sent successfully!");
@@ -267,7 +284,7 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
                 </button>
               }
               {data?.resume && (
-                <a href={data.resume} target="_blank" rel="noreferrer" className="bg-white border-4 border-black text-black px-8 py-4 font-black uppercase text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center gap-2">
+                <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-white border-4 border-black text-black px-8 py-4 font-black uppercase text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center gap-2">
                   RESUME
                 </a>
               )}
@@ -479,8 +496,8 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
           </div>
 
           <div className="flex gap-4">
-            {data?.github && <a href={data.github} className="bg-[#90BAFE] border-4 border-black p-3 hover:bg-[#FFC900] hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-black uppercase text-sm">GitHub</a>}
-            {data?.linkedin && <a href={data.linkedin} className="bg-[#FF90E8] border-4 border-black p-3 hover:bg-[#90BAFE] hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-black uppercase text-sm">LinkedIn</a>}
+            {data?.github && <a href={data.github} onClick={() => trackClick("github")} className="bg-[#90BAFE] border-4 border-black p-3 hover:bg-[#FFC900] hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-black uppercase text-sm">GitHub</a>}
+            {data?.linkedin && <a href={data.linkedin} onClick={() => trackClick("linkedin")} className="bg-[#FF90E8] border-4 border-black p-3 hover:bg-[#90BAFE] hover:-translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-black uppercase text-sm">LinkedIn</a>}
           </div>
         </div>
 
