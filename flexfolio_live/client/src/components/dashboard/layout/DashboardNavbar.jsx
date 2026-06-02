@@ -126,7 +126,7 @@ export default function DashboardNavbar() {
           <div className="group relative">
             <button
               type="button"
-              onClick={() => toggleDropdown('bell')}
+              onClick={(e) => { e.stopPropagation();toggleDropdown('bell');}}
               className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'bell'
                 ? 'bg-gray-100 text-gray-900'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
@@ -169,7 +169,7 @@ export default function DashboardNavbar() {
           <div className="group relative">
             <button
               type="button"
-              onClick={() => toggleDropdown('news')}
+               onClick={(e) => { e.stopPropagation();toggleDropdown('news');}}
               className={`p-2 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'news'
                 ? 'bg-gray-100 text-gray-900'
                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
@@ -193,7 +193,7 @@ export default function DashboardNavbar() {
               <h3 className="text-sm font-semibold text-gray-800">News Center</h3>
               <span className="text-[10px] uppercase tracking-wider font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">New</span>
             </div>
-            <div className="flex-1 p-2">
+            <div className="flex-1 p-2 overflow-y-auto max-h-80">
               <button type="button" className="w-full text-left p-3 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 group">
                 <p className="text-xs text-indigo-600 font-semibold mb-1 group-hover:text-indigo-700">v1.0.0 is live</p>
                 <p className="text-sm text-gray-800 font-medium">UI Improvements</p>
@@ -212,7 +212,7 @@ export default function DashboardNavbar() {
         <div className="relative hidden md:flex  items-center justify-center">
           <button
             type="button"
-            onClick={() => toggleDropdown('profile')}
+             onClick={(e) => { e.stopPropagation();toggleDropdown('profile');}}
             className={`flex items-center gap-2 pl-2 pr-1 py-1 rounded-full transition-colors duration-200 border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${activeDropdown === 'profile' ? 'bg-gray-100' : 'hover:bg-gray-100'
               }`}
             aria-haspopup="true"

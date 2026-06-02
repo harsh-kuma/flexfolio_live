@@ -307,7 +307,7 @@ export default function DashboardPage() {
                     />
 
                     {/* Subtle Glassmorphism Blur on Hover */}
-                    <div className="absolute inset-0 bg-gray-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[1px]" />
+                    <div className="absolute inset-0 bg-gray-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     {/* 2. Floating Action Button (Slides in from the right) */}
                     <div className="absolute top-3 right-3 translate-x-4 opacity-0 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-0 group-hover:opacity-100">
