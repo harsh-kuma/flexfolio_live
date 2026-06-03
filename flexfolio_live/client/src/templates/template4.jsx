@@ -513,7 +513,7 @@ export default function Template4Animated({ data, owner_key, working }) {
                     </div>
                     <div>
                       <p className="text-slate-500 text-sm font-semibold uppercase tracking-wider">Email</p>
-                      <p className="text-xl font-bold text-slate-200">{data?.email || "Not Provided"}</p>
+                      <p className="text-xl font-bold text-slate-200 break-all">{data?.email || "Not Provided"}</p>
                     </div>
                   </div>
 
@@ -532,7 +532,7 @@ export default function Template4Animated({ data, owner_key, working }) {
               {/* Right: Form */}
               <form suppressHydrationWarning onSubmit={handleSubmit} className="bg-slate-950/50 p-4 md:p-8 rounded-3xl border border-slate-800/80 space-y-5">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Your Name</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1 ">Your Name</label>
                   <input
                     name="name"
                     type="text"
@@ -540,7 +540,7 @@ export default function Template4Animated({ data, owner_key, working }) {
                     onChange={handleChange}
                     placeholder="John Doe"
                     required
-                    className="w-full bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
+                    className="w-full mt-2 bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Your Email</label>
@@ -551,7 +551,7 @@ export default function Template4Animated({ data, owner_key, working }) {
                     onChange={handleChange}
                     placeholder="john@example.com"
                     required
-                    className="w-full bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
+                    className="w-full mt-2 bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Message</label>
@@ -562,7 +562,7 @@ export default function Template4Animated({ data, owner_key, working }) {
                     placeholder="Write your message here..."
                     required
                     rows={4}
-                    className="w-full bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none"></textarea>
+                    className="w-full mt-2 bg-slate-900 border border-slate-700 text-white p-4 rounded-xl focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all resize-none"></textarea>
                 </div>
                 <button
                   type="submit"

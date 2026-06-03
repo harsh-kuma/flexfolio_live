@@ -463,7 +463,7 @@ export default function Template2({ data, owner_key, working }) {
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">Email</p>
-                    <p className="font-medium text-sm">{data?.email || "Not provided"}</p>
+                    <p className="font-medium text-sm break-all">{data?.email || "Not provided"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-slate-700">
@@ -481,7 +481,7 @@ export default function Template2({ data, owner_key, working }) {
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">Location</p>
-                    <p className="font-medium text-sm">{data?.location || "Not provided"}</p>
+                    <p className="font-medium text-sm break-all">{data?.location || "Not provided"}</p>
                   </div>
                 </div>
               </div>

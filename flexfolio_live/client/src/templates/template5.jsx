@@ -414,7 +414,7 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
                 <div className="space-y-4 pt-6">
                   <div className="flex items-center gap-4 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <span className="font-black uppercase w-20">Email:</span>
-                    <span className="font-bold">{data?.email || "Not Provided"}</span>
+                    <span className="font-bold break-all">{data?.email || "Not Provided"}</span>
                   </div>
                   <div className="flex items-center gap-4 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <span className="font-black uppercase w-20">Phone:</span>
@@ -422,7 +422,7 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
                   </div>
                   <div className="flex items-center gap-4 bg-white border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <span className="font-black uppercase w-20">Loc:</span>
-                    <span className="font-bold">{data?.location || "Not Provided"}</span>
+                    <span className="font-bold break-all">{data?.location || "Not Provided"}</span>
                   </div>
                 </div>
               </div>
