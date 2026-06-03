@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Reusable Project Card for Dark Theme
-const DarkProjectCard = ({ p }) => {
+const DarkProjectCard = ({ p ,trackClick }) => {
   const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState("0px");
@@ -76,12 +76,12 @@ const DarkProjectCard = ({ p }) => {
 
       <div className="flex gap-3 mt-auto relative z-10">
         {p?.github && (
-          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
+          <a href={p.github} onClick={() => trackClick(`project_code:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 py-2 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
             Code
           </a>
         )}
         {p?.live && (
-          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">
+          <a href={p.live} onClick={() => trackClick(`project_live:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">
             Live Demo
           </a>
         )}
@@ -366,7 +366,7 @@ export default function Template3({ data, owner_key, working }) {
             <h2 className="text-3xl font-bold text-white mb-10 text-center">Featured Projects</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {data?.projects?.map((p, i) => (
-                <DarkProjectCard key={i} p={p} />
+                <DarkProjectCard key={i} p={p} trackClick={trackClick}/>
               ))}
             </div>
           </div>

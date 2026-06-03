@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Separate component to handle individual project state (View More / View Less)
-const ProjectCard = ({ p }) => {
+const ProjectCard = ({ p , trackClick}) => {
   const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState("0px");
@@ -76,12 +76,12 @@ const ProjectCard = ({ p }) => {
 
       <div className="flex gap-3 mt-auto">
         {p.github && (
-          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 py-2 rounded-lg text-sm font-medium transition-colors">
+          <a href={p.github} onClick={() => trackClick(`project_code:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-blue-600 py-2 rounded-lg text-sm font-medium transition-colors">
             View Code
           </a>
         )}
         {p.live && (
-          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white py-2 rounded-lg text-sm font-medium transition-colors">
+          <a href={p.live} onClick={() => trackClick(`project_live:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white py-2 rounded-lg text-sm font-medium transition-colors">
             Live App
           </a>
         )}
@@ -409,7 +409,7 @@ export default function Template2({ data, owner_key, working }) {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {data?.projects?.map((p, i) => (
-                <ProjectCard key={i} p={p} />
+                <ProjectCard key={i} p={p} trackClick={trackClick} />
               ))}
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 // Reusable Interactive Project Card
-const AnimatedProjectCard = ({ p }) => {
+const AnimatedProjectCard = ({ p ,trackClick}) => {
   const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState("0px");
@@ -78,12 +78,12 @@ const AnimatedProjectCard = ({ p }) => {
 
       <div className="relative z-10 flex gap-3 mt-auto pt-4 border-t border-slate-800/50">
         {p?.github && (
-          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg">
+          <a href={p.github} onClick={() => trackClick(`project_code:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-lg">
             Source Code
           </a>
         )}
         {p?.live && (
-          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white py-2.5 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)]">
+          <a href={p.live} onClick={() => trackClick(`project_live:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white py-2.5 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(139,92,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)]">
             Live Preview
           </a>
         )}
@@ -457,7 +457,7 @@ export default function Template4Animated({ data, owner_key, working }) {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data?.projects?.map((p, i) => (
-                <AnimatedProjectCard key={i} p={p} />
+                <AnimatedProjectCard key={i} p={p} trackClick={trackClick}/>
               ))}
             </div>
           </div>

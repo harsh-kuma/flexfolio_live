@@ -19,6 +19,7 @@ import { useCallback, useEffect, useState } from "react";
 // =====================
 import {
   ArcElement,
+  BarElement,
   CategoryScale,
   Chart as ChartJS,
   Legend,
@@ -28,7 +29,7 @@ import {
   Tooltip,
 } from "chart.js";
 
-import { Doughnut, Line } from "react-chartjs-2";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
 
 // REGISTER CHART
 ChartJS.register(
@@ -38,7 +39,8 @@ ChartJS.register(
   LineElement,
   ArcElement,
   Tooltip,
-  Legend
+  Legend,
+  BarElement
 );
 
 const DEFAULT_THUMBNAIL =
@@ -63,6 +65,7 @@ export default function DashboardPage() {
       longestVisit: 0,
       totalVisitTime: 0,
     },
+    topClicks: [],
   });
 
   // =====================
@@ -86,6 +89,7 @@ export default function DashboardPage() {
           longestVisit: 0,
           totalVisitTime: 0,
         },
+        topClicks: res.topClicks || [],
       });
     } catch (err) {
       console.error(err);
@@ -187,6 +191,79 @@ export default function DashboardPage() {
     },
   };
 
+  const topClicksChartData = {
+  labels: stats.topClicks.map((item) => {
+    if (item._id.startsWith("project_")) {
+      const name = item._id.replace("project_", "");
+
+      return name.length > 25
+        ? `${name.slice(0, 25)}...`
+        : name;
+    }
+
+    return item._id.charAt(0).toUpperCase() + item._id.slice(1);
+  }),
+
+  datasets: [
+    {
+      label: "Clicks",
+      data: stats.topClicks.map((item) => item.count),
+      backgroundColor: "#7c3aed",
+      borderRadius: 8,
+      barThickness: 18,
+    },
+  ],
+};
+
+  const topClicksOptions = {
+  indexAxis: "y",
+  responsive: true,
+  maintainAspectRatio: false,
+
+  plugins: {
+    legend: {
+      display: false,
+    },
+
+    tooltip: {
+      callbacks: {
+        title: (items) => {
+          const index = items[0].dataIndex;
+
+          return stats.topClicks[index]._id.replace(
+            "project_code:",
+            ""
+          );
+        },
+      },
+    },
+  },
+
+  scales: {
+    x: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0,
+        stepSize: 1,
+      },
+      grid: {
+        color: "#f3f4f6",
+      },
+    },
+
+    y: {
+      grid: {
+        display: false,
+      },
+      ticks: {
+        font: {
+          size: 12,
+        },
+      },
+    },
+  },
+};
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
@@ -243,7 +320,7 @@ export default function DashboardPage() {
         {/* ===================== */}
         {/* CHARTS SIDE BY SIDE */}
         {/* ===================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* LINE CHART */}
           <div className="bg-white border rounded-2xl p-5">
@@ -259,7 +336,7 @@ export default function DashboardPage() {
 
           {/* ENGAGEMENT CHART */}
           <div className="bg-white border rounded-2xl p-5">
-            <h2 className="font-semibold mb-4">Engagement Overview</h2>
+            <h2 className="font-semibold mb-4">Engagement Overview (Seconds)</h2>
             <div className="h-[280px]">
               {loading ? (
                 <div className="h-full bg-gray-100 animate-pulse rounded-xl" />
@@ -267,6 +344,24 @@ export default function DashboardPage() {
                 <Doughnut
                   data={engagementChartData}
                   options={engagementOptions}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Bar CHART */}
+          <div className="bg-white border rounded-2xl p-5">
+            <h2 className="font-semibold mb-4">
+              Top Clicked Links
+            </h2>
+
+            <div className="h-[320px]">
+              {loading ? (
+                <div className="h-full bg-gray-100 animate-pulse rounded-xl" />
+              ) : (
+                <Bar
+                  data={topClicksChartData}
+                  options={topClicksOptions}
                 />
               )}
             </div>

@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 
 // Neo-Brutalist Project Card
-const NeoProjectCard = ({ p, index }) => {
+const NeoProjectCard = ({ p, index ,trackClick}) => {
   const contentRef = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState("0px");
@@ -80,12 +80,12 @@ const NeoProjectCard = ({ p, index }) => {
 
       <div className="flex gap-4 mt-auto">
         {p?.github && (
-          <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-white border-2 border-black hover:bg-black hover:text-white text-black py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <a href={p.github} onClick={() => trackClick(`project_code:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-white border-2 border-black hover:bg-black hover:text-white text-black py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Code
           </a>
         )}
         {p?.live && (
-          <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noreferrer" className="flex-1 text-center bg-[#23A094] border-2 border-black hover:bg-[#1a7a71] text-white py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <a href={p.live} onClick={() => trackClick(`project_live:${p.title}`)} target="_blank" rel="noreferrer" className="flex-1 text-center bg-[#23A094] border-2 border-black hover:bg-[#1a7a71] text-white py-2.5 font-black uppercase text-sm transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             Live Demo
           </a>
         )}
@@ -373,7 +373,7 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data?.projects?.map((p, i) => (
-                <NeoProjectCard key={i} index={i} p={p} />
+                <NeoProjectCard key={i} index={i} p={p}  trackClick={trackClick} />
               ))}
             </div>
           </div>
