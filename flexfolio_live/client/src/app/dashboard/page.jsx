@@ -52,11 +52,11 @@ export default function DashboardPage() {
 
   const [stats, setStats] = useState({
     overview: {
-      totalPortfolios: 0,
-      totalViews: 0,
-      totalClicks: 0,
-      uniqueVisitors: 0,
-      todayViews: 0,
+      totalPortfolios: null,
+      totalViews: null,
+      totalClicks: null,
+      uniqueVisitors: null,
+      todayViews: null,
     },
     portfolios: [],
     chart: [],
@@ -192,77 +192,77 @@ export default function DashboardPage() {
   };
 
   const topClicksChartData = {
-  labels: stats.topClicks.map((item) => {
-    if (item._id.startsWith("project_")) {
-      const name = item._id.replace("project_", "");
+    labels: stats.topClicks.map((item) => {
+      if (item._id.startsWith("project_")) {
+        const name = item._id.replace("project_", "");
 
-      return name.length > 25
-        ? `${name.slice(0, 25)}...`
-        : name;
-    }
+        return name.length > 20
+          ? `${name.slice(0, 20)}...`
+          : name;
+      }
 
-    return item._id.charAt(0).toUpperCase() + item._id.slice(1);
-  }),
+      return item._id.charAt(0).toUpperCase() + item._id.slice(1);
+    }),
 
-  datasets: [
-    {
-      label: "Clicks",
-      data: stats.topClicks.map((item) => item.count),
-      backgroundColor: "#7c3aed",
-      borderRadius: 8,
-      barThickness: 18,
-    },
-  ],
-};
+    datasets: [
+      {
+        label: "Clicks",
+        data: stats.topClicks.map((item) => item.count),
+        backgroundColor: "#7c3aed",
+        borderRadius: 8,
+        barThickness: 18,
+      },
+    ],
+  };
 
   const topClicksOptions = {
-  indexAxis: "y",
-  responsive: true,
-  maintainAspectRatio: false,
+    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: false,
 
-  plugins: {
-    legend: {
-      display: false,
-    },
-
-    tooltip: {
-      callbacks: {
-        title: (items) => {
-          const index = items[0].dataIndex;
-
-          return stats.topClicks[index]._id.replace(
-            "project_code:",
-            ""
-          );
-        },
-      },
-    },
-  },
-
-  scales: {
-    x: {
-      beginAtZero: true,
-      ticks: {
-        precision: 0,
-        stepSize: 1,
-      },
-      grid: {
-        color: "#f3f4f6",
-      },
-    },
-
-    y: {
-      grid: {
+    plugins: {
+      legend: {
         display: false,
       },
-      ticks: {
-        font: {
-          size: 12,
+
+      tooltip: {
+        callbacks: {
+          title: (items) => {
+            const index = items[0].dataIndex;
+
+            return stats.topClicks[index]._id.replace(
+              "project_code:",
+              ""
+            );
+          },
         },
       },
     },
-  },
-};
+
+    scales: {
+      x: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+          stepSize: 1,
+        },
+        grid: {
+          color: "#f3f4f6",
+        },
+      },
+
+      y: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          font: {
+            size: 12,
+          },
+        },
+      },
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -310,9 +310,13 @@ export default function DashboardPage() {
                 {card.label}
                 {card.icon}
               </div>
-              <h2 className="text-2xl font-bold mt-2">
-                {Number(card.value || 0).toLocaleString()}
-              </h2>
+              {card.value !== undefined && card.value !== null ? (
+                <h2 className="text-2xl font-bold mt-2">
+                  {Number(card.value).toLocaleString()}
+                </h2>
+              ) : (
+                <div className="h-8 w-20 mt-2 bg-gray-100 animate-pulse rounded-xl" />
+              )}
             </div>
           ))}
         </div>
