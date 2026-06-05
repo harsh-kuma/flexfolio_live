@@ -12,7 +12,7 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
   const router = useRouter();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
-  const category = templateKey.split("-")[0];
+  const category = templateKey.split("~")[0];
   const template = templates[category];
 
   useEffect(() => {

@@ -21,7 +21,7 @@ exports.createPortfolio = async (req, res) => {
     // Template info
     const templateKey = req.body.templateKey;
 
-    const [category, templateSlug] = templateKey.split("-");
+    const [category, templateSlug] = templateKey.split("~");
 
     // Image handling
     if (req.file) {

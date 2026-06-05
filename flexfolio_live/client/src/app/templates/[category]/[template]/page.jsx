@@ -112,7 +112,7 @@ export default function TemplatePreview() {
 
   const isIframe = searchParams.get("view") === "true";
 
-  const key = `${params.category}-${params.template}`;
+  const key = `${params.category}~${params.template}`;
   const template = templates[key];
 
   if (!template) return <TemplateNotFound/>;

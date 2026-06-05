@@ -16,7 +16,7 @@ function BuilderForm() {
   const [ checkingAuth,setCheckingAuth] = useState(true);
 
   const isValidTemplate = verifyTemplate(type);
-  const category = isValidTemplate? type.split("-")[0]: null;
+  const category = isValidTemplate? type.split("~")[0]: null;
 
   const template = isValidTemplate? templates[category]: null;
 
