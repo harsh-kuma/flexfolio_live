@@ -36,7 +36,7 @@ export default function DashbordShell({ children }) {
                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
 
                     {/* content wrapper */}
-                    <div className="relative p-2 max-w-[1400px] mx-auto w-full">
+                    <div className="relative md:p-2 max-w-[1400px] mx-auto w-full">
                         {children}
                     </div>
 
