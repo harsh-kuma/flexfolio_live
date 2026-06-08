@@ -14,6 +14,7 @@ import {
   verifyPortfolioEmailOtp,
 } from "@/lib/api";
 
+import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import {
   ArrowLeft,
@@ -159,10 +160,7 @@ export default function PortfolioManagePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50/50">
-        <Loader2 className="animate-spin w-8 h-8 text-blue-600 mb-4" />
-        <p className="text-sm text-gray-500 font-medium animate-pulse">Loading portfolio details...</p>
-      </div>
+    <Loader/>
     );
   }
 
