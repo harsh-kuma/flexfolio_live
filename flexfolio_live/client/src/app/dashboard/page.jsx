@@ -108,7 +108,7 @@ export default function DashboardPage() {
   // =====================
   const overviewCards = [
     {
-      label: "Total Portfolios",
+      label: "Total Live Portfolios",
       value: stats.overview.totalPortfolios,
       icon: <LayoutGrid size={18} className="text-violet-500" />,
     },
@@ -273,7 +273,7 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-gray-500 text-sm">
-              Manage portfolios & analytics
+              Manage Live Sites & analytics
             </p>
           </div>
 
@@ -375,8 +375,7 @@ export default function DashboardPage() {
 
         {/* PORTFOLIOS */}
         <div className="space-y-5">
-          <h2 className="text-xl font-semibold">Your Portfolios</h2>
-
+          <h2 className="text-xl font-semibold">Your Live Sites</h2>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {Array.from({ length: 3 }).map((_, i) => (

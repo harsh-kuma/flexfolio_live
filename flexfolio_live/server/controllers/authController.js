@@ -4,12 +4,13 @@ const generateAccountUsername = require("../utils/generateAccountUsername");
 
 const User = require("../models/User");
 const { sendOTP } = require("../utils/sendOTP");
-
+const { validateEmail } = require("../utils/validateEmail");
 // reusable part
 const { cookieOptions } = require("../utils/cookieOptions");
 const { getSafeUser } = require("../utils/getSafeUser");
 const { generateOTP } = require("../utils/generateOTP");
 const cloudinary = require("../config/cloudinary");
+const crypto = require("crypto");
 
 const createToken = (user) => {
   return jwt.sign(
@@ -30,6 +31,13 @@ exports.register = async (req, res) => {
     let { name, email } = req.body;
     email = email.trim().toLowerCase();
     const username = await generateAccountUsername(name);
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
 
     let user = await User.findOne({ email });
 
@@ -54,11 +62,10 @@ exports.register = async (req, res) => {
 
       // reuse OTP if still valid
       if (user.otp && user.otpExpiry > Date.now()) {
-        otp = user.otp;
       } else {
         otp = generateOTP();
-
-        user.otp = otp;
+        const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+        user.otp = otpHash;
         user.otpExpiry = Date.now() + 10 * 60 * 1000;
         await user.save();
         await sendOTP(email, otp);
@@ -87,6 +94,7 @@ exports.register = async (req, res) => {
 
 
     const otp = generateOTP();
+    const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
 
     const otpExpiry = Date.now() + 10 * 60 * 1000;
 
@@ -94,7 +102,7 @@ exports.register = async (req, res) => {
       name,
       email,
       username,
-      otp,
+      otp: otpHash,
       otpExpiry,
       isVerified: false,
     });
@@ -130,7 +138,8 @@ exports.verifyOTP = async (req, res) => {
       });
     }
 
-    if (user.otp !== otp || user.otpExpiry < Date.now()) {
+    const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+    if (user.otp !== otpHash || user.otpExpiry < Date.now()) {
       return res.status(400).json({
         success: false,
         message: "Invalid or expired OTP",
@@ -321,6 +330,12 @@ exports.forgotPassword = async (req, res) => {
     const email = req.body.email
       .trim()
       .toLowerCase();
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -330,9 +345,19 @@ exports.forgotPassword = async (req, res) => {
       });
     }
 
-    const otp = generateOTP();
+    const now = Date.now();
 
-    user.resetPasswordOtp = otp;
+    if (user.resetPasswordOtp && user.resetPasswordOtpExpiry && user.resetPasswordOtpExpiry > now) {
+      return res.status(429).json({
+        success: false,
+        message: "OTP already sent. Please check your email.",
+      });
+    }
+
+    const otp = generateOTP();
+    const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+
+    user.resetPasswordOtp = otpHash;
     user.resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000;
 
     await user.save();
@@ -371,8 +396,9 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
+    const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
     if (
-      user.resetPasswordOtp !== otp ||
+      user.resetPasswordOtp !== otpHash ||
       user.resetPasswordOtpExpiry < Date.now()
     ) {
       return res.status(400).json({
@@ -452,6 +478,12 @@ exports.googleLogin = async (req, res) => {
     let { email, name, profile } = req.body;
 
     email = email.trim().toLowerCase();
+    if (!validateEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
 
     let user = await User.findOne({ email });
 
@@ -500,7 +532,7 @@ exports.googleLogin = async (req, res) => {
       user = await User.create({
         name,
         email,
-        profile:uploadedImage.secure_url,
+        profile: uploadedImage.secure_url,
         username,
         providers: ["google"],
         isVerified: true,

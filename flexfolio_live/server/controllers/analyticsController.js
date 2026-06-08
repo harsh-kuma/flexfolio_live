@@ -301,7 +301,7 @@ exports.getMyAnalyticsSummary = async (req, res) => {
     const userId = req.user.id;
 
     // 1. Get all user portfolios with required fields
-    const portfolios = await Portfolio.find({ user: userId })
+    const portfolios = await Portfolio.find({ user: userId , isPublished: true })
       .select(
         "_id title thumbnail username category templateSlug isPublished createdAt"
       )

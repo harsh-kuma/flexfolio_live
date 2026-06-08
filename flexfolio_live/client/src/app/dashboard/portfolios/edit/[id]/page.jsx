@@ -2,14 +2,15 @@
 
 import PortfolioEditor from "@/components/builder/PortfolioEditor";
 import Loader from "@/components/common/loader/Loader";
+import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { getPortfolioById } from "@/lib/api";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function EditPortfolioPage() {
-  const params =useParams();
-  const [portfolio,setPortfolio] = useState(null);
-  const [loading,setLoading] = useState(true);
+  const params = useParams();
+  const [portfolio, setPortfolio] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadPortfolio();
@@ -35,6 +36,12 @@ export default function EditPortfolioPage() {
 
   if (loading) {
     return <Loader />;
+  }
+
+  if (!portfolio) {
+    return (
+      <DashboardPortfolioNotFound />
+    );
   }
 
   return (

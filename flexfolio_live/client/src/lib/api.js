@@ -98,7 +98,7 @@ export const getMyPortfolios = async () => {
 };
 
 export const getPortfolioById = async (id) => {
-  const res = await api.get(`/portfolio/manage/${id}`);
+  const res = await api.get(`/portfolio/edit/${id}`);
   return res.data;
 };
 
@@ -111,6 +111,37 @@ export const deletePortfolio = async (id) => {
   const res = await api.delete(`/portfolio/${id}`);
   return res.data;
 };
+
+export const updatePortfolioGeneralDetail = async (data) => {
+  const res = await api.post(`/portfolio/general-details`,data);
+  return res.data;
+};
+
+export const getPortfolioForManage = async (id) => {
+  const res = await api.get(`/portfolio/manage/${id}`);
+  return res.data;
+};
+
+export const publishPortfolio = async (id) => {
+  const res = await api.get(`/portfolio/publish/${id}`);
+  return res.data;
+};
+
+export const unpublishPortfolio = async (id) => {
+  const res = await api.get(`/portfolio/unpublish/${id}`);
+  return res.data;
+};
+
+export const sendPortfolioVerificationEmail = async (data) => {
+  const res = await api.post(`/portfolio/send-verify-email`,data);
+  return res.data;
+};
+
+export const verifyPortfolioEmailOtp = async (data) => {
+  const res = await api.post(`/portfolio/verify-email`,data);
+  return res.data;
+};
+
 
 
 // New Free Analytics 

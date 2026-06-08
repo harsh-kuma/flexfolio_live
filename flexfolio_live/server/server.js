@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 const app = express();
 const helmet = require("helmet");
 const compression = require("compression");
+const multer = require("multer");
 app.set("trust proxy", 1);
 
 
@@ -88,9 +89,36 @@ app.get("/", (req, res) => {
 // SERVER
 // =========================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Error:", err);
 
-  res.status(err.status || 500).json({
+  //  Multer specific errors
+  if (err instanceof multer.MulterError) {
+    let message = "File upload error";
+
+    if (err.code === "LIMIT_FILE_SIZE") {
+      message = "File too large. Maximum allowed size is 2MB.";
+    }
+
+    if (err.code === "LIMIT_UNEXPECTED_FILE") {
+      message = "Unexpected file field.";
+    }
+
+    return res.status(400).json({
+      success: false,
+      message,
+    });
+  }
+
+  //  Custom errors (like fileFilter)
+  if (err.message === "Only image files are allowed") {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
+  //  Default server error
+  return res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
   });

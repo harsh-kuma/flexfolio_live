@@ -8,7 +8,7 @@ const portfolioSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  
+
   // SYSTEM FIELDS
   username: {
     type: String,
@@ -34,20 +34,36 @@ const portfolioSchema = new mongoose.Schema({
   },
 
   // DASHBOARD
-    title: {
-      type: String,
-      default: "Untitled Portfolio",
-    },
+  title: {
+    type: String,
+    default: "Untitled Portfolio",
+  },
 
-    thumbnail: {
-      type: String,
-      default: "",
-    },
+  thumbnail: {
+    type: String,
+    default: "",
+  },
 
-    isPublished: {
-      type: Boolean,
-      default: true,
-    },
+  isPublished: {
+    type: Boolean,
+    default: false,
+  },
+
+  // EMAIL SECTION
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    default: "",
+  },
+
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  emailVerificationOtp: String,
+  emailVerificationExpires: Date,
 
   // COMPLETE TEMPLATE DATA
   data: {

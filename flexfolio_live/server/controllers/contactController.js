@@ -33,7 +33,8 @@ exports.sendContactMessage = async (req, res) => {
         message,
       });
 
-    await sendContactMail({
+    if(portfolio.emailVerified){
+      await sendContactMail({
       ownerEmail: portfolio.data.email,
       ownerName: portfolio.data.fullName,
 
@@ -41,7 +42,7 @@ exports.sendContactMessage = async (req, res) => {
       senderEmail: email,
       message,
     });
-
+    }
     return res.status(201).json({
       success: true,
       message: "Message sent successfully",

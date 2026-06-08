@@ -1,30 +1,30 @@
 "use client";
 
 import Loader from "@/components/common/loader/Loader";
-import { deletePortfolio, getMyPortfolios } from "@/lib/api";
+import { getMyPortfolios } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { usePlan } from "@/hooks/usePlan";
 import {
   Calendar,
   Copy,
-  ExternalLink,
   Globe,
   Layout,
   LayoutTemplate,
-  Loader2,
+  Lock,
   Pencil,
   Plus,
   Search,
-  SearchX,
-  Trash2
+  SearchX
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function PortfoliosPage() {
+  const router = useRouter();
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
 
   // Professional fallback image for portfolios without a thumbnail
   const DEFAULT_IMAGE = "https://res.cloudinary.com/dr38wac7n/image/upload/v1779525495/default_portfolio_shk797.png";
@@ -44,19 +44,6 @@ export default function PortfoliosPage() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this portfolio? All portfolio data, contact messages, and uploaded images will be permanently removed. This action cannot be undone.")) return;
-
-    setDeletingId(id);
-    try {
-      await deletePortfolio(id);
-      setPortfolios((prev) => prev.filter((p) => p._id !== id));
-    } catch (error) {
-      console.error("Failed to delete portfolio:", error);
-    } finally {
-      setDeletingId(null);
-    }
-  };
 
   const filteredPortfolios = portfolios.filter(p =>
     p.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -65,13 +52,23 @@ export default function PortfoliosPage() {
 
   const publishedCount = portfolios.filter(p => p.isPublished).length;
 
-  const handleCopyUrl = async (username) => {
-    const url = `${window.location.origin}/portfolio/${username}`;
+  const handleCopyUrl = async (username, isPublished) => {
+    const url = isPublished ? `https://flexfolio.online/portfolio/${username}` : `https://flexfolio.online/preview/${username}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch (error) {
       console.error("Failed to copy URL:", error);
     }
+  };
+
+  const { canCreatePortfolio } = usePlan();
+
+  const handleClick = () => {
+    if (!canCreatePortfolio()) {
+      router.push("/pricing");
+      return;
+    }
+    router.push("/dashboard/templates");
   };
 
   if (loading) {
@@ -97,13 +94,13 @@ export default function PortfoliosPage() {
         </div>
 
         <div className="item-center">
-          <Link
-            href="/dashboard/templates"
+          <button
+            onClick={handleClick}
             className="bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium shadow-lg shadow-violet-600/20 hover:shadow-violet-600/40 active:scale-95"
           >
             <Plus size={16} strokeWidth={2.5} />
             Create Portfolio
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -172,8 +169,8 @@ export default function PortfoliosPage() {
                     <div className="absolute top-3 left-3">
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase border backdrop-blur-md shadow-sm ${portfolio.isPublished
-                            ? "bg-emerald-50/95 text-emerald-700 border-emerald-200"
-                            : "bg-white/95 text-gray-600 border-gray-200"
+                          ? "bg-emerald-50/95 text-emerald-700 border-emerald-200"
+                          : "bg-white/95 text-gray-600 border-gray-200"
                           }`}
                       >
                         {portfolio.isPublished ? "Published" : "Draft"}
@@ -200,13 +197,23 @@ export default function PortfoliosPage() {
                       {/* URL BOX */}
                       <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg">
                         <div className="flex items-center gap-2 overflow-hidden">
-                          <Globe size={14} className="text-gray-400 shrink-0" />
+                          {portfolio.isPublished ? 
+                          <>
+                          <Globe size={14} className="text-blue-500 shrink-0" />
                           <span className="text-xs text-gray-600 truncate select-all">
                             flexfolio.online/portfolio/{portfolio.username}
                           </span>
+                          </>: 
+                          <>
+                          <Lock size={14} className="text-green-600 shrink-0" />
+                          <span className="text-xs text-gray-600 truncate select-all">
+                            flexfolio.online/preview/{portfolio.username}
+                          </span>
+                          </>}
+                          
                         </div>
                         <button
-                          onClick={() => handleCopyUrl(portfolio.username)}
+                          onClick={() => handleCopyUrl(portfolio.username, portfolio.isPublished)}
                           className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
                           title="Copy URL"
                           aria-label="Copy URL"
@@ -228,38 +235,12 @@ export default function PortfoliosPage() {
                       {/* FOOTER ACTIONS */}
                       <div className="pt-4 border-t border-gray-100 flex items-center gap-2 min-w-0">
                         <Link
-                          href={`/dashboard/portfolios/edit/${portfolio._id}`}
+                          href={`/dashboard/portfolios/manage/${portfolio._id}`}
                           className="flex-1 min-w-0 inline-flex items-center justify-center gap-2 h-9 px-3 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-500 whitespace-nowrap"
                         >
                           <Pencil size={15} className="text-gray-500 shrink-0" />
-                          <span>Edit Site</span>
+                          <span>Manage Site</span>
                         </Link>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Link
-                            href={`/portfolio/${portfolio.username}`}
-                            target="_blank"
-                            className="inline-flex items-center justify-center h-9 w-9 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
-                            title="View Live Site"
-                            aria-label="View Live Site"
-                          >
-                            <ExternalLink size={16} />
-                          </Link>
-
-                          <button
-                            onClick={() => handleDelete(portfolio._id)}
-                            disabled={deletingId === portfolio._id}
-                            className="inline-flex items-center justify-center h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-200 disabled:opacity-50"
-                            title="Delete Site"
-                            aria-label="Delete Site"
-                          >
-                            {deletingId === portfolio._id ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-red-600" />
-                            ) : (
-                              <Trash2 size={16} />
-                            )}
-                          </button>
-                        </div>
                       </div>
                     </div>
                   </div>

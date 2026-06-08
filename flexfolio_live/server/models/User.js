@@ -46,6 +46,37 @@ const userSchema = new mongoose.Schema(
     otpExpiry: Date,
     resetPasswordOtp: String,
     resetPasswordOtpExpiry: Date,
+
+    subscription: {
+      plan: {
+        type: String,
+        enum: ["free", "pro"],
+        default: "free"
+      },
+
+      status: {
+        type: String,
+        enum: ["active", "expired", "cancelled"],
+        default: "active"
+      },
+
+      startDate: {
+        type: Date,
+        default: null
+      },
+
+      endDate: {
+        type: Date,
+        default: null
+      }
+    },
+
+    usage: {
+      portfolios: {
+        type: Number,
+        default: 0
+      },
+    }
   },
   {
     timestamps: true,

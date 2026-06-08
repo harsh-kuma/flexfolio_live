@@ -1,18 +1,9 @@
 "use client";
 
-import Loader from "@/components/common/loader/Loader";
-import { useAuth } from "@/components/providers/AuthProvider";
 import DashboardNavbar from "./DashboardNavbar";
 import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashbordShell({ children }) {
-    const { loading } = useAuth();
-
-    if (loading) {
-        return (
-            <Loader/>
-        );
-    }
     return (
         <div className="h-screen w-full flex flex-col bg-gray-200 text-white overflow-hidden">
 

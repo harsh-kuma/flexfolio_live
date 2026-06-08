@@ -111,7 +111,7 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
 
         if (res?.success) {
           router.push(
-            `/portfolio/${res.username}`
+            `/dashboard/portfolios/manage/${res._id}`
           );
         }
       }
@@ -138,12 +138,8 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
           "Portfolio updated successfully"
         );
       }
-    } catch (err) {
-      console.error(err);
-
-      toast(
-        "Something went wrong"
-      );
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
