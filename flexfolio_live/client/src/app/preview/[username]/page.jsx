@@ -9,7 +9,7 @@ export default async function PortfolioPage({ params }) {
   const { username } = await params;
 
   const res = await getPreviewPortfolio(username);
-
+  console.log(res);
   const portfolio = res.portfolio;
 
   if (!portfolio) {

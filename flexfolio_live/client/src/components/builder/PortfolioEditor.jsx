@@ -7,6 +7,7 @@ import { templates } from "@/utils/templates";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "../providers/AuthProvider";
 
 export default function PortfolioEditor({ templateKey, initialData, mode = "create", portfolioId = null }) {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
   const [loading, setLoading] = useState(false);
   const category = templateKey.split("~")[0];
   const template = templates[category];
+  const {fetchUser} = useAuth(); 
 
   useEffect(() => {
     if (initialData) {
@@ -104,10 +106,8 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
           JSON.stringify(formData)
         );
 
-        const res =
-          await createPortfolio(
-            payload
-          );
+        const res = await createPortfolio(payload);
+        await fetchUser();
 
         if (res?.success) {
           router.push(

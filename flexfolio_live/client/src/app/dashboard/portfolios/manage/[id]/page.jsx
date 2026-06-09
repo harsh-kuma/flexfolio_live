@@ -16,6 +16,7 @@ import {
 
 import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
+import { useAuth } from "@/components/providers/AuthProvider";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -36,6 +37,7 @@ const DEFAULT_IMAGE =
   "https://res.cloudinary.com/dr38wac7n/image/upload/v1779525495/default_portfolio_shk797.png";
 
 export default function PortfolioManagePage() {
+  const {fetchUser} = useAuth();
   const { id } = useParams();
   const router = useRouter();
 
@@ -108,6 +110,7 @@ export default function PortfolioManagePage() {
     setDeleting(true);
     try {
       await deletePortfolio(id);
+      await fetchUser();
       router.push("/dashboard/portfolios");
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
