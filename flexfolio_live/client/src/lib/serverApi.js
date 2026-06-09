@@ -8,6 +8,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const getCookieHeader = async () => {
   const cookieStore = await cookies();
 
+  console.log(
+  cookieStore.getAll().map(c => ({
+    name: c.name,
+    value: c.value.slice(0, 20)
+  }))
+);
+
   return cookieStore
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
