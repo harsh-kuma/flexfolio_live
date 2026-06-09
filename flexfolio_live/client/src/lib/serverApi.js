@@ -18,17 +18,8 @@ const getCookieHeader = async () => {
  * GET Preview Portfolio (Server Component safe)
  */
 export const getPreviewPortfolio = async (username) => {
-  const debug = {
-    timestamp: new Date().toISOString(),
-    username,
-    apiUrl: API_URL,
-  };
-
   try {
     const cookieHeader = await getCookieHeader();
-
-    debug.cookieHeader = cookieHeader;
-    debug.cookieLength = cookieHeader?.length || 0;
 
     const res = await fetch(
       `${API_URL}/portfolio/preview/${username}`,
@@ -41,52 +32,20 @@ export const getPreviewPortfolio = async (username) => {
       }
     );
 
-    debug.status = res.status;
-    debug.statusText = res.statusText;
-    debug.ok = res.ok;
-    debug.url = res.url;
-
-    const responseText = await res.text();
-
-    debug.responseBody = responseText;
-
-    try {
-      debug.responseJson = JSON.parse(responseText);
-    } catch {
-      debug.responseJson = null;
-    }
-
-    console.log(
-      "========== PREVIEW DEBUG ==========",
-      JSON.stringify(debug, null, 2)
-    );
+    const data = await res.json().catch(() => null);
 
     if (!res.ok) {
       return {
         success: false,
-        error:
-          debug.responseJson?.message ||
-          responseText ||
-          "Failed to fetch preview portfolio",
+        error: data?.message || "Failed to fetch preview portfolio",
       };
     }
 
     return {
       success: true,
-      portfolio: debug.responseJson,
+      portfolio: data,
     };
   } catch (error) {
-    debug.error = {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    };
-
-    console.log(
-      "========== PREVIEW ERROR ==========",
-      JSON.stringify(debug, null, 2)
-    );
-
     return {
       success: false,
       error: error.message,
