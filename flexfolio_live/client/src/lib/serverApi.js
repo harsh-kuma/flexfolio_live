@@ -19,8 +19,9 @@ const getCookieHeader = async () => {
  */
 export const getPreviewPortfolio = async (username) => {
   try {
+    console.log("11111111111111");
     const cookieHeader = await getCookieHeader();
-
+    console.log("22222222",cookieHeader);
     const res = await fetch(
       `${API_URL}/portfolio/preview/${username}`,
       {
@@ -31,7 +32,7 @@ export const getPreviewPortfolio = async (username) => {
         cache: "no-store",
       }
     );
-
+    console.log("33333333",res);
     const data = await res.json().catch(() => null);
 
     if (!res.ok) {
@@ -46,6 +47,7 @@ export const getPreviewPortfolio = async (username) => {
       portfolio: data,
     };
   } catch (error) {
+    console.log("444444",error.message);
     return {
       success: false,
       error: error.message,
