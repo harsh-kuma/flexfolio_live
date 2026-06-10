@@ -4,7 +4,7 @@ export default function AuthLayout({
   children,
 }) {
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-[#0f172a] flex items-center justify-center p-4">
       <div className="w-full max-w-6xl bg-white rounded-3xl overflow-hidden shadow-2xl grid lg:grid-cols-2">
         <div className="hidden lg:flex bg-gradient-to-br from-black to-slate-900 text-white p-12 flex-col justify-between">
           <div>

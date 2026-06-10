@@ -5,17 +5,17 @@ import { usePlan } from "@/hooks/usePlan";
 import { deleteAccountAPI, updateProfileAPI } from "@/lib/api";
 
 import {
-  AlertCircle,
-  ArrowRight,
-  BadgeCheck,
-  Camera,
-  Check,
-  ChevronRight,
-  Crown,
-  Folder,
-  Lock,
-  Shield,
-  Trash2
+    AlertCircle,
+    ArrowRight,
+    BadgeCheck,
+    Camera,
+    Check,
+    ChevronRight,
+    Crown,
+    Folder,
+    Lock,
+    Shield,
+    Trash2
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -173,7 +173,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] px-4 py-8 sm:px-6 lg:px-10 font-sans pb-24">
+    <div className="min-h-dvh bg-[#F8F9FA] px-4 py-8 sm:px-6 lg:px-10 font-sans pb-24">
       <div className="mx-auto space-y-8 max-w-5xl">
         
         {/* HEADER */}

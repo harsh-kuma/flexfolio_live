@@ -201,7 +201,7 @@ export default function Template4Animated({ data, owner_key, working }) {
 
 
   return (
-    <div className="relative bg-slate-950 text-slate-300 font-sans min-h-screen pb-2 selection:bg-violet-500/30 selection:text-violet-200 overflow-hidden">
+    <div className="relative bg-slate-950 text-slate-300 font-sans min-h-dvh pb-2 selection:bg-violet-500/30 selection:text-violet-200 overflow-hidden">
 
       {/* --- DYNAMIC MOUSE SPOTLIGHT (Desktop Only) --- */}
       <div

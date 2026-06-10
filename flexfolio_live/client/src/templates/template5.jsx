@@ -193,7 +193,7 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
   }, [menuOpen]);
 
   return (
-    <div className="bg-[#fdfbf7] text-black font-sans min-h-screen pb-10 selection:bg-[#FFC900] selection:text-black font-medium ">
+    <div className="bg-[#fdfbf7] text-black font-sans min-h-dvh pb-10 selection:bg-[#FFC900] selection:text-black font-medium ">
 
       {/* NEO-BRUTALIST NAVBAR */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-[#fdfbf7] border-b-4 border-black">

@@ -186,7 +186,7 @@ export default function Template3({ data, owner_key, working }) {
   }, [menuOpen]);
 
   return (
-    <div className="bg-neutral-950 text-neutral-300 font-sans min-h-screen pb-2 selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className="bg-neutral-950 text-neutral-300 font-sans min-h-dvh pb-2 selection:bg-emerald-500/30 selection:text-emerald-200">
 
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 w-full z-[60] bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800/80">

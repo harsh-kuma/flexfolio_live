@@ -5,31 +5,31 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
-  deletePortfolio,
-  getPortfolioForManage,
-  publishPortfolio,
-  sendPortfolioVerificationEmail,
-  unpublishPortfolio,
-  updatePortfolioGeneralDetail,
-  verifyPortfolioEmailOtp,
+    deletePortfolio,
+    getPortfolioForManage,
+    publishPortfolio,
+    sendPortfolioVerificationEmail,
+    unpublishPortfolio,
+    updatePortfolioGeneralDetail,
+    verifyPortfolioEmailOtp,
 } from "@/lib/api";
 
 import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
-  ArrowLeft,
-  CheckCircle2,
-  Copy,
-  ExternalLink,
-  Globe,
-  Loader2,
-  Lock,
-  MailWarning,
-  Pencil,
-  Save,
-  Trash2,
-  XCircle,
+    ArrowLeft,
+    CheckCircle2,
+    Copy,
+    ExternalLink,
+    Globe,
+    Loader2,
+    Lock,
+    MailWarning,
+    Pencil,
+    Save,
+    Trash2,
+    XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -174,7 +174,7 @@ export default function PortfolioManagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-12">
+    <div className="min-h-dvh bg-white pb-12">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* TOP NAVIGATION */}
         <Link

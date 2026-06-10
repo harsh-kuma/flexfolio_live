@@ -7,16 +7,16 @@ import { useEffect, useState } from "react";
 
 import { usePlan } from "@/hooks/usePlan";
 import {
-  Calendar,
-  Copy,
-  Globe,
-  Layout,
-  LayoutTemplate,
-  Lock,
-  Pencil,
-  Plus,
-  Search,
-  SearchX
+    Calendar,
+    Copy,
+    Globe,
+    Layout,
+    LayoutTemplate,
+    Lock,
+    Pencil,
+    Plus,
+    Search,
+    SearchX
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -80,7 +80,7 @@ export default function PortfoliosPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8 pb-12 bg-white min-h-screen">
+    <div className="max-w-7xl mx-auto p-6 space-y-8 pb-12 bg-white min-h-dvh">
 
       {/* HEADER & METRICS */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-6">

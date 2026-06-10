@@ -1,6 +1,6 @@
 export default function PortfolioNotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f5f5f5] px-6 antialiased">
+    <div className="min-h-dvh flex items-center justify-center bg-[#f5f5f5] px-6 antialiased">
       <div className="text-center max-w-md flex flex-col items-center">
         
         {/* ENHANCED TYPOGRAPHY */}

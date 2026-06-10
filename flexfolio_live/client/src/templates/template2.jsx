@@ -193,7 +193,7 @@ export default function Template2({ data, owner_key, working }) {
   }, [menuOpen]);
 
   return (
-    <div className="bg-[#f8fafc] text-slate-800 font-sans min-h-screen">
+    <div className="bg-[#f8fafc] text-slate-800 font-sans min-h-dvh">
       {/* NAVBAR */}
       <nav className="fixed top-0 left-0 w-full z-50 px-6 md:px-12 py-4 bg-[#0B1120] text-slate-200 shadow-md">
         <div className="flex justify-between items-center relative z-50">

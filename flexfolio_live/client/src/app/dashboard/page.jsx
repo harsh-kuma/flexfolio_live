@@ -2,13 +2,13 @@
 
 import { getMyAnalyticsSummary } from "@/lib/api";
 import {
-  AlertCircle,
-  ArrowUpRight,
-  Eye,
-  LayoutGrid,
-  MousePointerClick,
-  Plus,
-  Users
+    AlertCircle,
+    ArrowUpRight,
+    Eye,
+    LayoutGrid,
+    MousePointerClick,
+    Plus,
+    Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,15 +18,15 @@ import { useCallback, useEffect, useState } from "react";
 // CHART IMPORTS
 // =====================
 import {
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Tooltip,
 } from "chart.js";
 
 import { Bar, Doughnut, Line } from "react-chartjs-2";
@@ -265,7 +265,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-dvh bg-gray-50 text-gray-900">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
         {/* HEADER */}

@@ -17,7 +17,7 @@ import { trackAnalyticsEvent } from "@/lib/api";
 
 export default function Template1({ data, owner_key, working}) {
   // Prevent crash if data is not passed
-  if (!data) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (!data) return <div className="min-h-dvh flex items-center justify-center">Loading...</div>;
 
   // Helper function to format experience dates from the dummy data structure
   const formatDuration = (start, end, current) => {
@@ -27,7 +27,7 @@ export default function Template1({ data, owner_key, working}) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 flex justify-center text-gray-900">
+    <div className="min-h-dvh bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 flex justify-center text-gray-900">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-6 sm:p-10 md:p-12">
         
         {/* PROFILE HEADER */}

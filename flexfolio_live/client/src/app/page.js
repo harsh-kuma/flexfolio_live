@@ -32,7 +32,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans flex flex-col relative w-full overflow-x-hidden selection:bg-indigo-600/10">
+    <div className="min-h-dvh bg-slate-50 text-slate-900 antialiased font-sans flex flex-col relative w-full overflow-x-hidden selection:bg-indigo-600/10">
 
       {/* 1. BACKGROUND CANVAS MESH */}
       <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:2rem_2rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-70 pointer-events-none z-0" />

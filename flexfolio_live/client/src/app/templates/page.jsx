@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function TemplatesPage() {
   const [activeCard, setActiveCard] = useState(null);
   return (
-    <div className="min-h-screen bg-[#f5f5f5] px-6 py-12 antialiased">
+    <div className="min-h-dvh bg-[#f5f5f5] px-6 py-12 antialiased">
       <div className="max-w-[1800px] mx-auto">
 
         {/* TITLE */}

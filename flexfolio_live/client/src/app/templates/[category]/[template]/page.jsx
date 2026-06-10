@@ -148,7 +148,7 @@ export default function TemplatePreview() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-dvh bg-gray-100 flex flex-col">
 
       {/* HEADER */}
       <div className="flex items-center justify-between px-4 md:px-8 py-3 bg-white shadow sticky top-0 z-50">

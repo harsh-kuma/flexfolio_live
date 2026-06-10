@@ -74,7 +74,7 @@ export default function GoogleSuccessPage() {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans flex flex-col items-center justify-center relative w-full overflow-x-hidden p-6">
+      <div className="min-h-dvh bg-slate-50 text-slate-900 antialiased font-sans flex flex-col items-center justify-center relative w-full overflow-x-hidden p-6">
         {/* Platform Canvas Mesh Background Sync */}
         <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-70 pointer-events-none z-0" />
 
@@ -122,7 +122,7 @@ export default function GoogleSuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 antialiased font-sans flex flex-col items-center justify-center relative w-full overflow-x-hidden p-6">
+    <div className="min-h-dvh bg-slate-50 text-slate-900 antialiased font-sans flex flex-col items-center justify-center relative w-full overflow-x-hidden p-6">
       {/* Platform Canvas Mesh Background Sync */}
       <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:2rem_2rem] opacity-70 pointer-events-none z-0" />
 
