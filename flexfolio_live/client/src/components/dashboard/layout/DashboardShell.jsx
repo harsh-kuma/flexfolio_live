@@ -5,7 +5,7 @@ import DashboardSidebar from "./DashboardSidebar";
 
 export default function DashbordShell({ children }) {
     return (
-        <div className="h-screen w-full flex flex-col bg-gray-200 text-white overflow-hidden">
+        <div className="h-dvh w-full flex flex-col bg-gray-200 text-white overflow-hidden">
 
             {/* TOP NAVBAR */}
             <div className="shrink-0 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md z-50">

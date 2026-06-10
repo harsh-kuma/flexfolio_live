@@ -3,15 +3,15 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import {
-  Bell,
-  House,
-  Layers,
-  LayoutGrid,
-  Loader2,
-  LogOut,
-  Newspaper,
-  Settings,
-  X,
+    Bell,
+    House,
+    Layers,
+    LayoutGrid,
+    Loader2,
+    LogOut,
+    Newspaper,
+    Settings,
+    X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -53,7 +53,7 @@ export default function MobileMenu({ isOpen, onClose }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`absolute left-0 top-0 h-screen w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ${
+        className={`absolute left-0 top-0 h-dvh w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

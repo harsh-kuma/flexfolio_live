@@ -233,7 +233,7 @@ export default function Template2({ data, owner_key, working }) {
         {menuOpen && (
           <>
             <div
-              className="fixed inset-0 h-screen w-screen bg-black/40 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 h-dvh w-screen bg-black/40 backdrop-blur-sm z-40 md:hidden"
               onClick={() => setMenuOpen(false)}
             ></div>
 

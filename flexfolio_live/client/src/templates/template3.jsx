@@ -229,7 +229,7 @@ export default function Template3({ data, owner_key, working }) {
           <div className="md:hidden absolute top-full left-0 w-full z-50">
             {/* Dark Overlay Backdrop */}
             <div
-              className="fixed inset-0 top-[73px] h-screen w-screen bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 top-[73px] h-dvh w-screen bg-black/60 backdrop-blur-sm"
               onClick={() => setMenuOpen(false)}
             ></div>
 
