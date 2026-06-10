@@ -160,4 +160,16 @@ export const getMyAnalyticsSummary = async () => {
   return res.data;
 };
 
+// Setting page 
+export const deleteAccountAPI = async () => {
+  const res = await api.post("/auth/account-delete");
+  return res.data;
+};
+
+export const updateProfileAPI = async (data) => {
+  const res = await api.post("/auth/update-profile", data);
+  return res.data;
+};
+
+
 export default api;

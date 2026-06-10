@@ -11,11 +11,15 @@ const {
   resetPassword,
   checkResetOtpAllowed,
   googleLogin,
+  updateProfile,
+  deleteAccount,
 } = require("../controllers/authController");
 
 const {
   protect,
 } = require("../middlewares/authMiddleware");
+
+const upload = require("../middlewares/uploadMiddleware");
 
 const {
   authLimiter,
@@ -39,5 +43,7 @@ router.post("/forgot-password",requireFields(["email"]),otpLimiter,forgotPasswor
 router.post("/reset-password",requireFields(["email","otp","password"]),verifyOtpLimiter,resetPassword);
 router.post("/check-reset-otp",requireFields(["email"]),verifyOtpLimiter,checkResetOtpAllowed);
 router.post("/google-login",requireFields(["email"]),loginLimiter, googleLogin);
+router.post("/update-profile",protect,loginLimiter,upload.single("profileImage"),updateProfile);
+router.post("/account-delete",protect,deleteAccount);
 
 module.exports = router;

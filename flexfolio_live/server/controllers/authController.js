@@ -11,6 +11,7 @@ const { getSafeUser } = require("../utils/getSafeUser");
 const { generateOTP } = require("../utils/generateOTP");
 const cloudinary = require("../config/cloudinary");
 const crypto = require("crypto");
+const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
 
 const createToken = (user) => {
   return jwt.sign(
@@ -269,15 +270,16 @@ exports.logout = async (req, res) => {
 exports.getMe = async (req, res) => {
 
   try {
-    const user = await User.findById(req.user.id)
-      .select("-password -otp -otpExpiry -resetPasswordOtp -resetPasswordOtpExpiry -__v -providers -createdAt -updatedAt");
+    const getuser = await User.findById(req.user.id)
 
-    if (!user) {
+    if (!getuser) {
       return res.status(404).json({
         success: false,
         message: "User Not Found",
       });
     }
+
+    const user = getSafeUser(getuser);
 
     res.status(200).json({
       success: true,
@@ -506,10 +508,11 @@ exports.googleLogin = async (req, res) => {
         const uploadedImage = await cloudinary.uploader.upload(
           googleProfile,
           {
-            folder: "flexfolio/avatars",
+            folder: "flexfolio",
           }
         );
         user.profile = uploadedImage.secure_url;
+        user.public_id = uploadedImage.public_id;
       }
       await user.save();
     }
@@ -519,7 +522,7 @@ exports.googleLogin = async (req, res) => {
       const uploadedImage = await cloudinary.uploader.upload(
         googleProfile,
         {
-          folder: "flexfolio/avatars",
+          folder: "flexfolio",
         }
       );
 
@@ -533,6 +536,7 @@ exports.googleLogin = async (req, res) => {
         name,
         email,
         profile: uploadedImage.secure_url,
+        public_id: uploadedImage.public_id,
         username,
         providers: ["google"],
         isVerified: true,
@@ -552,6 +556,160 @@ exports.googleLogin = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Google login failed",
+    });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, username } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Update name
+    if (name !== undefined) {
+      const trimmedName = name.trim();
+
+      if (trimmedName.length < 2 || trimmedName.length > 50) {
+        return res.status(400).json({
+          success: false,
+          message: "Name must be between 2 and 50 characters",
+        });
+      }
+
+      user.name = trimmedName;
+    }
+
+    // Update username
+    if (username !== undefined) {
+      const trimmedUsername = username.trim().toLowerCase();
+
+      if (!/^[a-z0-9_]{3,50}$/.test(trimmedUsername)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Username must be 3-50 characters and contain only letters, numbers and underscores",
+        });
+      }
+
+      const existingUser = await User.findOne({
+        username: trimmedUsername,
+        _id: { $ne: user._id },
+      });
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "Username already taken",
+        });
+      }
+
+      user.username = trimmedUsername;
+    }
+
+    
+    // Update profile image only if uploaded
+    if (req.file) {
+      if(user.public_id){
+        await deleteCloudinaryImage(user.public_id);
+      }
+      user.profile = req.file.path; // Cloudinary URL or local path
+      user.public_id = req.file.filename;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: getSafeUser(user),
+    });
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const Portfolio = require("../models/Portfolio");
+const ContactMessage = require("../models/ContactMessage");
+const Analytics = require("../models/Analytics"); 
+
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Get all portfolios
+    const portfolios = await Portfolio.find({
+      user: userId,
+    });
+
+    const portfolioIds = portfolios.map(
+      (p) => p._id
+    );
+
+    //  Delete Cloudinary images( profile images)
+    if (user.public_id) {
+      await deleteCloudinaryImage(
+        user.public_id
+      );
+    }
+
+    for (const portfolio of portfolios) {
+      // delete  portfolio main image
+      if (portfolio.data?.image?.public_id) {
+        await deleteCloudinaryImage(
+          portfolio.data.image.public_id
+        );
+      }
+    }
+
+    // Delete contact messages
+    await ContactMessage.deleteMany({
+      portfolio: { $in: portfolioIds },
+    });
+
+    // Delete analytics
+    await Analytics.deleteMany({
+      portfolioId: { $in: portfolioIds },
+    });
+
+    // Delete portfolios
+    await Portfolio.deleteMany({
+      user: userId,
+    });
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    // 8. Clear auth cookie
+    res.clearCookie("token", cookieOptions);
+
+    return res.status(200).json({
+      success: true,
+      message:"Account and all associated data deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete account",
     });
   }
 };

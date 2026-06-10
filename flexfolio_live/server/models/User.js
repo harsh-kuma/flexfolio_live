@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    public_id: {
+      type: String,
+      default: null,
+    },
+
     providers: {
       type: [String],
       default: [],
