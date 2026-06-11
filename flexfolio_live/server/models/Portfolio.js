@@ -72,6 +72,19 @@ const portfolioSchema = new mongoose.Schema({
     default: {},
   },
 
+customDomain: {
+  type: String,
+  unique: true, 
+  sparse: true,
+  lowercase: true,
+  trim: true,
+},
+
+domainVerified: {
+  type: Boolean,
+  default: false,
+},
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Portfolio", portfolioSchema);

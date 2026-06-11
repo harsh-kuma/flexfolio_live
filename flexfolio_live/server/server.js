@@ -40,11 +40,15 @@ app.use(
       // Allow requests with no origin (like mobile apps, Postman, or server-to-server requests)
       if (!origin) return callback(null, true);
       
-      if (allowedOrigins.indexOf(origin) !== -1) {
+      const isLocalhostSubdomain = /^http:\/\/([a-zA-Z0-9-]+)\.localhost:3000$/.test(origin);
+      const isProductionSubdomain = /^https:\/\/([a-zA-Z0-9-]+)\.flexfolio\.online$/.test(origin);
+
+      if ( allowedOrigins.includes(origin) || isLocalhostSubdomain || isProductionSubdomain) {
         return callback(null, true);
-      } else {
-        return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
       }
+
+      console.log("BLOCKED:", origin);
+      return callback(new Error("CORS not allowed"));
     },
     credentials: true,
   })
