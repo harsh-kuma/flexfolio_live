@@ -2,10 +2,17 @@
 import { templates } from "@/lib/templates";
 import { Eye, Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TemplatesPage() {
   const [activeCard, setActiveCard] = useState(null);
+  const [canHover, setCanHover] = useState(false);
+
+  useEffect(() => {
+    setCanHover(
+      window.matchMedia("(hover: hover)").matches
+    );
+  }, []);
   return (
     <div className="min-h-dvh bg-[#f5f5f5] px-6 py-12 antialiased">
       <div className="max-w-[1800px] mx-auto">
@@ -25,8 +32,10 @@ export default function TemplatesPage() {
                 key={key}
                 className="group flex flex-col"
                 onClick={() => {
-                  if (window.innerWidth < 640) {
-                    setActiveCard(activeCard === key ? null : key);
+                  if (!canHover) {
+                    setActiveCard(
+                      activeCard === key ? null : key
+                    );
                   }
                 }}
               >
@@ -48,10 +57,13 @@ export default function TemplatesPage() {
 
                     {/* HOVER ACTIONS OVERLAY */}
                     <div
-                      className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3 px-6 z-10 transition-all duration-300 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto
-                          ${activeCard === key
-                          ? "opacity-100 pointer-events-auto"
-                          : "opacity-0 pointer-events-none"
+                      className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3 px-6 z-10 transition-all duration-300
+                        group-hover:opacity-100
+                        group-hover:pointer-events-auto
+                        ${
+                          activeCard === key
+                            ? "opacity-100 pointer-events-auto"
+                            : "opacity-0 pointer-events-none"
                         }`}
                     >
                       {/* USE TEMPLATE */}

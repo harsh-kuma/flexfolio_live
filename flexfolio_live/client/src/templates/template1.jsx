@@ -161,12 +161,12 @@ export default function Template1({ data, owner_key, working}) {
 
                   <div className="flex gap-4 mt-5 pt-4 border-t border-gray-200">
                     {p.github && (
-                      <a href={p.github} onClick={() => trackClick("project_code")} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
+                      <a href={p.github} onClick={() => trackClick(`project_code:${p.title}`)} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
                         GitHub ↗
                       </a>
                     )}
                     {p.live && (
-                      <a href={p.live} onClick={() => trackClick("project_live")} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
+                      <a href={p.live} onClick={() => trackClick(`project_live:${p.title}`)} target="_blank" rel="noopener noreferrer" className="text-gray-900 text-sm font-semibold hover:text-blue-600 transition-colors">
                         Live Demo ↗
                       </a>
                     )}
