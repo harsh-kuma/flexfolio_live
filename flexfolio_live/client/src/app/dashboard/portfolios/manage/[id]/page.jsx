@@ -281,8 +281,8 @@ export default function PortfolioManagePage() {
                     Custom Username (URL)
                   </label>
                   <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
-                    <span className="bg-gray-50 px-4 py-2.5 text-gray-500 text-sm border-r border-gray-300">
-                      https://flexfolio.online/portfolio/
+                    <span className="bg-gray-50 px-2 py-2.5 text-gray-500 text-sm border-r border-gray-300">
+                      https://
                     </span>
                     <input
                       id="username"
@@ -305,6 +305,9 @@ export default function PortfolioManagePage() {
                       placeholder="username"
                       className="w-full px-4 py-2.5 text-sm outline-none bg-transparent"
                     />
+                    <span className="bg-gray-50 px-2 py-2.5 text-gray-500 text-sm border-r border-gray-300">
+                      .flexfolio.online
+                    </span>
                   </div>
                 </div>
 
