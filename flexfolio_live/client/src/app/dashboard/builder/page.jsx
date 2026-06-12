@@ -2,6 +2,7 @@
 
 import PortfolioEditor from "@/components/builder/PortfolioEditor";
 import Loader from "@/components/common/loader/Loader";
+import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { verifyTemplate } from "@/lib/verifyTemplate";
 import { templates } from "@/utils/templates";
@@ -38,7 +39,7 @@ function BuilderForm() {
   if (!isValidTemplate) {
     return (
       <div>
-        Invalid Template
+        <DashboardPortfolioNotFound/>
       </div>
     );
   }

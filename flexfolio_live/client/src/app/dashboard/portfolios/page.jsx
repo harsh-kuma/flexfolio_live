@@ -7,16 +7,16 @@ import { useEffect, useState } from "react";
 
 import { usePlan } from "@/hooks/usePlan";
 import {
-    Calendar,
-    Copy,
-    Globe,
-    Layout,
-    LayoutTemplate,
-    Lock,
-    Pencil,
-    Plus,
-    Search,
-    SearchX
+  Calendar,
+  Copy,
+  Globe,
+  Layout,
+  LayoutTemplate,
+  Lock,
+  Pencil,
+  Plus,
+  Search,
+  SearchX
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -53,7 +53,7 @@ export default function PortfoliosPage() {
   const publishedCount = portfolios.filter(p => p.isPublished).length;
 
   const handleCopyUrl = async (username, isPublished) => {
-    const url = isPublished ? `https://flexfolio.online/portfolio/${username}` : `https://flexfolio.online/preview/${username}`;
+    const url = isPublished ? `https://${username}.flexfolio.online` : `https://flexfolio.online/preview/${username}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch (error) {
@@ -201,13 +201,13 @@ export default function PortfoliosPage() {
                           <>
                           <Globe size={14} className="text-blue-500 shrink-0" />
                           <span className="text-xs text-gray-600 truncate select-all">
-                            flexfolio.online/portfolio/{portfolio.username}
+                            https://{portfolio.username}.flexfolio.online
                           </span>
                           </>: 
                           <>
                           <Lock size={14} className="text-green-600 shrink-0" />
                           <span className="text-xs text-gray-600 truncate select-all">
-                            flexfolio.online/preview/{portfolio.username}
+                            https://flexfolio.online/preview/{portfolio.username}
                           </span>
                           </>}
                           

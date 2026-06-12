@@ -126,7 +126,7 @@ exports.getPortfolio = async (req, res) => {
     const portfolio = await Portfolio.findOne({
       username: req.params.username,
     });
-    if (!portfolio.isPublished) {
+    if (!portfolio || !portfolio.isPublished) {
       return res.status(200).json({
         success: false,
         message: "Portfolio Not Found",
@@ -585,6 +585,14 @@ exports.updatePortfolioGeneralDetail = async (req, res) => {
         return res.status(409).json({
           success: false,
           message: "Username already exists",
+        });
+      }
+
+      if (!/^[a-z0-9-]{3,40}$/.test(normalizedUsername)) { 
+        return res.status(400).json({
+          success: false,
+          message:
+            "Username must be 3-40 characters and contain only letters, numbers and hyphen",
         });
       }
 

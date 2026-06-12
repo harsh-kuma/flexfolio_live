@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
   const data = portfolio.data;
 
   return {
-    title: `${data?.fullName} - ${data?.title || "Portfolio"}`,
+    title: `${data?.fullName || "flexfolio"} - ${data?.title || "Portfolio"}`,
 
     description:
       data?.bio ||
@@ -76,7 +76,7 @@ export default async function PortfolioPage({ params }) {
 
   const portfolio = await getPortfolio(username);
 
-  if (!portfolio) {
+  if (!portfolio?.data) {
     return <PortfolioNotFound />;
   }
 

@@ -590,11 +590,11 @@ exports.updateProfile = async (req, res) => {
     if (username !== undefined) {
       const trimmedUsername = username.trim().toLowerCase();
 
-      if (!/^[a-z0-9_]{3,50}$/.test(trimmedUsername)) {
+      if (!/^[a-z0-9-]{3,40}$/.test(trimmedUsername)) { 
         return res.status(400).json({
           success: false,
           message:
-            "Username must be 3-50 characters and contain only letters, numbers and underscores",
+            "Username must be 3-40 characters and contain only letters, numbers and hyphen",
         });
       }
 

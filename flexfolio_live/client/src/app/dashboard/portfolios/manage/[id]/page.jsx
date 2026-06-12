@@ -5,31 +5,31 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
-    deletePortfolio,
-    getPortfolioForManage,
-    publishPortfolio,
-    sendPortfolioVerificationEmail,
-    unpublishPortfolio,
-    updatePortfolioGeneralDetail,
-    verifyPortfolioEmailOtp,
+  deletePortfolio,
+  getPortfolioForManage,
+  publishPortfolio,
+  sendPortfolioVerificationEmail,
+  unpublishPortfolio,
+  updatePortfolioGeneralDetail,
+  verifyPortfolioEmailOtp,
 } from "@/lib/api";
 
 import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
-    ArrowLeft,
-    CheckCircle2,
-    Copy,
-    ExternalLink,
-    Globe,
-    Loader2,
-    Lock,
-    MailWarning,
-    Pencil,
-    Save,
-    Trash2,
-    XCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Globe,
+  Loader2,
+  Lock,
+  MailWarning,
+  Pencil,
+  Save,
+  Trash2,
+  XCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -152,8 +152,8 @@ export default function PortfolioManagePage() {
     }
   };
 
-  const handleCopyUrl = async (username, isPublished) => {
-    const url = isPublished ? `https://flexfolio.online/portfolio/${username}` : `https://flexfolio.online/preview/${username}`;
+  const handleCopyUrl = async (username, isPublished ,main = false) => {
+    const url = isPublished ? (main ? `https://${username}.flexfolio.online`  : `https://flexfolio.online/portfolio/${username}`) : `https://flexfolio.online/preview/${username}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch (error) {
@@ -205,7 +205,7 @@ export default function PortfolioManagePage() {
             </span>
             {isLive && (
               <Link
-                href={`/portfolio/${data.username}`}
+                href={`https://${data.username}.flexfolio.online`}
                 target="_blank"
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
               >
@@ -282,7 +282,7 @@ export default function PortfolioManagePage() {
                   </label>
                   <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
                     <span className="bg-gray-50 px-4 py-2.5 text-gray-500 text-sm border-r border-gray-300">
-                      flexfolio.online/portfolio/
+                      https://flexfolio.online/portfolio/
                     </span>
                     <input
                       id="username"
@@ -328,19 +328,38 @@ export default function PortfolioManagePage() {
             {/* PUBLISH STATUS */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
               <h2 className="text-sm font-bold tracking-wide text-gray-500 uppercase mb-4">Visibility</h2>
+              {data.isPublished && (
+              <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg mb-3">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <Globe size={14} className="text-blue-500 shrink-0" />
+                  <span className="text-xs text-gray-600 truncate select-all">
+                      https://{data.username}.flexfolio.online
+                  </span>
+                   
+                </div>
+                <button
+                  onClick={() => handleCopyUrl(data.username,data.isPublished,true)}
+                  className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                  title="Copy URL"
+                  aria-label="Copy URL"
+                >
+                  <Copy size={14} />
+                </button>
+              </div>
+              )}
               <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg mb-3">
                 <div className="flex items-center gap-2 overflow-hidden">
                   {data.isPublished ?
                     <>
                       <Globe size={14} className="text-blue-500 shrink-0" />
                       <span className="text-xs text-gray-600 truncate select-all">
-                        flexfolio.online/portfolio/{data.username}
+                        https://flexfolio.online/portfolio/{data.username}
                       </span>
                     </> :
                     <>
                       <Lock size={14} className="text-green-600 shrink-0" />
                       <span className="text-xs text-gray-600 truncate select-all">
-                        flexfolio.online/preview/{data.username}
+                        https://flexfolio.online/preview/{data.username}
                       </span>
                     </>}
                 </div>
