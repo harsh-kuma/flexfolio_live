@@ -133,47 +133,75 @@ export default function Home() {
 
         {/* Right Side: Step-by-Step Visual Live Form Mockup */}
         <div className="lg:col-span-6 flex flex-col gap-4 relative w-full max-w-xl mx-auto">
-
-          {/* Visual Canvas 1: The Build/Form State */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xl shadow-slate-100 relative group">
+          {/* Visual Canvas 1: Completed State */}
+          <div className="bg-slate-50/60 backdrop-blur-sm p-5 rounded-2xl border border-slate-200/50 shadow-sm transition-all duration-300 relative group">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center">2</span>
-                <span className="text-xs font-bold text-slate-800">Fill My Details</span>
+              <div className="flex items-center gap-3">
+                {/* Muted number for completed state */}
+                <span className="w-5 h-5 rounded-full bg-slate-200/70 text-slate-500 text-[10px] font-bold flex items-center justify-center ring-2 ring-slate-100">1</span>
+                <span className="text-xs font-bold text-slate-600 tracking-tight">Select Your Template</span>
               </div>
-              <span className="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-500 font-medium">Canvas Selected</span>
+              <span className="text-[9px] uppercase tracking-wider bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full text-slate-500 font-bold">Template Selected</span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 opacity-80">
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Portfolio Slug Name</label>
-                <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800">johndoe</div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5 ml-0.5">Preview Portfolio</label>
+                <div className="px-3 py-2.5 bg-slate-100/50 border border-slate-200/50 rounded-xl text-xs font-mono text-slate-500">Use Template</div>
               </div>
             </div>
           </div>
 
           {/* Animated Processing Connection Dot Line */}
-          <div className="flex justify-center my-1">
-            <div className="h-6 w-[2px] bg-gradient-to-b from-indigo-500 to-emerald-500 rounded animate-pulse" />
+          <div className="flex justify-center my-1 relative z-0">
+            <div className="h-6 w-[2px] bg-gradient-to-b from-slate-200 to-indigo-400 rounded-full animate-pulse opacity-80" />
           </div>
 
-          {/* Visual Canvas 2: The Instant Live Deployment */}
-          <div className="bg-slate-900 text-white p-5 rounded-xl border border-slate-800 shadow-2xl relative group">
-            <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center justify-center">3</span>
-                <span className="text-xs font-bold text-slate-200">Instant Live Routing</span>
+          {/* Visual Canvas 2: Active Form State */}
+          <div className="bg-white/95 backdrop-blur-sm p-5 rounded-2xl border border-indigo-100 shadow-[0_8px_30px_rgb(99,102,241,0.06)] ring-1 ring-indigo-50/50 hover:shadow-[0_8px_30px_rgb(99,102,241,0.12)] transition-all duration-300 relative group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {/* Highlighted number for active state */}
+                <span className="w-5 h-5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-bold flex items-center justify-center ring-2 ring-indigo-100/50 shadow-sm">2</span>
+                <span className="text-xs font-bold text-slate-800 tracking-tight">Fill My Details</span>
               </div>
-              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full tracking-wide">
-                ⚡ Flexfolio.online/portfolio/johndoe
+              <span className="text-[9px] uppercase tracking-wider bg-indigo-50/50 border border-indigo-100/50 px-2.5 py-1 rounded-full text-indigo-500 font-bold">Canvas Build</span>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-[10px] font-bold text-indigo-400/80 uppercase tracking-wider block mb-1.5 ml-0.5">Portfolio Slug Name</label>
+                <div className="px-3 py-2.5 bg-white border border-indigo-100 rounded-xl text-xs font-mono text-slate-800 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-400 transition-all">johndoe</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Animated Processing Connection Dot Line */}
+          <div className="flex justify-center my-1 relative z-0">
+            <div className="h-6 w-[2px] bg-gradient-to-b from-indigo-400 to-emerald-500 rounded-full animate-pulse opacity-80" />
+          </div>
+
+          {/* Visual Canvas 3: The Instant Live Routing */}
+          <div className="bg-[#0A0F1C] text-white p-5 rounded-2xl border border-slate-800/80 shadow-2xl relative group overflow-hidden hover:border-slate-700 transition-all duration-500">
+            {/* Subtle top inner glow */}
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+
+            <div className="flex items-center justify-between mb-4 border-b border-slate-800/80 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold flex items-center justify-center ring-2 ring-emerald-500/20">3</span>
+                <span className="text-xs font-bold text-slate-200 tracking-tight">Instant Live Routing</span>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                https://alex.Flexfolio.online
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center text-sm">✨</div>
+            <div className="flex items-center gap-3.5">
+              <div className="w-9 h-9 bg-gradient-to-tr from-emerald-500/20 to-teal-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center text-sm shadow-inner">✨</div>
               <div>
-                <div className="text-xs font-bold text-white">Production Build Successful</div>
-                <div className="text-[10px] text-slate-400">Deployed globally to edge network servers</div>
+                <div className="text-xs font-bold text-white tracking-wide mb-0.5">Production Build Successful</div>
+                <div className="text-[10px] text-slate-400 font-medium">Deployed globally to edge network servers</div>
               </div>
             </div>
           </div>
