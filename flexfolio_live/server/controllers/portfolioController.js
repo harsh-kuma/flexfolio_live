@@ -10,6 +10,7 @@ const { sendContactVerificationEmail } = require("../utils/sendContactVerificati
 const crypto = require("crypto");
 const { generateOTP } = require("../utils/generateOTP");
 const { getSafePortfolio } = require("../utils/getSafePortfolio");
+const RESERVED_USERNAMES = require("../utils/reservedUsernames");
 
 // CREATE
 exports.createPortfolio = async (req, res) => {
@@ -575,6 +576,13 @@ exports.updatePortfolioGeneralDetail = async (req, res) => {
         });
       }
 
+      if (RESERVED_USERNAMES.has(normalizedUsername)) {
+        return res.status(400).json({
+          success: false,
+          message: "This username is reserved. Please choose another one.",
+        });
+      }
+
       // Check if username is already used by another portfolio
       const existingPortfolio = await Portfolio.findOne({
         username: normalizedUsername,
@@ -588,7 +596,7 @@ exports.updatePortfolioGeneralDetail = async (req, res) => {
         });
       }
 
-      if (!/^[a-z0-9-]{3,40}$/.test(normalizedUsername)) { 
+      if (!/^[a-z0-9-]{3,40}$/.test(normalizedUsername)) {
         return res.status(400).json({
           success: false,
           message:

@@ -19,7 +19,7 @@ export default function DashboardSidebar() {
       path: "/dashboard",
     },
     {
-      name: "Sites",
+      name: "My Sites",
       icon: LayoutGrid,
       path: "/dashboard/portfolios",
     },

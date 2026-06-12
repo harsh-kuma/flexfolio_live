@@ -3,15 +3,15 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import {
-    Bell,
-    House,
-    Layers,
-    LayoutGrid,
-    Loader2,
-    LogOut,
-    Newspaper,
-    Settings,
-    X,
+  Bell,
+  House,
+  Layers,
+  LayoutGrid,
+  Loader2,
+  LogOut,
+  Newspaper,
+  Settings,
+  X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -25,7 +25,7 @@ export default function MobileMenu({ isOpen, onClose }) {
 
   const navItems = [
     { name: "Home", icon: House, path: "/dashboard" },
-    { name: "Sites", icon: LayoutGrid, path: "/dashboard/portfolios" },
+    { name: "My Sites", icon: LayoutGrid, path: "/dashboard/portfolios" },
     { name: "Templates", icon: Layers, path: "/dashboard/templates" },
     { name: "Settings", icon: Settings, path: "/dashboard/settings" },
   ];
