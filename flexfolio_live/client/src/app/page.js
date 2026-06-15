@@ -41,7 +41,7 @@ export default function Home() {
       <header className="w-full max-w-full bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Image
-            src="/flexfolio_full.jpeg"
+            src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781369309/flexfolio-full_r0d6e1.png"
             alt="FlexFolio"
             width={100}
             height={40}

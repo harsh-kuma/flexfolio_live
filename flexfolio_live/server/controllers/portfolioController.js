@@ -11,7 +11,9 @@ const crypto = require("crypto");
 const { generateOTP } = require("../utils/generateOTP");
 const { getSafePortfolio } = require("../utils/getSafePortfolio");
 const RESERVED_USERNAMES = require("../utils/reservedUsernames");
-
+const { removeDomainFromVercel } = require("../services/domainService");
+const { canDeleteDomain } = require("../utils/domainCleanup");
+const { refreshDomainStatus } = require("../services/domainSyncService");
 // CREATE
 exports.createPortfolio = async (req, res) => {
   try {
@@ -120,13 +122,21 @@ exports.createPortfolio = async (req, res) => {
   }
 };
 
-// GET BY USERNAME
+// GET BY USERNAME or domain
 exports.getPortfolio = async (req, res) => {
   try {
-
-    const portfolio = await Portfolio.findOne({
-      username: req.params.username,
-    });
+    let portfolio;
+    if (req?.params?.domain) {
+      const domain = req.params.domain.toLowerCase().replace(/^www\./, "").trim();
+      portfolio = await Portfolio.findOne({
+        customDomain: domain,
+        domainVerified: true,
+      });
+    } else {
+      portfolio = await Portfolio.findOne({
+        username: req.params.username,
+      });
+    }
     if (!portfolio || !portfolio.isPublished) {
       return res.status(200).json({
         success: false,
@@ -198,6 +208,19 @@ exports.deletePortfolio = async (req, res) => {
       portfolioId: portfolio._id,
     });
 
+    // Delete the domain from versel if avalible .
+
+    const domain = portfolio.customDomain || portfolio.pendingDomain;
+    if (domain) {
+      const safeToDelete = await canDeleteDomain(
+        domain,
+        portfolio._id
+      );
+
+      if (safeToDelete) {
+        await removeDomainFromVercel(domain);
+      }
+    }
     // then delete portfolio
     await portfolio.deleteOne();
 
@@ -342,12 +365,13 @@ exports.updatePortfolio = async (req, res) => {
 
 exports.getPortfolioForManage = async (req, res) => {
   try {
-    const portfolio = await Portfolio.findOne({
+    let portfolio = await Portfolio.findOne({
       _id: req.params.id,
       user: req.user.id,
     }).select(
-      "_id title username isPublished emailVerified thumbnail templateKey email createdAt updatedAt"
-    );;
+      "_id title username isPublished emailVerified thumbnail templateKey email customDomain pendingDomain domainVerificationToken  domainVerified domainConnectedAt domainVerificationError vercelVerification createdAt updatedAt"
+    );
+
 
     if (!portfolio) {
       return res.status(404).json({
@@ -356,9 +380,41 @@ exports.getPortfolioForManage = async (req, res) => {
       });
     }
 
+    if (portfolio?.customDomain) {
+      await refreshDomainStatus(portfolio);
+
+      portfolio = await Portfolio.findById(portfolio._id).select(
+        "_id title username isPublished emailVerified thumbnail templateKey email customDomain pendingDomain domainVerificationToken domainVerified domainConnectedAt domainVerificationError vercelVerification createdAt updatedAt"
+      );
+    }
+
+    const portfolioObj = portfolio.toObject();
+
+    if (portfolio.pendingDomain) {
+      portfolioObj.dnsRecords = [
+        {
+          type: "A",
+          host: "@",
+          value: "216.198.79.1",
+        },
+        {
+          type: "TXT",
+          host: "_flexfolio",
+          value: portfolio.domainVerificationToken,
+        },
+        ...portfolio.vercelVerification.map(v => ({
+          type: v.type,
+          host: v.domain.replace(
+            `.${portfolio.pendingDomain}`,
+            ""
+          ),
+          value: v.value,
+        })),
+      ];
+    }
     res.json({
       success: true,
-      portfolio,
+      portfolio: portfolioObj,
     });
   } catch (error) {
     res.status(500).json({

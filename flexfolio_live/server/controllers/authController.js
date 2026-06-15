@@ -12,6 +12,7 @@ const { generateOTP } = require("../utils/generateOTP");
 const cloudinary = require("../config/cloudinary");
 const crypto = require("crypto");
 const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
+const { canDeleteDomain } = require("../utils/domainCleanup");
 
 const createToken = (user) => {
   return jwt.sign(
@@ -590,7 +591,7 @@ exports.updateProfile = async (req, res) => {
     if (username !== undefined) {
       const trimmedUsername = username.trim().toLowerCase();
 
-      if (!/^[a-z0-9-]{3,40}$/.test(trimmedUsername)) { 
+      if (!/^[a-z0-9-]{3,40}$/.test(trimmedUsername)) {
         return res.status(400).json({
           success: false,
           message:
@@ -613,10 +614,10 @@ exports.updateProfile = async (req, res) => {
       user.username = trimmedUsername;
     }
 
-    
+
     // Update profile image only if uploaded
     if (req.file) {
-      if(user.public_id){
+      if (user.public_id) {
         await deleteCloudinaryImage(user.public_id);
       }
       user.profile = req.file.path; // Cloudinary URL or local path
@@ -642,7 +643,8 @@ exports.updateProfile = async (req, res) => {
 
 const Portfolio = require("../models/Portfolio");
 const ContactMessage = require("../models/ContactMessage");
-const Analytics = require("../models/Analytics"); 
+const Analytics = require("../models/Analytics");
+const { removeDomainFromVercel } = require("../services/domainService");
 
 exports.deleteAccount = async (req, res) => {
   try {
@@ -679,6 +681,20 @@ exports.deleteAccount = async (req, res) => {
           portfolio.data.image.public_id
         );
       }
+
+      // Delete the domain from versel if avalible and in use by this user .
+      const domain = portfolio.customDomain || portfolio.pendingDomain;
+
+      if (!domain) continue;
+
+      const safeToDelete = await canDeleteDomain(
+        domain,
+        portfolio._id
+      );
+
+      if (safeToDelete) {
+        await removeDomainFromVercel(domain);
+      }
     }
 
     // Delete contact messages
@@ -704,7 +720,7 @@ exports.deleteAccount = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message:"Account and all associated data deleted successfully",
+      message: "Account and all associated data deleted successfully",
     });
   } catch (error) {
     return res.status(500).json({

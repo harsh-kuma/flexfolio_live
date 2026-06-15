@@ -110,7 +110,7 @@ export default function DashboardNavbar() {
       {/* LEFT - Logo */}
       <div className="flex items-center gap-2 cursor-pointer group rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
         <img
-          src="/flexfolio_full.jpeg"
+          src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781369309/flexfolio-full_r0d6e1.png"
           alt="Flexfolio Logo"
           className="h-10 w-auto object-contain group-hover:scale-105 transition-transform duration-200 ease-out"
         />

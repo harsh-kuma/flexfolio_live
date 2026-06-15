@@ -79,6 +79,9 @@ app.use("/api/owner", require("./routes/contactRoutes"));
 // ANALYTICS FREE
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
 
+// For Custom domains
+app.use("/api/domains", require("./routes/domainRoutes"));
+
 // =========================
 // TEST ROUTE
 // =========================

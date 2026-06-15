@@ -3,15 +3,15 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import {
-  Bell,
-  House,
-  Layers,
-  LayoutGrid,
-  Loader2,
-  LogOut,
-  Newspaper,
-  Settings,
-  X,
+    Bell,
+    House,
+    Layers,
+    LayoutGrid,
+    Loader2,
+    LogOut,
+    Newspaper,
+    Settings,
+    X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -60,7 +60,7 @@ export default function MobileMenu({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <img
-            src="/flexfolio_full.jpeg"
+            src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781369309/flexfolio-full_r0d6e1.png"
             alt="Logo"
             className="h-8 object-contain"
           />

@@ -80,10 +80,47 @@ customDomain: {
   trim: true,
 },
 
+pendingDomain: {
+  type: String,
+  lowercase: true,
+  trim: true,
+  default: null,
+},
+
+domainVerificationToken: {
+  type: String,
+},
+
 domainVerified: {
   type: Boolean,
   default: false,
 },
+
+domainConnectedAt: {
+  type: Date,
+},
+
+domainVerificationError: {
+  type: String,
+  default: null,
+},
+
+vercelVerification: [
+  {
+    type: {
+      type: String,
+    },
+    domain: {
+      type: String,
+    },
+    value: {
+      type: String,
+    },
+    reason: {
+      type: String,
+    },
+  },
+],
 
 }, { timestamps: true });
 

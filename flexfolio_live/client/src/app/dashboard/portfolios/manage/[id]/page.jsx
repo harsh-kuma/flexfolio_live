@@ -5,18 +5,22 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
+  createDomain,
+  deleteDomain,
   deletePortfolio,
   getPortfolioForManage,
   publishPortfolio,
   sendPortfolioVerificationEmail,
   unpublishPortfolio,
   updatePortfolioGeneralDetail,
-  verifyPortfolioEmailOtp,
+  verifyDomain,
+  verifyPortfolioEmailOtp
 } from "@/lib/api";
 
 import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { isValidDomain, normalizeDomain } from "@/utils/domain";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -37,7 +41,7 @@ const DEFAULT_IMAGE =
   "https://res.cloudinary.com/dr38wac7n/image/upload/v1779525495/default_portfolio_shk797.png";
 
 export default function PortfolioManagePage() {
-  const {fetchUser} = useAuth();
+  const { fetchUser } = useAuth();
   const { id } = useParams();
   const router = useRouter();
 
@@ -48,6 +52,9 @@ export default function PortfolioManagePage() {
   const [publishing, setPublishing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [domain, setDomain] = useState("");
+  const [domainLoading, setDomainLoading] = useState(false);
+  const [verifyingDomain, setVerifyingDomain] = useState(false);
 
   const [form, setForm] = useState({ title: "", username: "" });
 
@@ -152,8 +159,8 @@ export default function PortfolioManagePage() {
     }
   };
 
-  const handleCopyUrl = async (username, isPublished ,main = false) => {
-    const url = isPublished ? (main ? `https://${username}.flexfolio.online`  : `https://flexfolio.online/portfolio/${username}`) : `https://flexfolio.online/preview/${username}`;
+  const handleCopyUrl = async (username, isPublished, main = false) => {
+    const url = isPublished ? (main ? `https://${username}.flexfolio.online` : `https://flexfolio.online/portfolio/${username}`) : `https://flexfolio.online/preview/${username}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch (error) {
@@ -161,9 +168,108 @@ export default function PortfolioManagePage() {
     }
   };
 
+  const connectDomain = async () => {
+    const cleanDomain = normalizeDomain(domain);
+
+    if (!isValidDomain(cleanDomain)) {
+      return toast.error("Enter a valid domain");
+    }
+
+    try {
+      setDomainLoading(true);
+
+      const res = await createDomain({
+        portfolioId: id,
+        domain: cleanDomain,
+      });
+
+      setData((prev) => ({
+        ...prev,
+        pendingDomain: res?.domain,
+        dnsRecords: res?.dnsRecords,
+        domainVerified: false,
+      }));
+
+      toast.success("Domain connected");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to connect domain"
+      );
+    } finally {
+      setDomainLoading(false);
+    }
+  };
+
+
+  const verifyDomainHandler = async () => {
+    try {
+      setVerifyingDomain(true);
+
+      const res = await verifyDomain(id);
+
+      if (res.verified) {
+        setData((prev) => ({
+          ...prev,
+          domainVerified: res.verified,
+          customDomain: data.pendingDomain,
+          pendingDomain: null,
+          dnsRecords: [],
+          domainVerificationError: null,
+        }));
+
+        toast.success("Domain verified");
+      } else {
+        setData((prev) => ({
+          ...prev,
+          domainVerificationError: res.error,
+        }));
+        toast.error("DNS not configured yet");
+      }
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        "Verification failed"
+      );
+    } finally {
+      setVerifyingDomain(false);
+    }
+  };
+
+  const removeDomainHandler = async () => {
+    const confirmed = window.confirm(
+      `Remove ${data.customDomain ? data.customDomain : data.pendingDomain}?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteDomain(id);
+
+      setData((prev) => ({
+        ...prev,
+        customDomain: null,
+        pendingDomain: null,
+        domainVerified: false,
+        domainConnectedAt: null,
+        domainVerificationError: null,
+        dnsRecords: [],
+      }));
+
+      setDomain("");
+
+      toast.success("Domain removed");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to remove domain"
+      );
+    }
+  };
+
   if (loading) {
     return (
-    <Loader/>
+      <Loader />
     );
   }
 
@@ -332,23 +438,23 @@ export default function PortfolioManagePage() {
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
               <h2 className="text-sm font-bold tracking-wide text-gray-500 uppercase mb-4">Visibility</h2>
               {data.isPublished && (
-              <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg mb-3">
-                <div className="flex items-center gap-2 overflow-hidden">
-                  <Globe size={14} className="text-blue-500 shrink-0" />
-                  <span className="text-xs text-gray-600 truncate select-all">
+                <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg mb-3">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <Globe size={14} className="text-blue-500 shrink-0" />
+                    <span className="text-xs text-gray-600 truncate select-all">
                       https://{data.username}.flexfolio.online
-                  </span>
-                   
+                    </span>
+
+                  </div>
+                  <button
+                    onClick={() => handleCopyUrl(data.username, data.isPublished, true)}
+                    className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                    title="Copy URL"
+                    aria-label="Copy URL"
+                  >
+                    <Copy size={14} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleCopyUrl(data.username,data.isPublished,true)}
-                  className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
-                  title="Copy URL"
-                  aria-label="Copy URL"
-                >
-                  <Copy size={14} />
-                </button>
-              </div>
               )}
               <div className="flex items-center justify-between gap-2 p-1.5 pl-3 bg-gray-50 border border-gray-200 rounded-lg mb-3">
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -367,7 +473,7 @@ export default function PortfolioManagePage() {
                     </>}
                 </div>
                 <button
-                  onClick={() => handleCopyUrl(data.username,data.isPublished)}
+                  onClick={() => handleCopyUrl(data.username, data.isPublished)}
                   className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
                   title="Copy URL"
                   aria-label="Copy URL"
@@ -501,6 +607,241 @@ export default function PortfolioManagePage() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+        <div>
+          {/* CUSTOM DOMAIN */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-sm font-bold tracking-wide text-gray-500 uppercase">
+                  Custom Domain
+                </h2>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  Connect your own domain to this portfolio.
+                </p>
+              </div>
+
+              {data?.domainVerified && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-medium">
+                  <CheckCircle2 size={14} />
+                  Verified
+                </span>
+              )}
+            </div>
+
+            {!data?.customDomain && !data?.pendingDomain ? (
+              <>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={domain}
+                    onChange={(e) => setDomain(e.target.value)}
+                    placeholder="example.com"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-black focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
+                  />
+
+                  <p className="text-xs text-gray-500">
+                    Enter your root domain without https:// or www.
+                  </p>
+
+                  <button
+                    onClick={connectDomain}
+                    disabled={domainLoading}
+                    className="w-full bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white py-3 rounded-xl text-sm font-medium transition-colors"
+                  >
+                    {domainLoading ? "Connecting..." : "Connect Domain"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* CONNECTED DOMAIN */}
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">
+                        Connected Domain
+                      </p>
+
+                      <div className="flex items-center gap-2">
+                        <Globe size={16} className="text-gray-500" />
+
+                        <p className="font-semibold text-gray-900 break-all">
+                          {data.customDomain ? data.customDomain : data.pendingDomain}
+                        </p>
+                      </div>
+
+                      {data?.domainConnectedAt && (
+                        <p className="text-xs text-gray-500 mt-2">
+                          Connected on{" "}
+                          {new Date(
+                            data.domainConnectedAt
+                          ).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          data.customDomain ? data.customDomain : data.pendingDomain
+                        );
+                        toast.success("Domain copied");
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                    >
+                      <Copy size={15} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* STATUS */}
+                <div className="mt-4">
+                  {data.domainVerified ? (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-4">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2
+                          size={18}
+                          className="text-green-600"
+                        />
+
+                        <p className="font-medium text-green-800">
+                          Domain Successfully Verified
+                        </p>
+                      </div>
+
+                      <p className="text-sm text-green-700 mt-2">
+                        Your portfolio is now available on your custom
+                        domain.
+                      </p>
+
+                      <a
+                        href={`https://${data.customDomain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
+                      >
+                        <ExternalLink size={15} />
+                        Visit Domain
+                      </a>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="rounded-xl border border-amber-200 bg-amber-50 overflow-hidden">
+
+                        {/* Header */}
+                        <div className="px-4 py-3 border-b border-amber-200">
+                          <div className="flex items-center gap-2">
+                            <Globe
+                              size={16}
+                              className="text-amber-600"
+                            />
+
+                            <p className="text-sm font-semibold text-amber-900">
+                              DNS Configuration Required
+                            </p>
+                          </div>
+
+                          <p className="text-xs text-amber-700 mt-1">
+                            Add the DNS record below in your domain
+                            provider dashboard and then click Verify.
+                          </p>
+                        </div>
+
+                        {/* DNS TABLE */}
+                        <div className="bg-white">
+                          <div className="grid grid-cols-3 gap-4 px-4 py-3 text-xs font-medium text-gray-500 border-b bg-gray-50">
+                            <span>Type</span>
+                            <span>Name</span>
+                            <span>Value</span>
+                          </div>
+
+                          {data.dnsRecords?.map((record, index) => (
+                            <div
+                              key={index}
+                              className="grid grid-cols-3 gap-4 px-4 py-4 text-sm items-center border-b last:border-b-0"
+                            >
+                              <span className="font-medium text-gray-900">
+                                {record.type}
+                              </span>
+                              <div className="flex items-center justify-normal gap-2">
+                                <span className="font-mono text-gray-700 truncate">
+                                  {record.host}
+                                </span>
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(record.host);
+                                    toast.success("DNS Name copied");
+                                  }}
+                                  className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                                >
+                                  <Copy size={14} />
+                                </button>
+                              </div>
+
+                              <div className="flex items-center justify-normal gap-2">
+                                <span className="font-mono text-gray-900 truncate">
+                                  {record.value}
+                                </span>
+
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(record.value);
+                                    toast.success("DNS Value copied");
+                                  }}
+                                  className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-md transition-colors shrink-0 focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                                >
+                                  <Copy size={14} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="px-4 py-3 border-t border-amber-200 bg-amber-50">
+                          <p className="text-xs text-amber-800">
+                            DNS propagation may take anywhere from a few
+                            minutes up to 24 hours.
+                          </p>
+                        </div>
+                      </div>
+
+                      {data?.domainVerificationError && (
+                        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3">
+                          <p className="text-sm text-red-700">
+                            {data.domainVerificationError}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex gap-3 mt-5">
+                  {!data.domainVerified && (
+                    <button
+                      onClick={verifyDomainHandler}
+                      disabled={verifyingDomain}
+                      className="flex-1 bg-gray-900 hover:bg-black disabled:bg-gray-300 text-white rounded-xl py-3 text-sm font-medium"
+                    >
+                      {verifyingDomain
+                        ? "Verifying..."
+                        : "Verify Domain"}
+                    </button>
+                  )}
+
+                  <button
+                    onClick={removeDomainHandler}
+                    className="flex-1 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl py-3 text-sm font-medium transition-colors"
+                  >
+                    Remove Domain
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

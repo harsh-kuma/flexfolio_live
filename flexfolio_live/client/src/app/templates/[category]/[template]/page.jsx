@@ -157,7 +157,7 @@ export default function TemplatePreview() {
             className="cursor-pointer flex items-center"
           >
             <Image
-              src="/flexfolio_full.jpeg"
+              src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781369309/flexfolio-full_r0d6e1.png"
               alt="FlexFolio"
               width={100}
               height={40}

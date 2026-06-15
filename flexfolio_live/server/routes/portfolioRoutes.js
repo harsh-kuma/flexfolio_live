@@ -29,6 +29,7 @@ router.get("/edit/:id",protect,getPortfolioById);
 router.put("/:id",protect,upload.single("image"),updatePortfolio);
 router.delete("/:id",protect,deletePortfolio);
 router.get("/:username", getPortfolio);
+router.get("/:domain", getPortfolio);
 router.get("/manage/:id",protect,getPortfolioForManage);
 router.get("/publish/:id",protect,setPublishPortfolio);
 router.get("/unpublish/:id",protect,setUnPublishPortfolio);

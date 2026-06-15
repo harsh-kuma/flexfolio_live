@@ -171,5 +171,29 @@ export const updateProfileAPI = async (data) => {
   return res.data;
 };
 
+export const createDomain = async (data) => {
+  const response = await api.post("/domains", data);
+  return response.data;
+};
 
+export const verifyDomain = async (portfolioId) => {
+  const response = await api.post("/domains/verify", {
+    portfolioId,
+  });
+
+  return response.data;
+};
+
+export const deleteDomain = async (portfolioId) => {
+  const response = await api.delete("/domains", {
+    data: { portfolioId },
+  });
+
+  return response.data;
+};
+
+export const getPortfolioByDomain = async (domain) => {
+  const res = await api.get(`/portfolio/${domain}`);
+  return res.data;
+}
 export default api;
