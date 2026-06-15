@@ -55,6 +55,7 @@ export default function PortfolioManagePage() {
   const [domain, setDomain] = useState("");
   const [domainLoading, setDomainLoading] = useState(false);
   const [verifyingDomain, setVerifyingDomain] = useState(false);
+  const [deleteDomainOn, setDeletingDomainOn] = useState(false);
 
   const [form, setForm] = useState({ title: "", username: "" });
 
@@ -242,7 +243,7 @@ export default function PortfolioManagePage() {
     );
 
     if (!confirmed) return;
-
+    setDeletingDomainOn(true);
     try {
       await deleteDomain(id);
 
@@ -264,6 +265,8 @@ export default function PortfolioManagePage() {
         error.response?.data?.message ||
         "Failed to remove domain"
       );
+    } finally {
+      setDeletingDomainOn(true);
     }
   };
 
@@ -645,6 +648,9 @@ export default function PortfolioManagePage() {
                   <p className="text-xs text-gray-500">
                     Enter your root domain without https:// or www.
                   </p>
+                  <p className="text-xs text-gray-500">
+                    Note: Only root domains (e.g., `example.com`, `alex.co.in`) are supported currently. Custom subdomains (e.g., `blog.example.com`, `alex.catler.co.in`) are not supported.
+                  </p>
 
                   <button
                     onClick={connectDomain}
@@ -835,9 +841,10 @@ export default function PortfolioManagePage() {
 
                   <button
                     onClick={removeDomainHandler}
-                    className="flex-1 border border-red-300 text-red-600 hover:bg-red-50 rounded-xl py-3 text-sm font-medium transition-colors"
+                    disabled={deleteDomainOn}
+                    className="flex-1 flex items-center justify-center border border-red-300 text-red-600 hover:bg-red-50 rounded-xl py-3 text-sm font-medium transition-colors"
                   >
-                    Remove Domain
+                    {deleteDomainOn ? <Loader2 className="w-4 h-4 animate-spin" /> : "Remove Domain"}
                   </button>
                 </div>
               </>
