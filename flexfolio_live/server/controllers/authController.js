@@ -11,8 +11,9 @@ const { getSafeUser } = require("../utils/getSafeUser");
 const { generateOTP } = require("../utils/generateOTP");
 const cloudinary = require("../config/cloudinary");
 const crypto = require("crypto");
-const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
+const deleteCloudinaryAsset = require("../utils/deleteCloudinaryAsset");
 const { canDeleteDomain } = require("../utils/domainCleanup");
+const deleteAssetsFromObject = require("../utils/deleteAssetsFromObject");
 
 const createToken = (user) => {
   return jwt.sign(
@@ -618,7 +619,7 @@ exports.updateProfile = async (req, res) => {
     // Update profile image only if uploaded
     if (req.file) {
       if (user.public_id) {
-        await deleteCloudinaryImage(user.public_id);
+        await deleteCloudinaryAsset(user.public_id);
       }
       user.profile = req.file.path; // Cloudinary URL or local path
       user.public_id = req.file.filename;
@@ -669,18 +670,17 @@ exports.deleteAccount = async (req, res) => {
 
     //  Delete Cloudinary images( profile images)
     if (user.public_id) {
-      await deleteCloudinaryImage(
+      await deleteCloudinaryAsset(
         user.public_id
       );
     }
 
     for (const portfolio of portfolios) {
       // delete  portfolio main image
-      if (portfolio.data?.image?.public_id) {
-        await deleteCloudinaryImage(
-          portfolio.data.image.public_id
-        );
-      }
+      await deleteAssetsFromObject(
+        portfolio.data
+      );
+
 
       // Delete the domain from versel if avalible and in use by this user .
       const domain = portfolio.customDomain || portfolio.pendingDomain;

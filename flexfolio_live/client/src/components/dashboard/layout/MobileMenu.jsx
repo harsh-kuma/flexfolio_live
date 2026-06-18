@@ -60,7 +60,7 @@ export default function MobileMenu({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
           <img
-            src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781369309/flexfolio-full_r0d6e1.png"
+            src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781678227/flexfolio-full_xkooln.png"
             alt="Logo"
             className="h-8 object-contain"
           />

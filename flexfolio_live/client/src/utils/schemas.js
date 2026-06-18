@@ -8,6 +8,7 @@ export const developerSchema = [
       { name: "email", label: "Email", type: "email", placeholder: "john@example.com" },
       { name: "phone", label: "Phone", type: "tel", placeholder: "+1 (555) 000-0000" },
       { name: "location", label: "Location", type: "text", placeholder: "New York, USA" },
+      { name: "resume", label: "Resume (PDF)", type: "document" },
     ],
   },
   // 🔹 PROFESSIONAL
@@ -40,6 +41,7 @@ export const developerSchema = [
       { name: "live", label: "Live Link", type: "text", placeholder: "https://myproject.com" },
       { name: "description", label: "Description", type: "textarea", placeholder: "Describe what you built..." },
       { name: "skills", label: "Tech Stack", type: "tags" },
+      {name: "image",label: "Project Screenshot",type: "file"},
     ],
   },
   // 🔹 EXPERIENCE
@@ -75,5 +77,43 @@ export const developerSchema = [
       { name: "skills", label: "Skills Used", type: "tags" },
     ],
   },
+  // 🔹 Certificate
+  {
+  section: "Certificates",
+  repeatable: true,
+  key: "certificates",
+
+  fields: [
+    {
+      name: "title",
+      label: "Certificate Name",
+      type: "text"
+    },
+
+    {
+      name: "issuer",
+      label: "Issuer",
+      type: "text"
+    },
+
+    {
+      name: "issueDate",
+      label: "Issue Date",
+      type: "date"
+    },
+
+    {
+      name: "credentialUrl",
+      label: "Credential URL",
+      type: "url"
+    },
+
+    {
+      name: "image",
+      label: "Certificate Image",
+      type: "file"
+    }
+  ]
+}
 ];
 

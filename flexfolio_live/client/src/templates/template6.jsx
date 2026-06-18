@@ -256,8 +256,8 @@ export default function Template6({ data, owner_key, working }) {
           </div>
 
           <div className="flex items-center gap-3">
-            {data?.resume && (
-              <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="hidden sm:flex items-center gap-1.5 bg-white text-black px-4 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] transition-all">
+            {data?.resume?.url && (
+              <a href={data.resume.url} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="hidden sm:flex items-center gap-1.5 bg-white text-black px-4 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.2)] transition-all">
                 Resume
               </a>
             )}

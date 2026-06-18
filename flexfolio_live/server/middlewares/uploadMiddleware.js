@@ -4,23 +4,29 @@ const cloudinary = require("../config/cloudinary");
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "flexfolio",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+
+  params: async (req, file) => {
+    const isPdf = file.mimetype === "application/pdf";
+    return {
+      folder: isPdf ? "flexfolio/documents" : "flexfolio/images",
+      format: isPdf ? "pdf" : undefined,
+      resource_type: isPdf ? "raw" : "image",
+    };
   },
 });
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 2 * 1024 * 1024,
-  },
+  limits: {fileSize: 2 * 1024 * 1024,},
+
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"), false);
+    const allowed = ["image/jpeg", "image/png", "image/jpg", "image/webp", "application/pdf",];
+
+    if (allowed.includes(file.mimetype)) {
+      return cb(null, true);
     }
+
+    cb( new Error("Only images and PDFs are allowed"));
   },
 });
 

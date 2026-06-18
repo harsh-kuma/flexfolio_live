@@ -283,8 +283,8 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
                   View My Work
                 </button>
               }
-              {data?.resume && (
-                <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-white border-4 border-black text-black px-8 py-4 font-black uppercase text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center gap-2">
+              {data?.resume?.url && (
+                <a href={data.resume.url} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-white border-4 border-black text-black px-8 py-4 font-black uppercase text-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] active:translate-y-2 active:translate-x-2 active:shadow-none transition-all flex items-center gap-2">
                   RESUME
                 </a>
               )}

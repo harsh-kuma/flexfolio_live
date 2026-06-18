@@ -4,6 +4,7 @@ export const templates = {
     schema: developerSchema,
     defaultData: {
       image: null,
+      resume: null,
       fullName: "",
       email: "",
       phone: "",
@@ -16,6 +17,7 @@ export const templates = {
       skills: [],
       projects: [],
       experience: [],
+      certificates: [],
     },
   },
 };

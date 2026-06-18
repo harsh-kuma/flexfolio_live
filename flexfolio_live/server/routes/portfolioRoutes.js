@@ -23,10 +23,10 @@ const { protect, } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/uploadMiddleware");
 
 // Routes
-router.post("/", upload.single("image"),protect, createPortfolio);
+router.post("/",protect, upload.any(), createPortfolio);
 router.get("/me",protect,getMyPortfolios);
 router.get("/edit/:id",protect,getPortfolioById);
-router.put("/:id",protect,upload.single("image"),updatePortfolio);
+router.put("/:id",protect,upload.any(),updatePortfolio);
 router.delete("/:id",protect,deletePortfolio);
 router.get("/:username", getPortfolio);
 router.get("/:domain", getPortfolio);

@@ -189,8 +189,8 @@ export default function Template1({ data, owner_key, working}) {
               LinkedIn Profile
             </a>
           )}
-          {data.resume && data.resume !== "#" && (
-            <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-900 border border-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors">
+          {data.resume?.url && data.resume !== "#" && (
+            <a href={data.resume.url} onClick={() => trackClick("resume")} target="_blank" rel="noopener noreferrer" className="bg-gray-100 text-gray-900 border border-gray-300 px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-gray-200 transition-colors">
               Download Resume
             </a>
           )}

@@ -3,7 +3,7 @@ const generateUsername = require("../utils/generateUsername");
 const { validateEmail } = require("../utils/validateEmail");
 const User = require("../models/User");
 const Analytics = require("../models/Analytics");
-const deleteCloudinaryImage = require("../utils/deleteCloudinaryImage");
+const deleteCloudinaryAsset = require("../utils/deleteCloudinaryAsset");
 const Contact = require("../models/ContactMessage");
 const { getLimit } = require("../utils/access");
 const { sendContactVerificationEmail } = require("../utils/sendContactVerificationEmail");
@@ -14,7 +14,50 @@ const RESERVED_USERNAMES = require("../utils/reservedUsernames");
 const { removeDomainFromVercel } = require("../services/domainService");
 const { canDeleteDomain } = require("../utils/domainCleanup");
 const { refreshDomainStatus } = require("../services/domainSyncService");
+const deleteAssetsFromObject = require("../utils/deleteAssetsFromObject");
+const getResourceType = require("../utils/getResourceType");
 // CREATE
+
+function setNestedValue(
+  obj,
+  path,
+  value
+) {
+  const keys = path.split(".");
+
+  let current = obj;
+
+  while (keys.length > 1) {
+    const key = keys.shift();
+
+    if (
+      current[key] === undefined
+    ) {
+      current[key] =
+        /^\d+$/.test(keys[0])
+          ? []
+          : {};
+    }
+
+    current = current[key];
+  }
+
+  current[keys[0]] = value;
+}
+
+const cleanupUploadedFiles = async (files = []) => {
+  if (!files?.length) return;
+
+  await Promise.allSettled(
+    files.map((file) =>
+      deleteCloudinaryAsset(
+        file.filename,
+        getResourceType(file.mimetype)
+      )
+    )
+  );
+};
+
 exports.createPortfolio = async (req, res) => {
   try {
     // Parse dynamic form data
@@ -22,6 +65,7 @@ exports.createPortfolio = async (req, res) => {
     try {
       data = JSON.parse(req.body.data || "{}");
     } catch (err) {
+      await cleanupUploadedFiles(req.files);
       return res.status(400).json({
         success: false,
         message: "Invalid form data",
@@ -33,11 +77,18 @@ exports.createPortfolio = async (req, res) => {
     const [category, templateSlug] = templateKey.split("~");
 
     // Image handling
-    if (req.file) {
-      data.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
+    if (req.files && req.files.length) {
+      for (const file of req.files) {
+        setNestedValue(
+          data,
+          file.fieldname,
+          {
+            url: file.path,
+            public_id: file.filename,
+            resource_type: getResourceType(file.mimetype)
+          }
+        );
+      }
     }
 
 
@@ -48,6 +99,7 @@ exports.createPortfolio = async (req, res) => {
     const user = await User.findById(id);
 
     if (!user || !user.isVerified) {
+      await cleanupUploadedFiles(req.files);
       return res.status(404).json({
         success: false,
         message: "Unauthorized Creation",
@@ -57,6 +109,7 @@ exports.createPortfolio = async (req, res) => {
     const email = data.email?.trim().toLowerCase();
 
     if (!email) {
+      await cleanupUploadedFiles(req.files);
       return res.status(400).json({
         success: false,
         message: "Email is required",
@@ -64,6 +117,7 @@ exports.createPortfolio = async (req, res) => {
     }
 
     if (!validateEmail(email)) {
+      await cleanupUploadedFiles(req.files);
       return res.status(400).json({
         success: false,
         message: "Invalid email format",
@@ -81,6 +135,7 @@ exports.createPortfolio = async (req, res) => {
     const limit = getLimit(user, "maxPortfolios");
 
     if (limit !== -1 && portfolioCount >= limit) {
+      await cleanupUploadedFiles(req.files);
       return res.status(403).json({
         success: false,
         message: "Portfolio limit reached. Upgrade your plan."
@@ -100,7 +155,6 @@ exports.createPortfolio = async (req, res) => {
       email,
       emailVerified,
     });
-
     await newPortfolio.save();
 
     await User.findByIdAndUpdate(id, {
@@ -115,6 +169,7 @@ exports.createPortfolio = async (req, res) => {
     });
 
   } catch (error) {
+    await cleanupUploadedFiles(req.files);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -194,8 +249,8 @@ exports.deletePortfolio = async (req, res) => {
     }
 
     // delete cloudinary image first
-    await deleteCloudinaryImage(
-      portfolio.data?.image?.public_id
+    await deleteAssetsFromObject(
+      portfolio.data
     );
 
     // delete all contacts related to portfolio
@@ -276,48 +331,81 @@ exports.updatePortfolio = async (req, res) => {
     });
 
     if (!portfolio) {
+      await cleanupUploadedFiles(req.files);
       return res.status(404).json({
         success: false,
         message: "Portfolio not found",
       });
     }
 
+    const extractAssets = (obj, assets = []) => {
+      if (!obj) return assets;
+
+      if (Array.isArray(obj)) {
+        obj.forEach(item => extractAssets(item, assets));
+        return assets;
+      }
+
+      if (typeof obj === "object") {
+        if (obj.public_id && obj.url) {
+          assets.push({
+            public_id: obj.public_id,
+            resource_type: obj.resource_type || "image",
+          });
+        }
+
+        Object.values(obj).forEach(value => {
+          extractAssets(value, assets);
+        });
+      }
+
+      return assets;
+    };
+
     let data = req.body.data;
 
-    if (typeof data === "string") {
-      data = JSON.parse(data);
+    try {
+      if (typeof data === "string") {
+        data = JSON.parse(data);
+      }
+    } catch {
+      await cleanupUploadedFiles(req.files);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid form data",
+      });
     }
 
     // STEP 1: normalize string image (VERY IMPORTANT) because frontend send only image:https not object
-    if (typeof data?.image === "string") {
-      data.image = {
-        url: data.image,
-        public_id: portfolio.data?.image?.public_id || null,
-      };
-    }
+    // if (typeof data?.image === "string" && data.image !== "") {
+    //   data.image = {
+    //     url: data.image,
+    //     public_id: portfolio.data?.image?.public_id || null,
+    //     resource_type: portfolio.data?.image?.resource_type || "image",
+    //   };
+    // }
 
-    if (req.file) {
-      if (portfolio.data?.image?.public_id) {
-        await deleteCloudinaryImage(
-          portfolio.data.image.public_id
+    if (req.files && req.files.length) {
+      for (const file of req.files) {
+        setNestedValue(
+          data,
+          file.fieldname,
+          {
+            url: file.path,
+            public_id: file.filename,
+            resource_type: getResourceType(file.mimetype)
+          }
         );
       }
-
-      data.image = {
-        url: req.file.path,
-        public_id: req.file.filename,
-      };
     }
 
-    if (!req.file && !data?.image) {
-      data.image = portfolio.data?.image;
-    }
 
     const oldEmail = portfolio.data?.email;
     const newEmail = data.email?.trim().toLowerCase();
 
     if (newEmail) {
       if (!validateEmail(newEmail)) {
+        await cleanupUploadedFiles(req.files);
         return res.status(400).json({
           success: false,
           message: "Invalid email format",
@@ -338,12 +426,47 @@ exports.updatePortfolio = async (req, res) => {
       }
     }
 
+    if (data.image === "") {
+      data.image = null;
+    }
 
-    portfolio.data = {
+    if (data.resume === "") {
+      data.resume = null;
+    }
+
+    const oldAssets = extractAssets(portfolio.data);
+
+    const updatedData = {
       ...portfolio.data,
       ...data,
     };
-    portfolio.thumbnail = data?.image?.url || portfolio.thumbnail;
+
+    const newAssets = extractAssets(updatedData);
+
+    const removedAssets = oldAssets.filter(
+      (oldAsset) =>
+        !newAssets.some(
+          (newAsset) =>
+            newAsset.public_id === oldAsset.public_id
+        )
+    );
+
+    for (const asset of removedAssets) {
+      try {
+        await deleteCloudinaryAsset(
+          asset.public_id,
+          asset.resource_type
+        );
+      } catch (err) {
+        console.error(
+          `Failed to delete ${asset.public_id}`,
+          err
+        );
+      }
+    }
+
+    portfolio.data = updatedData;
+    portfolio.thumbnail = portfolio.data?.image?.url || "";
 
     if (req.body.title) {
       portfolio.title = req.body.title;
@@ -356,6 +479,7 @@ exports.updatePortfolio = async (req, res) => {
       portfolio: Safeportfolio,
     });
   } catch (error) {
+    await cleanupUploadedFiles(req.files);
     res.status(500).json({
       success: false,
       error: error.message,

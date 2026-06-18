@@ -2,12 +2,48 @@
 
 import { getCompany } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function DynamicField({ field, value, onChange, itemIndex, currentData }) {
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const wrapperRef = useRef(null);
     const debounceTimeout = useRef(null);
+
+    const getAssetUrl = (value) => {
+        if (!value) return "";
+
+        if (typeof value === "string") {
+            return value;
+        }
+
+        if (
+            typeof value === "object" &&
+            value.url
+        ) {
+            return value.url;
+        }
+
+        return "";
+    };
+
+    const getFileUrl = (value) => {
+        if (!value) return "";
+
+        if (typeof value === "string") {
+            return value;
+        }
+
+        if (
+            typeof value === "object" &&
+            value.url
+        ) {
+            return value.url;
+        }
+
+        return "";
+    };
+
     useEffect(() => {
         return () => {
             if (debounceTimeout.current) {
@@ -18,6 +54,7 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     const today = new Date().toISOString().split("T")[0];
 
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [documentUrl, setDocumentUrl] = useState(null);
 
     useEffect(() => {
         if (value instanceof File) {
@@ -27,11 +64,25 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
             return () => URL.revokeObjectURL(url);
         }
 
-        if (typeof value === "string" && value.length > 0) {
-            setPreviewUrl(value);
-        } else {
-            setPreviewUrl(null);
+        setPreviewUrl(
+            getAssetUrl(value) || null
+        );
+    }, [value]);
+
+    useEffect(() => {
+        if (value instanceof File) {
+            const url =
+                URL.createObjectURL(value);
+
+            setDocumentUrl(url);
+
+            return () =>
+                URL.revokeObjectURL(url);
         }
+
+        setDocumentUrl(
+            getFileUrl(value) || null
+        );
     }, [value]);
 
     // ✅ Click outside to close autocomplete
@@ -81,7 +132,67 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     const baseInput = "w-full p-3 bg-slate-50 text-slate-900  border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm";
     const labelStyle = "text-xs font-semibold text-slate-700 mb-1.5 block ml-1 uppercase tracking-wide";
 
-    // 🔹 FILE (IMAGE)
+    // 🔹 FILE (document)
+
+    if (field.type === "document") {
+        const currentValue =
+            itemIndex !== undefined
+                ? value?.[itemIndex]?.[field.name]
+                : value;
+
+        return (
+            <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                    {field.label}
+                </label>
+
+                <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const maxSize = 2 * 1024 * 1024;
+                        if (file.size > maxSize) {
+                            toast.error("Document must be under 2MB");
+                            return;
+                        }
+                        onChange(field.name, file, itemIndex);
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                />
+
+                {currentValue && (
+                    <div className="flex items-center justify-between rounded-lg border p-3 bg-gray-50">
+                        <div>
+                            <p className="text-sm font-medium text-black">
+                                {currentValue?.name || currentValue?.url?.split("/")?.pop() || currentValue?.split("/")?.pop() || "Document Uploaded"}
+                            </p>
+                            {documentUrl && (
+                                <a
+                                    href={documentUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-blue-600 text-sm underline"
+                                >
+                                    View Current Resume
+                                </a>
+                            )}
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => onChange(field.name, "", itemIndex)}
+                            className="text-red-500 text-sm hover:text-red-600 "
+                        >
+                            Remove
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     // 🔹 FILE (IMAGE)
     if (field.type === "file") {
         // Generate a preview URL if the value is a File object (newly uploaded) or a string (existing image URL)
@@ -92,13 +203,23 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
 
                 <div className="flex items-center gap-5 p-4 border border-slate-200 rounded-xl bg-slate-50">
                     {/* 1. The Image Preview Box */}
-                    <div className="w-20 h-20 rounded-full border-2 border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                    <div className="w-28 h-28   rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                         {previewUrl ? (
-                            <img
-                                src={previewUrl}
-                                alt="Profile Preview"
-                                className="w-full h-full object-cover"
-                            />
+                            <div className="relative w-full h-full">
+                                <img
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => onChange(field.name, "", itemIndex)}
+                                    className=" absolute top-1 right-1 bg-gray-200 text-red-600 text-xs px-2 py-1 rounded shadow"
+                                >
+                                    ✕
+                                </button>
+                            </div>
                         ) : (
                             <span className="text-xs text-slate-400 font-medium text-center">No<br />Image</span>
                         )}
@@ -110,10 +231,14 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
                             type="file"
                             accept="image/*"
                             onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    onChange(field.name, file, itemIndex);
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (file.size > 2 * 1024 * 1024) {
+                                    toast.error("Image must be under 2MB");
+                                    return;
                                 }
+
+                                onChange(field.name, file, itemIndex);
                             }}
                             className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-blue-700 file:shadow-sm hover:file:bg-blue-50 transition cursor-pointer"
                         />
@@ -127,7 +252,7 @@ export default function DynamicField({ field, value, onChange, itemIndex, curren
     }
 
     // 🔹 TEXT / EMAIL / TEL
-    if (["text", "email", "tel"].includes(field.type)) {
+    if (["text", "email", "tel", "url"].includes(field.type)) {
         return (
             <div className="w-full">
                 {field.label && <label className={labelStyle}>{field.label}</label>}

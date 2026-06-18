@@ -282,8 +282,8 @@ export default function Template3({ data, owner_key, working }) {
             <button onClick={() => scrollTo("#contact")} className="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-full font-medium transition-colors shadow-[0_0_15px_rgba(16,185,129,0.3)]">
               Get In Touch
             </button>
-            {data?.resume && (
-              <a href={data.resume} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-8 py-3 rounded-full font-medium transition-colors">
+            {data?.resume?.url && (
+              <a href={data.resume?.url} onClick={() => trackClick("resume")} target="_blank" rel="noreferrer" className="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 px-8 py-3 rounded-full font-medium transition-colors">
                 Resume
               </a>
             )}

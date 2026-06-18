@@ -3,6 +3,7 @@
 import DynamicField from "@/components/builder/DynamicField";
 import RepeatableSection from "@/components/builder/RepeatableSection";
 import { createPortfolio, updatePortfolio } from "@/lib/api";
+import { normalizeAssets } from "@/utils/normalizeAssets";
 import { templates } from "@/utils/templates";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,64 +16,130 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
   const [loading, setLoading] = useState(false);
   const category = templateKey.split("~")[0];
   const template = templates[category];
-  const {fetchUser} = useAuth(); 
+  const { fetchUser } = useAuth();
 
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        ...initialData,
-        image: initialData.image?.url || "",
-      });
+      setFormData(normalizeAssets(initialData));
     }
   }, [initialData]);
 
-  const handleChange = (key, value, index, action) => {
-    setFormData((prev) => {
-      if (action === "addTag") {
-        const existing = Array.isArray(
-          prev[key]
-        )
-          ? prev[key]
-          : [];
+ const handleChange = (
+  key,
+  value,
+  index,
+  action,
+  sectionKey
+) => {
+  setFormData((prev) => {
+    // TAGS
+    if (action === "addTag") {
+      const existing = Array.isArray(prev[key])
+        ? prev[key]
+        : [];
 
-        if (
-          !existing.includes(value)
-        ) {
-          return {
-            ...prev,
-            [key]: [
-              ...existing,
-              value,
-            ],
-          };
-        }
+      if (!existing.includes(value)) {
+        return {
+          ...prev,
+          [key]: [...existing, value],
+        };
+      }
 
-        return prev;
+      return prev;
+    }
+
+    if (action === "removeTag") {
+      const existing = Array.isArray(prev[key])
+        ? prev[key]
+        : [];
+
+      return {
+        ...prev,
+        [key]: existing.filter(
+          (t) => t !== value
+        ),
+      };
+    }
+
+    // REPEATABLE SECTION FIELD
+    if (
+      sectionKey &&
+      index !== undefined
+    ) {
+      const items = Array.isArray(
+        prev[sectionKey]
+      )
+        ? [...prev[sectionKey]]
+        : [];
+
+      items[index] = {
+        ...(items[index] || {}),
+        [key]: value,
+      };
+
+      return {
+        ...prev,
+        [sectionKey]: items,
+      };
+    }
+
+    // NORMAL FIELD
+    return {
+      ...prev,
+      [key]: value,
+    };
+  });
+};
+
+  const appendNestedFiles = (
+    obj,
+    formData,
+    parentKey = ""
+  ) => {
+    Object.keys(obj).forEach((key) => {
+      const value = obj[key];
+
+      const fullKey = parentKey
+        ? `${parentKey}.${key}`
+        : key;
+
+      if (value instanceof File) {
+        formData.append(
+          fullKey,
+          value
+        );
       }
 
       else if (
-        action === "removeTag"
+        Array.isArray(value)
       ) {
-        const existing = Array.isArray(
-          prev[key]
-        )
-          ? prev[key]
-          : [];
-
-        return {
-          ...prev,
-          [key]:
-            existing.filter(
-              (t) => t !== value
-            ),
-        };
+        value.forEach(
+          (item, index) => {
+            if (
+              typeof item ===
+              "object" &&
+              item !== null
+            ) {
+              appendNestedFiles(
+                item,
+                formData,
+                `${fullKey}.${index}`
+              );
+            }
+          }
+        );
       }
 
-      else {
-        return {
-          ...prev,
-          [key]: value,
-        };
+      else if (
+        typeof value ===
+        "object" &&
+        value !== null
+      ) {
+        appendNestedFiles(
+          value,
+          formData,
+          fullKey
+        );
       }
     });
   };
@@ -86,15 +153,10 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
         const payload =
           new FormData();
 
-        if (
-          formData.image instanceof
-          File
-        ) {
-          payload.append(
-            "image",
-            formData.image
-          );
-        }
+        appendNestedFiles(
+          formData,
+          payload
+        );
 
         payload.append(
           "templateKey",
@@ -120,9 +182,10 @@ export default function PortfolioEditor({ templateKey, initialData, mode = "crea
       else {
         const payload = new FormData();
 
-        if (formData.image instanceof File) {
-          payload.append("image", formData.image);
-        }
+        appendNestedFiles(
+          formData,
+          payload
+        );
 
         payload.append(
           "data",
