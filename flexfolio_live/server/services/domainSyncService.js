@@ -1,3 +1,4 @@
+const User = require("../models/User");
 const { verifyFlexfolioToken } = require("./dnsService");
 const { getDomainInfo } = require("./domainService");
 
@@ -12,13 +13,34 @@ async function refreshDomainStatus(portfolio) {
     const domainInfo = await getDomainInfo(domain);
     vercelVerified = domainInfo?.data?.verified === true;
 
-    tokenVerified = await verifyFlexfolioToken(domain,portfolio.domainVerificationToken);
+    tokenVerified = await verifyFlexfolioToken(domain, portfolio.domainVerificationToken);
   } catch (error) {
     console.error(error);
   }
 
   const verified = vercelVerified && tokenVerified;
 
+  if (portfolio.domainVerified && !verified) {
+    await User.findByIdAndUpdate(
+      portfolio.user,
+      {
+        $inc: {
+          "usage.domains": -1
+        }
+      }
+    );
+    await User.updateOne(
+      {
+        _id: portfolio.user,
+        "usage.domains": { $lt: 0 }
+      },
+      {
+        $set: {
+          "usage.domains": 0
+        }
+      }
+    );
+  }
   portfolio.domainVerified = verified;
 
   if (!verified) {

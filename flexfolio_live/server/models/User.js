@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema(
     subscription: {
       plan: {
         type: String,
-        enum: ["free", "pro"],
+        enum: ["free", "basic", "pro"],
         default: "free"
       },
 
@@ -79,8 +79,33 @@ const userSchema = new mongoose.Schema(
     usage: {
       portfolios: {
         type: Number,
+        default: 0 
+      },
+
+      domains: {
+        type: Number,
         default: 0
       },
+
+      mediaFiles: {
+        type: Number,
+        default: 0
+      },
+
+      storageUsed: {
+        type: Number,
+        default: 0
+      },
+
+      aiGenerations: {
+        type: Number,
+        default: 0
+      },
+
+      portfolioViews: {
+        type: Number,
+        default: 0
+      }
     }
   },
   {

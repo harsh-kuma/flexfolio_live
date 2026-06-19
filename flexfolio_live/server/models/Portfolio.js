@@ -124,4 +124,12 @@ vercelVerification: [
 
 }, { timestamps: true });
 
+portfolioSchema.index({
+  user: 1
+});
+
+portfolioSchema.index({
+  pendingDomain: 1
+});
+
 module.exports = mongoose.model("Portfolio", portfolioSchema);

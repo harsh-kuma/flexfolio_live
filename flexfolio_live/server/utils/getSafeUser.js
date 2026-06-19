@@ -15,5 +15,10 @@ exports.getSafeUser = (user) => ({
 
   usage: {
     portfolios: user.usage?.portfolios || 0,
+    domains: user.usage?.domains || 0,
+    mediaFiles: user.usage?.mediaFiles || 0,
+    storageUsed: user.usage?.storageUsed || 0,
+    aiGenerations: user.usage?.aiGenerations || 0,
+    portfolioViews: user.usage?.portfolioViews || 0,
   }
 });

@@ -16,6 +16,7 @@ const { canDeleteDomain } = require("../utils/domainCleanup");
 const { refreshDomainStatus } = require("../services/domainSyncService");
 const deleteAssetsFromObject = require("../utils/deleteAssetsFromObject");
 const getResourceType = require("../utils/getResourceType");
+const extractAssets = require("../utils/extractAssets");
 // CREATE
 
 function setNestedValue(
@@ -85,7 +86,8 @@ exports.createPortfolio = async (req, res) => {
           {
             url: file.path,
             public_id: file.filename,
-            resource_type: getResourceType(file.mimetype)
+            resource_type: getResourceType(file.mimetype),
+            bytes: file.size
           }
         );
       }
@@ -142,6 +144,26 @@ exports.createPortfolio = async (req, res) => {
       });
     }
 
+    const uploadedFiles = req.files?.length || 0;
+    const mediaLimit = getLimit(user, "maxMediaFiles");
+    if (mediaLimit !== -1 && user.usage.mediaFiles + uploadedFiles > mediaLimit) {
+      await cleanupUploadedFiles(req.files);
+      return res.status(403).json({
+        success: false,
+        message: "Media limit reached"
+      });
+    }
+
+    const uploadedSize = req.files?.reduce((sum, file) => sum + file.size, 0);
+    const storageLimit = getLimit(user, "storageLimit");
+    if (storageLimit !== -1 && user.usage.storageUsed + uploadedSize > storageLimit) {
+      await cleanupUploadedFiles(req.files);
+      return res.status(403).json({
+        success: false,
+        message: "Storage limit reached"
+      });
+    }
+
     // Create portfolio
     const newPortfolio = new Portfolio({
       user: id,
@@ -159,7 +181,9 @@ exports.createPortfolio = async (req, res) => {
 
     await User.findByIdAndUpdate(id, {
       $inc: {
-        "usage.portfolios": 1
+        "usage.portfolios": 1,
+        "usage.mediaFiles": uploadedFiles,
+        "usage.storageUsed": uploadedSize
       }
     });
 
@@ -248,6 +272,16 @@ exports.deletePortfolio = async (req, res) => {
       });
     }
 
+    const assets = extractAssets(portfolio.data);
+    const deletedFiles = assets.length;
+
+    const deletedSize =
+      assets.reduce(
+        (sum, asset) =>
+          sum + (asset.bytes || 0),
+        0
+      );
+
     // delete cloudinary image first
     await deleteAssetsFromObject(
       portfolio.data
@@ -279,11 +313,34 @@ exports.deletePortfolio = async (req, res) => {
     // then delete portfolio
     await portfolio.deleteOne();
 
-    await User.findByIdAndUpdate(req.user.id, {
-      $inc: {
-        "usage.portfolios": -1
+    const updateInc = {
+      "usage.portfolios": -1,
+      "usage.mediaFiles": -deletedFiles,
+      "usage.storageUsed": -deletedSize
+    };
+
+    if (portfolio.domainVerified) {
+      updateInc["usage.domains"] = -1;
+    }
+
+    await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        $inc: updateInc
       }
-    });
+    );
+
+    await User.updateOne(
+      {
+        _id: req.user.id,
+        "usage.domains": { $lt: 0 }
+      },
+      {
+        $set: {
+          "usage.domains": 0
+        }
+      }
+    );
 
     res.json({
       success: true,
@@ -338,29 +395,6 @@ exports.updatePortfolio = async (req, res) => {
       });
     }
 
-    const extractAssets = (obj, assets = []) => {
-      if (!obj) return assets;
-
-      if (Array.isArray(obj)) {
-        obj.forEach(item => extractAssets(item, assets));
-        return assets;
-      }
-
-      if (typeof obj === "object") {
-        if (obj.public_id && obj.url) {
-          assets.push({
-            public_id: obj.public_id,
-            resource_type: obj.resource_type || "image",
-          });
-        }
-
-        Object.values(obj).forEach(value => {
-          extractAssets(value, assets);
-        });
-      }
-
-      return assets;
-    };
 
     let data = req.body.data;
 
@@ -393,7 +427,8 @@ exports.updatePortfolio = async (req, res) => {
           {
             url: file.path,
             public_id: file.filename,
-            resource_type: getResourceType(file.mimetype)
+            resource_type: getResourceType(file.mimetype),
+            bytes: file.size
           }
         );
       }
@@ -451,7 +486,48 @@ exports.updatePortfolio = async (req, res) => {
         )
     );
 
-    for (const asset of removedAssets) {
+    const addedAssets = newAssets.filter(newAsset => !oldAssets.some(
+      oldAsset => oldAsset.public_id === newAsset.public_id
+    ));
+
+    const removedCount = removedAssets.length;
+    const addedCount = addedAssets.length;
+
+    const removedSize = removedAssets.reduce(
+      (sum, asset) =>
+        sum + (asset.bytes || 0),
+      0
+    );
+
+    const addedSize = addedAssets.reduce(
+      (sum, asset) =>
+        sum + (asset.bytes || 0),
+      0
+    );
+
+
+    const user = await User.findById(req.user.id);
+    const newMediaUsage = user.usage.mediaFiles + addedCount - removedCount;
+    const newStorageUsage = user.usage.storageUsed + addedSize - removedSize;
+    const mediaLimit = getLimit(user, "maxMediaFiles");
+    if (mediaLimit !== -1 && newMediaUsage > mediaLimit) {
+      await cleanupUploadedFiles(req.files);
+      return res.status(403).json({
+        success: false,
+        message: "Media limit reached"
+      });
+    }
+
+    const storageLimit = getLimit(user, "storageLimit");
+    if (storageLimit !== -1 && newStorageUsage > storageLimit) {
+      await cleanupUploadedFiles(req.files);
+      return res.status(403).json({
+        success: false,
+        message: "Storage limit reached"
+      });
+    }
+
+     for (const asset of removedAssets) {
       try {
         await deleteCloudinaryAsset(
           asset.public_id,
@@ -473,6 +549,17 @@ exports.updatePortfolio = async (req, res) => {
     }
 
     await portfolio.save();
+
+    if (removedCount || addedCount || removedSize || addedSize) {
+      await User.findByIdAndUpdate(req.user.id,
+        {
+          $inc: {
+            "usage.mediaFiles": addedCount - removedCount,
+            "usage.storageUsed": addedSize - removedSize
+          }
+        }
+      );
+    }
     const Safeportfolio = getSafePortfolio(portfolio);
     res.json({
       success: true,
@@ -493,9 +580,8 @@ exports.getPortfolioForManage = async (req, res) => {
       _id: req.params.id,
       user: req.user.id,
     }).select(
-      "_id title username isPublished emailVerified thumbnail templateKey email customDomain pendingDomain domainVerificationToken  domainVerified domainConnectedAt domainVerificationError vercelVerification createdAt updatedAt"
+      "_id user title username isPublished emailVerified thumbnail templateKey email customDomain pendingDomain domainVerificationToken  domainVerified domainConnectedAt domainVerificationError vercelVerification createdAt updatedAt"
     );
-
 
     if (!portfolio) {
       return res.status(404).json({

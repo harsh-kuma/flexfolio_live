@@ -13,17 +13,28 @@ const validator = require("validator");
 const crypto = require("crypto");
 
 const { canDeleteDomain } = require("../utils/domainCleanup");
+const User = require("../models/User");
+const { getLimit } = require("../utils/access");
 /** 
  * POST /api/domains
  */
 exports.createDomain = async (req, res) => {
   try {
     const { portfolioId, domain } = req.body;
-
-    if (!portfolioId || !domain) {
+    const user = await User.findById(req.user.id);
+    if (!portfolioId || !domain || !user) {
       return res.status(400).json({
         success: false,
-        message: "Unauthorized Access",
+        message: "Portfolio not found",
+      });
+    }
+
+    const domainLimit = getLimit(user, "maxDomains");
+
+    if (domainLimit !== -1 && user.usage.domains >= domainLimit) {
+      return res.status(403).json({
+        success: false,
+        message: "Domain limit reached. Upgrade your plan."
       });
     }
 
@@ -48,7 +59,10 @@ exports.createDomain = async (req, res) => {
       });
     }
 
-    const portfolio = await Portfolio.findById(portfolioId);
+    const portfolio = await Portfolio.findOne({
+      _id: portfolioId,
+      user: req.user.id
+    });
 
     if (!portfolio) {
       return res.status(404).json({
@@ -57,14 +71,22 @@ exports.createDomain = async (req, res) => {
       });
     }
 
+    if (portfolio.customDomain || portfolio.pendingDomain) {
+      return res.status(400).json({
+        success: false,
+        message: "Remove existing domain before adding a new one"
+      });
+    }
+
     const existingPendingDomain = await Portfolio.findOne({
       pendingDomain: normalizedDomain,
+      _id: { $ne: portfolio._id }
     });
 
     if (!existingPendingDomain) {
       const domainInfo = await addDomainToVercel(normalizedDomain);
       portfolio.vercelVerification = domainInfo.data.verification || [];
-    }else{
+    } else {
       portfolio.vercelVerification = existingPendingDomain.vercelVerification || [];
     }
 
@@ -119,23 +141,42 @@ exports.createDomain = async (req, res) => {
 exports.verifyDomain = async (req, res) => {
   try {
     const { portfolioId } = req.body;
+    const user = await User.findById(req.user.id);
+    const portfolio = await Portfolio.findOne({
+      _id: portfolioId,
+      user: req.user.id
+    });
 
-    const portfolio = await Portfolio.findById(portfolioId);
-
-    if (!portfolio || !portfolio.pendingDomain) {
+    if (!portfolio || !portfolio.pendingDomain || !user) {
       return res.status(404).json({
         success: false,
-        message: "Unauthorized Access",
+        message: "Portfolio not found",
+      });
+    }
+
+    if (portfolio.domainVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Domain already verified"
+      });
+    }
+
+    const domainLimit = getLimit(user, "maxDomains");
+    if (domainLimit !== -1 && user.usage.domains >= domainLimit) {
+      return res.status(403).json({
+        success: false,
+        message: "Domain limit reached. Upgrade your plan."
       });
     }
 
     const existingVerifiedDomain = await Portfolio.findOne({
       customDomain: portfolio.pendingDomain,
       domainVerified: true,
+      _id: { $ne: portfolio._id }
     });
 
     if (existingVerifiedDomain) {
-      return res.status(404).json({
+      return res.status(409).json({
         success: false,
         message: "This Domain Already In Use ..",
       });
@@ -166,15 +207,40 @@ exports.verifyDomain = async (req, res) => {
       else {
         portfolio.domainVerificationError = null;
       }
-    } else {
+      await portfolio.save();
+    }
+
+    if (verified) {
+
+      const result = await User.updateOne(
+        {
+          _id: req.user.id,
+          ...(domainLimit !== -1
+            ? { "usage.domains": { $lt: domainLimit } }
+            : {})
+        },
+        {
+          $inc: {
+            "usage.domains": 1
+          }
+        }
+      );
+
+      if (result.modifiedCount === 0) {
+        return res.status(403).json({
+          success: false,
+          message: "Domain limit reached"
+        });
+      }
+
       portfolio.domainVerificationError = null;
       portfolio.domainVerified = true;
       portfolio.customDomain = portfolio.pendingDomain;
       portfolio.pendingDomain = null;
       portfolio.domainVerificationToken = null;
-    }
 
-    await portfolio.save();
+      await portfolio.save();
+    }
 
     return res.status(200).json({
       success: true,
@@ -198,12 +264,15 @@ exports.deleteDomain = async (req, res) => {
   try {
     const { portfolioId } = req.body;
 
-    const portfolio = await Portfolio.findById(portfolioId);
+    const portfolio = await Portfolio.findOne({
+      _id: portfolioId,
+      user: req.user.id
+    });
 
     if (!portfolio) {
       return res.status(404).json({
         success: false,
-        message: "Unauthorized Access",
+        message: "Portfolio not found",
       });
     }
 
@@ -215,18 +284,48 @@ exports.deleteDomain = async (req, res) => {
     );
 
     if (safeToDelete) {
-      await removeDomainFromVercel(domain);
+      try {
+        await removeDomainFromVercel(domain);
+      } catch (err) {
+        console.error(
+          "Vercel domain deletion failed:",
+          err.message
+        );
+      }
     }
 
-    portfolio.customDomain = undefined;
+    const wasVerified = portfolio.domainVerified;
+    portfolio.customDomain = null;
     portfolio.pendingDomain = null;
     portfolio.domainVerificationToken = null;
     portfolio.domainVerified = false;
-    portfolio.domainConnectedAt = undefined;
+    portfolio.domainConnectedAt = null;
     portfolio.domainVerificationError = null;
     portfolio.vercelVerification = [];
 
     await portfolio.save();
+
+    if (wasVerified) {
+      await User.findByIdAndUpdate(
+        req.user.id,
+        {
+          $inc: {
+            "usage.domains": -1
+          }
+        }
+      );
+      await User.updateOne(
+        {
+          _id: req.user.id,
+          "usage.domains": { $lt: 0 }
+        },
+        {
+          $set: {
+            "usage.domains": 0
+          }
+        }
+      );
+    }
 
     return res.status(200).json({
       success: true,
