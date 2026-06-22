@@ -36,7 +36,7 @@ export default function DashboardSidebar() {
   ];
 
   return (
-    <aside className="w-[260px] h-full flex flex-col bg-white text-black border-r border-gray-300  shadow-gray-400 shadow-lg ">
+    <aside className="w-[200px] h-full flex flex-col bg-white text-black border-r border-gray-300  shadow-gray-400 shadow-lg ">
 
       {/* USER SECTION */}
       <div className="px-5 py-4 border-b border-gray-200">

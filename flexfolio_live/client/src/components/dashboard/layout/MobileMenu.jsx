@@ -3,15 +3,15 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { logoutUser } from "@/lib/api";
 import {
-    Bell,
-    House,
-    Layers,
-    LayoutGrid,
-    Loader2,
-    LogOut,
-    Newspaper,
-    Settings,
-    X,
+  Bell,
+  House,
+  Layers,
+  LayoutGrid,
+  Loader2,
+  LogOut,
+  Newspaper,
+  Settings,
+  X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -44,7 +44,7 @@ export default function MobileMenu({ isOpen, onClose }) {
 
   return (
     <div id="mobile-menu"
-      className={`fixed inset-0 z-50 md:hidden transition-all duration-300 ${
+      className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
         isOpen
           ? "visible bg-black/40 backdrop-blur-sm"
           : "invisible opacity-0"

@@ -1,4 +1,4 @@
-const PLAN_FEATURES = {
+export const PLAN_FEATURES = {
   free: {
     maxPortfolios: 2,
     maxDomains: 0,
@@ -53,5 +53,3 @@ const PLAN_FEATURES = {
     templates: "premium"
   }
 };
-
-module.exports = PLAN_FEATURES;

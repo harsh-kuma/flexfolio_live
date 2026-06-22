@@ -16,7 +16,7 @@ export default function DashbordShell({ children }) {
             <div className="flex flex-1 overflow-hidden">
 
                 {/* SIDEBAR */}
-                <aside className="hidden md:flex">
+                <aside className="hidden lg:flex">
                     <DashboardSidebar/>
                 </aside>
 

@@ -122,7 +122,7 @@ export default function DashboardNavbar() {
         {/* ========================================= */}
         {/* 1. BELL NOTIFICATIONS                       */}
         {/* ========================================= */}
-        <div className="relative hidden md:flex items-center justify-center">
+        <div className="relative hidden lg:flex items-center justify-center">
           <div className="group relative">
             <button
               type="button"
@@ -165,7 +165,7 @@ export default function DashboardNavbar() {
         {/* ========================================= */}
         {/* 2. NEWS / UPDATES                           */}
         {/* ========================================= */}
-        <div className="relative hidden md:flex items-center justify-center">
+        <div className="relative hidden lg:flex items-center justify-center">
           <div className="group relative">
             <button
               type="button"
@@ -204,12 +204,12 @@ export default function DashboardNavbar() {
         </div>
 
         {/* SEPARATOR */}
-        <div className="h-6 w-px hidden md:flex  bg-gray-200 mx-1" aria-hidden="true" />
+        <div className="h-6 w-px hidden lg:flex  bg-gray-200 mx-1" aria-hidden="true" />
 
         {/* ========================================= */}
         {/* 3. PROFILE                                  */}
         {/* ========================================= */}
-        <div className="relative hidden md:flex  items-center justify-center">
+        <div className="relative hidden lg:flex  items-center justify-center">
           <button
             type="button"
              onClick={(e) => { e.stopPropagation();toggleDropdown('profile');}}
@@ -288,7 +288,7 @@ export default function DashboardNavbar() {
         <div className="relative flex items-center justify-center">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
           >
             <Menu size={22} />
           </button>
