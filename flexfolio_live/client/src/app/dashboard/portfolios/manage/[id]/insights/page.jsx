@@ -267,11 +267,11 @@ export default function InsightsPage() {
           <>
             {/* OVERVIEW STATS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              <StatCard label="Total Views" value={analytics?.overview?.totalViews ?? 0} icon={<Eye size={18} className="text-blue-500" />} />
-              <StatCard label="Total Clicks" value={analytics?.overview?.totalClicks ?? 0} icon={<MousePointerClick size={18} className="text-emerald-500" />} />
-              <StatCard label="Unique Visitors" value={analytics?.overview?.uniqueVisitors ?? 0} icon={<Users size={18} className="text-violet-500" />} />
+              <StatCard label="Total Views" value={analytics?.overview?.totalViews} icon={<Eye size={18} className="text-blue-500" />} />
+              <StatCard label="Total Clicks" value={analytics?.overview?.totalClicks} icon={<MousePointerClick size={18} className="text-emerald-500" />} />
+              <StatCard label="Unique Visitors" value={analytics?.overview?.uniqueVisitors} icon={<Users size={18} className="text-violet-500" />} />
               <StatCard label="Unread Messages" value={unread} icon={<Mail size={18} className="text-amber-500" />} />
-              <StatCard label="Avg Visit Time" value={`${analytics?.engagement?.averageVisitTime ?? 0}s`} icon={<Clock size={18} className="text-rose-500" />} />
+              <StatCard label="Avg Visit Time (Sec.)" value={analytics?.engagement?.averageVisitTime} icon={<Clock size={18} className="text-rose-500" />} />
             </div>
 
             {/* CHARTS ROW */}
