@@ -1,17 +1,17 @@
 "use client";
 
 import { useAuth } from "@/components/providers/AuthProvider";
+import { usePlan } from "@/hooks/usePlan";
 import { logoutUser } from "@/lib/api";
 import {
-  Bell,
+  Crown,
   House,
   Layers,
   LayoutGrid,
   Loader2,
   LogOut,
-  Newspaper,
   Settings,
-  X,
+  X
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -20,6 +20,7 @@ import { useState } from "react";
 
 export default function MobileMenu({ isOpen, onClose }) {
   const { user } = useAuth();
+  const { plan } = usePlan();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -44,18 +45,16 @@ export default function MobileMenu({ isOpen, onClose }) {
 
   return (
     <div id="mobile-menu"
-      className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
-        isOpen
+      className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${isOpen
           ? "visible bg-black/40 backdrop-blur-sm"
           : "invisible opacity-0"
-      }`}
+        }`}
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`absolute left-0 top-0 h-dvh w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`absolute left-0 top-0 h-dvh w-[300px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
@@ -92,11 +91,10 @@ export default function MobileMenu({ isOpen, onClose }) {
                 key={item.name}
                 href={item.path}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-                  isActive
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${isActive
                     ? "bg-purple-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 <Icon size={18} />
                 {item.name}
@@ -107,15 +105,28 @@ export default function MobileMenu({ isOpen, onClose }) {
 
         {/* Bottom Actions */}
         <div className="border-t border-gray-200 p-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition">
-            <Bell size={18} />
-            Notifications
-          </button>
+          {plan !== "pro" && (
+            <div className="mx-3 mb-3 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50 p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Crown size={16} className="text-purple-600" />
+                <span className="text-xs font-semibold text-purple-700">
+                  Upgrade to Pro
+                </span>
+              </div>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition">
-            <Newspaper size={18} />
-            News Center
-          </button>
+              <p className="text-[11px] text-gray-600 leading-relaxed mb-3">
+                Unlock unlimited portfolios, custom domains, analytics and premium templates.
+              </p>
+
+              <Link
+                href="/pricing"
+                className="flex items-center justify-center gap-1 w-full rounded-lg bg-purple-600 py-2 text-xs font-medium text-white hover:bg-purple-700 transition-colors"
+              >
+                Upgrade Now
+              </Link>
+            </div>
+          )}
+
 
           <button
             onClick={handleLogout}

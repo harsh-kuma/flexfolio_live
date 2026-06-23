@@ -1,12 +1,15 @@
 "use client";
 
 import { useAuth } from "@/components/providers/AuthProvider";
-import { House, Layers, LayoutGrid, Settings } from "lucide-react";
+import { usePlan } from "@/hooks/usePlan";
+import { Crown, House, Layers, LayoutGrid, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+
 export default function DashboardSidebar() {
   const { user } = useAuth();
+  const { plan } = usePlan();
   const pathname = usePathname();
 
   const fullName = user?.name || "user";
@@ -76,6 +79,29 @@ export default function DashboardSidebar() {
         })}
 
       </nav>
+
+       {plan !== "pro" && (
+        <div className="mx-3 mb-3 rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50 p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Crown size={16} className="text-purple-600" />
+            <span className="text-xs font-semibold text-purple-700">
+              Upgrade to Pro
+            </span>
+          </div>
+
+          <p className="text-[11px] text-gray-600 leading-relaxed mb-3">
+            Unlock unlimited portfolios, custom domains, analytics and premium templates.
+          </p>
+
+          <Link
+            href="/pricing"
+            className="flex items-center justify-center gap-1 w-full rounded-lg bg-purple-600 py-2 text-xs font-medium text-white hover:bg-purple-700 transition-colors"
+          >
+            Upgrade Now
+          </Link>
+        </div>
+      )}
+
 
       {/* FOOTER */}
       <div className="p-3 border-t border-gray-200 text-xs text-gray-500">
