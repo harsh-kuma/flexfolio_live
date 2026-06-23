@@ -59,7 +59,7 @@ export default function InsightsPage() {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
-  const [unread, setUnread] = useState(0);
+  const [unread, setUnread] = useState();
   const [expandedMessages, setExpandedMessages] = useState({});
 
   // Click Outside Listener for Sorting Dropdown
