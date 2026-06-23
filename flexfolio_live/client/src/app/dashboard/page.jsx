@@ -1,47 +1,23 @@
 "use client";
 
+import ChartCard from "@/components/analytics/ChartCard";
+import EngagementChart from "@/components/analytics/EngagementChart";
+import StatCard from "@/components/analytics/StatCard";
+import TopClicksChart from "@/components/analytics/TopClicksChart";
+import ViewsChart from "@/components/analytics/ViewsChart";
 import { getMyAnalyticsSummary } from "@/lib/api";
 import {
-    AlertCircle,
-    ArrowUpRight,
-    Eye,
-    LayoutGrid,
-    MousePointerClick,
-    Plus,
-    Users
+  AlertCircle,
+  ArrowUpRight,
+  Eye,
+  LayoutGrid,
+  MousePointerClick,
+  Plus,
+  Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-
-// =====================
-// CHART IMPORTS
-// =====================
-import {
-    ArcElement,
-    BarElement,
-    CategoryScale,
-    Chart as ChartJS,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Tooltip,
-} from "chart.js";
-
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-
-// REGISTER CHART
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Tooltip,
-  Legend,
-  BarElement
-);
 
 const DEFAULT_THUMBNAIL =
   "https://res.cloudinary.com/dr38wac7n/image/upload/v1779525495/default_portfolio_shk797.png";
@@ -134,136 +110,6 @@ export default function DashboardPage() {
     },
   ];
 
-  // =====================
-  // LINE CHART DATA
-  // =====================
-  const chartData = {
-    labels: stats.chart.map((i) => i?._id?.day || "Unknown"),
-    datasets: [
-      {
-        label: "Views",
-        data: stats.chart.map((i) => i?.views || 0),
-        borderColor: "#7c3aed",
-        backgroundColor: "rgba(124, 58, 237, 0.1)",
-        tension: 0.4,
-        fill: true,
-        pointRadius: 3,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { display: false } },
-      y: { grid: { color: "#f3f4f6" } },
-    },
-  };
-
-  // =====================
-  // ENGAGEMENT CHART
-  // =====================
-  const engagementChartData = {
-    labels: ["Average Visit", "Longest Visit", "Total Visit"],
-    datasets: [
-      {
-        data: [
-          stats.engagement.averageVisitTime,
-          stats.engagement.longestVisit,
-          stats.engagement.totalVisitTime,
-        ],
-        backgroundColor: [
-          "rgba(124, 58, 237, 0.8)",
-          "rgba(59, 130, 246, 0.8)",
-          "rgba(16, 185, 129, 0.8)",
-        ],
-      },
-    ],
-  };
-
-  const engagementOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { position: "bottom" },
-    },
-  };
-
-  const topClicksChartData = {
-    labels: stats.topClicks.map((item) => {
-      if (item._id.startsWith("project_")) {
-        const name = item._id.replace("project_", "");
-
-        return name.length > 20
-          ? `${name.slice(0, 20)}...`
-          : name;
-      }
-
-      return item._id.charAt(0).toUpperCase() + item._id.slice(1);
-    }),
-
-    datasets: [
-      {
-        label: "Clicks",
-        data: stats.topClicks.map((item) => item.count),
-        backgroundColor: "#7c3aed",
-        borderRadius: 8,
-        barThickness: 18,
-      },
-    ],
-  };
-
-  const topClicksOptions = {
-    indexAxis: "y",
-    responsive: true,
-    maintainAspectRatio: false,
-
-    plugins: {
-      legend: {
-        display: false,
-      },
-
-      tooltip: {
-        callbacks: {
-          title: (items) => {
-            const index = items[0].dataIndex;
-
-            return stats.topClicks[index]._id.replace(
-              "project_code:",
-              ""
-            );
-          },
-        },
-      },
-    },
-
-    scales: {
-      x: {
-        beginAtZero: true,
-        ticks: {
-          precision: 0,
-          stepSize: 1,
-        },
-        grid: {
-          color: "#f3f4f6",
-        },
-      },
-
-      y: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-          },
-        },
-      },
-    },
-  };
-
   return (
     <div className="min-h-dvh bg-gray-50 text-gray-900">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
@@ -302,22 +148,12 @@ export default function DashboardPage() {
         {/* OVERVIEW */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {overviewCards.map((card) => (
-            <div
+            <StatCard
               key={card.label}
-              className="bg-white border rounded-2xl p-5 hover:shadow"
-            >
-              <div className="flex justify-between text-sm text-gray-500">
-                {card.label}
-                {card.icon}
-              </div>
-              {card.value !== undefined && card.value !== null ? (
-                <h2 className="text-2xl font-bold mt-2">
-                  {Number(card.value).toLocaleString()}
-                </h2>
-              ) : (
-                <div className="h-8 w-20 mt-2 bg-gray-100 animate-pulse rounded-xl" />
-              )}
-            </div>
+              label={card.label}
+              value={card.value}
+              icon={card.icon}
+            />
           ))}
         </div>
 
@@ -326,50 +162,33 @@ export default function DashboardPage() {
         {/* ===================== */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* LINE CHART */}
-          <div className="bg-white border rounded-2xl p-5">
-            <h2 className="font-semibold mb-4">Views Analytics</h2>
-            <div className="h-[280px]">
-              {loading ? (
-                <div className="h-full bg-gray-100 animate-pulse rounded-xl" />
-              ) : (
-                <Line data={chartData} options={chartOptions} />
-              )}
-            </div>
-          </div>
+          <ChartCard
+            title="Views Analytics"
+            loading={loading}
+          >
+            <ViewsChart
+              data={stats.chart}
+            />
+          </ChartCard>
 
-          {/* ENGAGEMENT CHART */}
-          <div className="bg-white border rounded-2xl p-5">
-            <h2 className="font-semibold mb-4">Engagement Overview (Seconds)</h2>
-            <div className="h-[280px]">
-              {loading ? (
-                <div className="h-full bg-gray-100 animate-pulse rounded-xl" />
-              ) : (
-                <Doughnut
-                  data={engagementChartData}
-                  options={engagementOptions}
-                />
-              )}
-            </div>
-          </div>
+          <ChartCard
+            title="Engagement Overview (Seconds)"
+            loading={loading}
+          >
+            <EngagementChart
+              engagement={stats.engagement}
+            />
+          </ChartCard>
 
-          {/* Bar CHART */}
-          <div className="bg-white border rounded-2xl p-5">
-            <h2 className="font-semibold mb-4">
-              Top Clicked Links
-            </h2>
-
-            <div className="h-[320px]">
-              {loading ? (
-                <div className="h-full bg-gray-100 animate-pulse rounded-xl" />
-              ) : (
-                <Bar
-                  data={topClicksChartData}
-                  options={topClicksOptions}
-                />
-              )}
-            </div>
-          </div>
+          <ChartCard
+            title="Top Clicked Links"
+            loading={loading}
+            height="320px"
+          >
+            <TopClicksChart
+              topClicks={stats.topClicks}
+            />
+          </ChartCard>
 
         </div>
 

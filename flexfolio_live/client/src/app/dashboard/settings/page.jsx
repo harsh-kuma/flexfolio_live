@@ -77,8 +77,13 @@ export default function SettingsPage() {
 
   const domainUsed = usage?.domains || 0;
   const maxDomains = features.maxDomains === -1 ? "Unlimited" : features.maxDomains;
-  const domainUsagePercentage = features.maxDomains === -1 ? 100 : Math.min((domainUsed / features.maxDomains) * 100, 100);
-
+  let domainUsagePercentage;
+  if(maxDomains !== 0){
+    domainUsagePercentage = features.maxDomains === -1 ? 100 : Math.min((domainUsed / features.maxDomains) * 100, 100);
+  }else{
+    domainUsagePercentage = 100;
+  }
+  
 
   const mediaUsed = usage?.mediaFiles || 0;
   const maxMediaFiles = features.maxMediaFiles === -1 ? "Unlimited" : features.maxMediaFiles;
@@ -246,7 +251,7 @@ export default function SettingsPage() {
             <div className="flex flex-col items-center gap-4">
               <div className="relative group">
                 <img
-                  src={previewUrl || initialData.profile || "/default-avatar.png"}
+                  src={previewUrl || initialData.profile || "/flexfolio_logo.jpeg"}
                   alt="Profile avatar"
                   className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-sm bg-gray-100 transition-opacity group-hover:opacity-90"
                 />
