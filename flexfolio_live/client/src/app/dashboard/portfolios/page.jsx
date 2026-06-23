@@ -5,7 +5,6 @@ import { getMyPortfolios } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { usePlan } from "@/hooks/usePlan";
 import {
   Calendar,
   Copy,
@@ -18,10 +17,8 @@ import {
   Search,
   SearchX
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function PortfoliosPage() {
-  const router = useRouter();
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,16 +58,6 @@ export default function PortfoliosPage() {
     }
   };
 
-  const { canCreatePortfolio } = usePlan();
-
-  const handleClick = () => {
-    if (!canCreatePortfolio()) {
-      router.push("/pricing");
-      return;
-    }
-    router.push("/dashboard/templates");
-  };
-
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -94,13 +81,13 @@ export default function PortfoliosPage() {
         </div>
 
         <div className="item-center">
-          <button
-            onClick={handleClick}
+          <Link
+            href="/dashboard/templates"
             className="bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 font-medium shadow-lg shadow-violet-600/20 hover:shadow-violet-600/40 active:scale-95"
           >
             <Plus size={16} strokeWidth={2.5} />
             Create Portfolio
-          </button>
+          </Link>
         </div>
       </div>
 

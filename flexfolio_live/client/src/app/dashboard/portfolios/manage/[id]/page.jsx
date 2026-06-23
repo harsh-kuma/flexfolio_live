@@ -20,6 +20,7 @@ import {
 import Loader from "@/components/common/loader/Loader";
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { usePlan } from "@/hooks/usePlan";
 import { isValidDomain, normalizeDomain } from "@/utils/domain";
 import {
   ArrowLeft,
@@ -62,6 +63,8 @@ export default function PortfolioManagePage() {
   const [showVerifyBox, setShowVerifyBox] = useState(false);
   const [otp, setOtp] = useState("");
   const [verifying, setVerifying] = useState(false);
+
+  const {canAddDomain } = usePlan();
   useEffect(() => {
     (async () => {
       try {
@@ -170,6 +173,11 @@ export default function PortfolioManagePage() {
   };
 
   const connectDomain = async () => {
+    if(!canAddDomain()){
+      router.push("/pricing");
+      return;
+    }
+
     const cleanDomain = normalizeDomain(domain);
 
     if (!isValidDomain(cleanDomain)) {
