@@ -14,6 +14,7 @@ const contactMessageSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    maxlength: 100,
   },
 
   email: {
@@ -21,12 +22,14 @@ const contactMessageSchema = new mongoose.Schema({
     required: true,
     trim: true,
     lowercase: true,
+    maxlength: 255,
   },
 
   message: {
     type: String,
     required: true,
     trim: true,
+    maxlength: 5000,
   },
 
   // IT FOR DESHBORD
@@ -35,7 +38,23 @@ const contactMessageSchema = new mongoose.Schema({
     default: false,
   },
 
+  readAt: {
+  type: Date,
+  default: null,
+}
+
 }, { timestamps: true });
+
+contactMessageSchema.index({
+  portfolio: 1,
+  createdAt: -1,
+});
+
+contactMessageSchema.index({
+  portfolio: 1,
+  isRead: 1,
+  createdAt: -1
+});
 
 module.exports = mongoose.model(
   "ContactMessage",

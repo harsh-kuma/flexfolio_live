@@ -196,4 +196,30 @@ export const getPortfolioByDomain = async (domain) => {
   const res = await api.get(`/portfolio/${domain}`);
   return res.data;
 }
+
+export const getPortfolioMessages = async (portfolioId,page = 1) => {
+  const res = await api.get(`/owner/messages/portfolio/${portfolioId}?page=${page}`);
+  return res.data;
+};
+
+export const markMessageRead = async (messageId) => {
+  const res = await api.patch(`/owner/messages/${messageId}/read`);
+  return res.data;
+};
+
+export const deleteMessage = async (messageId) => {
+  const res = await api.delete(`/owner/messages/${messageId}`);
+  return res.data;
+};
+
+export const deleteAllMessages = async (portfolioId) => {
+  const res = await api.delete(`/owner/messages/portfolio/${portfolioId}`);
+  return res.data;
+};
+
+export const getSingleAnalyticsSummary = async (portfolioId) => {
+  const res = await api.get(`/analytics/summary/${portfolioId}`);
+  return res.data;
+};
+
 export default api;

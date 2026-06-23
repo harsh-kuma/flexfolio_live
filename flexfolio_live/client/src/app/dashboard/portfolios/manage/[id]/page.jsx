@@ -33,7 +33,7 @@ import {
   Pencil,
   Save,
   Trash2,
-  XCircle,
+  XCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -436,6 +436,24 @@ export default function PortfolioManagePage() {
 
           {/* RIGHT COLUMN - ACTIONS & STATUS */}
           <div className="space-y-6">
+
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+              <h2 className="text-sm font-bold tracking-wide text-gray-500 uppercase mb-4">
+                Site Insights
+              </h2>
+
+              <p className="text-sm text-gray-600 mb-4">
+                View visitor analytics, engagement metrics, clicks, and contact messages for this portfolio.
+              </p>
+
+              <Link
+                href={`/dashboard/portfolios/manage/${id}/insights`}
+                className="w-full flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"
+              >
+                <ExternalLink size={16} />
+                Open Insights
+              </Link>
+            </div>
 
             {/* PUBLISH STATUS */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

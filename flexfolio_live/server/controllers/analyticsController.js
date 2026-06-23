@@ -142,6 +142,25 @@ exports.getSummary = async (req, res) => {
   try {
     const { portfolioId } = req.params;
 
+    if (!mongoose.Types.ObjectId.isValid(portfolioId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid portfolio id",
+      });
+    }
+    
+    const portfolio = await Portfolio.findOne({
+      _id: portfolioId,
+      user: req.user.id,
+    }).select("_id");
+
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        message: "Portfolio not found",
+      });
+    }
+
     const objectId = new mongoose.Types.ObjectId(portfolioId);
 
     const today = new Date();
@@ -301,7 +320,7 @@ exports.getMyAnalyticsSummary = async (req, res) => {
     const userId = req.user.id;
 
     // 1. Get all user portfolios with required fields
-    const portfolios = await Portfolio.find({ user: userId , isPublished: true })
+    const portfolios = await Portfolio.find({ user: userId, isPublished: true })
       .select(
         "_id title thumbnail username category templateSlug isPublished createdAt"
       )

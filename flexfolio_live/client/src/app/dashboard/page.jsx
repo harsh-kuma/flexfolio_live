@@ -210,7 +210,7 @@ export default function DashboardPage() {
               {stats.portfolios.map((p) => (
                 <Link
                   key={p._id}
-                  href={`/portfolio/${p.username}`}
+                  href={`https://${p.username}.flexfolio.online`}
                   target="_blank" rel="noopener noreferrer"
                   className="group relative bg-white rounded-[28px] p-2 flex flex-col ring-1 ring-gray-900/5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] transition-all duration-500 ease-out hover:-translate-y-1.5 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)] hover:ring-gray-900/10"
                 >
