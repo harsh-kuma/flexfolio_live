@@ -20,6 +20,7 @@ import {
   Shield,
   Trash2
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function SettingsPage() {
@@ -495,14 +496,14 @@ export default function SettingsPage() {
                 </span>
               </div>
 
-              {plan !== "pro" && (
+              {plan !== "pro" && ( 
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <button className="bg-[#5642E6] hover:bg-[#4a39c7] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+                  <Link href="/pricing" className="bg-[#5642E6] hover:bg-[#4a39c7] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
                     <Crown size={16} /> Upgrade to Pro
-                  </button>
-                  <a href="#" className="text-[#5642E6] text-sm font-medium hover:underline flex items-center gap-1">
+                  </Link>
+                  <Link href="/pricing" className="text-[#5642E6] text-sm font-medium hover:underline flex items-center gap-1">
                     View Plans & Features <ArrowRight size={16} />
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>
