@@ -1,4 +1,4 @@
-import { developerSchema } from "./schemas";
+import { developerMinimalSchema, developerSchema } from "./schemas";
 export const templates = {
   "developer": {
     schema: developerSchema,
