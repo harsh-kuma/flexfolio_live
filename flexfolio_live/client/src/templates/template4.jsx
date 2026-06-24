@@ -92,7 +92,7 @@ const AnimatedProjectCard = ({ p ,trackClick}) => {
   );
 };
 
-export default function Template4Animated({ data, owner_key, working }) {
+export default function Template4Animated({ data, owner_key, working ,system_allow}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const scrollTo = (id) => {
@@ -586,14 +586,14 @@ export default function Template4Animated({ data, owner_key, working }) {
             </div>
             <p className="text-slate-400 font-medium">
               © {new Date().getFullYear()} {data?.fullName}. All rights reserved.
-              <a
+              {(!system_allow?.removeBranding || !system_allow) && <a
                 href="https://flexfolio.online"
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Built with Flexfolio
-              </a>
+              </a>}
             </p>
 
           </div>

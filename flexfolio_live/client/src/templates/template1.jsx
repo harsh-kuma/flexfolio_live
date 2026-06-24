@@ -15,7 +15,7 @@ import { trackAnalyticsEvent } from "@/lib/api";
     }
   };
 
-export default function Template1({ data, owner_key, working}) {
+export default function Template1({ data, owner_key, working,system_allow}) {
   // Prevent crash if data is not passed
   if (!data) return <div className="min-h-dvh flex items-center justify-center">Loading...</div>;
 

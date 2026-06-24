@@ -94,7 +94,7 @@ const NeoProjectCard = ({ p, index ,trackClick}) => {
   );
 };
 
-export default function TemplateNeoBrutalist({ data, owner_key, working }) {
+export default function TemplateNeoBrutalist({ data, owner_key, working ,system_allow}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const scrollTo = (id) => {
@@ -484,14 +484,14 @@ export default function TemplateNeoBrutalist({ data, owner_key, working }) {
             </div>
             <p className="font-black uppercase">
               © {new Date().getFullYear()} {data?.fullName}. All rights reserved.
-              <a
+              {(!system_allow?.removeBranding || !system_allow) && <a
                 href="https://flexfolio.online"
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Built with Flexfolio
-              </a>
+              </a>}
             </p>
           </div>
 

@@ -222,7 +222,13 @@ exports.getPortfolio = async (req, res) => {
         message: "Portfolio Not Found",
       });
     }
-    const Safeportfolio = getSafePortfolio(portfolio);
+    const owner = await User.findById(portfolio.user).select("subscription.plan");
+    let Safeportfolio = getSafePortfolio(portfolio);
+
+    Safeportfolio.features = {
+      removeBranding : owner?.subscription?.plan !== "free",
+    };
+    
     res.json(Safeportfolio);
 
   } catch (error) {

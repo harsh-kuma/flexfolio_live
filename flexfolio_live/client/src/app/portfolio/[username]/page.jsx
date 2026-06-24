@@ -109,7 +109,7 @@ export default async function PortfolioPage({ params }) {
         }}
       />
       <PortfolioAnalytics portfolioId={String(portfolio?._id)} />
-      <TemplateComponent data={portfolio.data} owner_key={portfolio._id} working={true} />
+      <TemplateComponent data={portfolio.data} owner_key={portfolio._id} working={true} system_allow={portfolio.features} />
     </>
   );
 }

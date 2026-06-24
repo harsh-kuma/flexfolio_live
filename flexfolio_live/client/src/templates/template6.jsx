@@ -105,7 +105,7 @@ const ProjectCard = ({ p, trackClick }) => {
   );
 };
 
-export default function Template6({ data, owner_key, working }) {
+export default function Template6({ data, owner_key, working ,system_allow}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -566,12 +566,13 @@ export default function Template6({ data, owner_key, working }) {
              <p className="text-xs sm:text-sm font-semibold text-white tracking-tight">
                {data?.fullName || "Portfolio"} © {new Date().getFullYear()}
              </p>
+             {(!system_allow?.removeBranding || !system_allow) &&
              <p className="text-[10px] sm:text-xs text-slate-500 font-light flex items-center justify-center sm:justify-start gap-1">
                Powered by
                <a href="https://flexfolio.online" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-white transition-colors underline decoration-white/20 underline-offset-2 sm:underline-offset-4">
                  Flexfolio
                </a>
-             </p>
+             </p>}
           </div>
           
           <div className="flex gap-3 sm:gap-4">

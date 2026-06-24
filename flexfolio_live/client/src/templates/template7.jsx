@@ -74,7 +74,7 @@ const ProjectCard = ({ p, trackClick }) => {
   );
 };
 
-export default function Template4({ data, owner_key, working }) {
+export default function Template4({ data, owner_key, working ,system_allow}) {
   const [activeSection, setActiveSection] = useState("#hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef(null);
@@ -434,8 +434,10 @@ export default function Template4({ data, owner_key, working }) {
         {/* FOOTER */}
         <footer className="pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/5">
           <p className="text-xs text-neutral-500 font-medium">© {new Date().getFullYear()} {data?.fullName}. All rights reserved.</p>
+          {(!system_allow?.removeBranding || !system_allow) &&
           <a href="https://flexfolio.online" target="_blank" rel="noreferrer" className="text-xs text-neutral-600 hover:text-white transition-colors">Built with Flexfolio</a>
-        </footer>
+          }
+          </footer>
 
       </main>
     </div>
