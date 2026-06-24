@@ -7,10 +7,10 @@ import Template6 from "@/templates/template6";
 import Template7 from "@/templates/template7";
 
 export const templates = { 
-  "developer~template1": {
+  "developer-minimal~template1": {
     name:"Basic Resume type Template",
     image:"https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/Screenshot_2026-05-18_141750_zxwn6e",
-    category: "developer",
+    category: "developer-minimal",
     id: "template1",
     component: Template1,
   },
@@ -35,10 +35,10 @@ export const templates = {
     id: "template4",
     component: Template4,
   },
-  "developer~template5": {
+  "developer-minimal~template5": {
     name:"Basic Resume type Template",
     image:"https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/Screenshot_2026-05-18_141750_zxwn6e",
-    category: "developer",
+    category: "developer-minimal",
     id: "template5",
     component: Template5,
   },
