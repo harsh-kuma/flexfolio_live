@@ -121,7 +121,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900 pb-24 overflow-hidden font-sans">
+    <div className="relative min-h-dvh bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900 pb-24 overflow-hidden font-sans">
 
       {/* --- REFINED SUBTLE BACKGROUND --- */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] bg-[size:32px_32px] opacity-20 -z-20" />

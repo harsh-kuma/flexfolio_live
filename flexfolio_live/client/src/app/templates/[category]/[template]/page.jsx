@@ -1,6 +1,7 @@
 "use client";
 
 import TemplateNotFound from "@/components/portfolio/TemplateNotFound";
+import { usePortfolioGuard } from "@/hooks/usePortfolioGuard";
 import { templates } from "@/lib/templates";
 import { Monitor, Smartphone, Tablet } from "lucide-react";
 import Image from "next/image";
@@ -106,6 +107,7 @@ Collaborated with cross-functional teams to deliver high-quality features and im
 };
 
 export default function TemplatePreview() {
+  const { checkPortfolioAccess } = usePortfolioGuard();
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -147,6 +149,13 @@ export default function TemplatePreview() {
     </button>
   );
 
+  const handleUseTemplate = (key) => {
+    if (!checkPortfolioAccess()) {
+      return;
+    }
+    router.push(`/dashboard/builder?template=${key}`);
+  };
+
   return (
     <div className="min-h-dvh bg-gray-100 flex flex-col">
 
@@ -173,7 +182,7 @@ export default function TemplatePreview() {
         </div>
 
         <button
-          onClick={() => router.push(`/dashboard/builder?template=${key}`)}
+          onClick={() => handleUseTemplate(key)}
           className="bg-black text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition"
         >
           Use Template

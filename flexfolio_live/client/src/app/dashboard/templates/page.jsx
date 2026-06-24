@@ -1,10 +1,14 @@
 "use client";
+import { usePortfolioGuard } from "@/hooks/usePortfolioGuard";
 import { templates } from "@/lib/templates";
 import { Eye, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TemplatesPage() {
+  const router = useRouter();
+  const { checkPortfolioAccess } = usePortfolioGuard();
   const [activeCard, setActiveCard] = useState(null);
   const [canHover, setCanHover] = useState(false);
 
@@ -13,6 +17,14 @@ export default function TemplatesPage() {
       window.matchMedia("(hover: hover)").matches
     );
   }, []);
+
+  const handleUseTemplate = (key) => {
+    if (!checkPortfolioAccess()) {
+      return;
+    }
+    router.push(`/dashboard/builder?template=${key}`);
+  };
+
   return (
     <div className="min-h-dvh bg-[#f5f5f5] px-6 py-12 antialiased">
       <div className="max-w-[1800px] mx-auto">
@@ -60,19 +72,18 @@ export default function TemplatesPage() {
                       className={`absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3 px-6 z-10 transition-all duration-300
                         group-hover:opacity-100
                         group-hover:pointer-events-auto
-                        ${
-                          activeCard === key
-                            ? "opacity-100 pointer-events-auto"
-                            : "opacity-0 pointer-events-none"
+                        ${activeCard === key
+                          ? "opacity-100 pointer-events-auto"
+                          : "opacity-0 pointer-events-none"
                         }`}
                     >
                       {/* USE TEMPLATE */}
-                      <Link href={`/dashboard/builder?template=${key}`} className="w-full max-w-[200px]">
-                        <button className="w-full bg-white text-black font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition">
+                      <button onClick={() => handleUseTemplate(key)} className="w-full max-w-[200px]">
+                        <p className="w-full bg-white text-black font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition">
                           <Plus size={16} />
                           Use Template
-                        </button>
-                      </Link>
+                        </p>
+                      </button>
 
                       {/* LIVE PREVIEW */}
                       <Link target="_blank" rel="noopener noreferrer" href={`/templates/${category}/${template}`} className="w-full max-w-[200px]">
