@@ -4,11 +4,13 @@ import { trackAnalyticsEvent } from "@/lib/api";
 // new analytics 
   const trackClick = (meta) => {
     if (working) {
-      const visitorId = sessionStorage.getItem("visitorId");
+      const visitorId = localStorage.getItem("visitorId");
+      const sessionId = sessionStorage.getItem("sessionId");
       if (!visitorId || !owner_key) return;
       trackAnalyticsEvent({
         portfolioId: owner_key,
         visitorId,
+        sessionId,
         eventType: "click",
         meta,
       });

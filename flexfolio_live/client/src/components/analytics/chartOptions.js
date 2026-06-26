@@ -27,6 +27,33 @@ if (!registered) {
   registered = true;
 }
 
+//old chart
+
+// export const lineChartOptions = {
+//   responsive: true,
+//   maintainAspectRatio: false,
+
+//   plugins: {
+//     legend: {
+//       display: false,
+//     },
+//   },
+
+//   scales: {
+//     x: {
+//       grid: {
+//         display: false,
+//       },
+//     },
+
+//     y: {
+//       grid: {
+//         color: "#f3f4f6",
+//       },
+//     },
+//   },
+// };
+
 export const lineChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -35,6 +62,20 @@ export const lineChartOptions = {
     legend: {
       display: false,
     },
+
+    tooltip: {
+      callbacks: {
+        title(items) {
+          const date = new Date(items[0].label);
+
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+        },
+      },
+    },
   },
 
   scales: {
@@ -42,9 +83,30 @@ export const lineChartOptions = {
       grid: {
         display: false,
       },
+
+      ticks: {
+        maxTicksLimit: 8,
+
+        callback(value) {
+          const label = this.getLabelForValue(value);
+
+          const date = new Date(label);
+
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
+        },
+      },
     },
 
     y: {
+      beginAtZero: true,
+
+      ticks: {
+        precision: 0,
+      },
+
       grid: {
         color: "#f3f4f6",
       },

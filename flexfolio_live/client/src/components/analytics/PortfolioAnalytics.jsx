@@ -3,24 +3,22 @@
 import { trackAnalyticsEvent } from "@/lib/api";
 import { useEffect, useRef } from "react";
 
-export default function PortfolioAnalytics({
-  portfolioId,
-}) {
+export default function PortfolioAnalytics({ portfolioId, }) {
   const sentRef = useRef(false);
-
   useEffect(() => {
     if (!portfolioId) return;
-
-    let visitorId =
-      sessionStorage.getItem("visitorId");
+    let visitorId = localStorage.getItem("visitorId");
 
     if (!visitorId) {
       visitorId = crypto.randomUUID();
+      localStorage.setItem("visitorId", visitorId);
+    }
 
-      sessionStorage.setItem(
-        "visitorId",
-        visitorId
-      );
+    let sessionId = sessionStorage.getItem("sessionId");
+
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      sessionStorage.setItem("sessionId",sessionId);
     }
 
     const viewedKey = `view_${portfolioId}`;
@@ -30,6 +28,7 @@ export default function PortfolioAnalytics({
       trackAnalyticsEvent({
         portfolioId,
         visitorId,
+        sessionId,
         eventType: "view",
       });
 
@@ -56,6 +55,7 @@ export default function PortfolioAnalytics({
       trackAnalyticsEvent({
         portfolioId,
         visitorId,
+        sessionId,
         eventType: "session",
         duration,
       });

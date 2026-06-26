@@ -11,11 +11,12 @@ exports.trackEvent = async (req, res) => {
       portfolioId,
       eventType,
       visitorId,
+      sessionId,
       meta = null,
       duration = 0,
     } = req.body;
 
-    if (!portfolioId || !visitorId || !eventType) {
+    if (!portfolioId || !visitorId || !sessionId || !eventType) {
       return res.status(400).json({
         success: false,
         error: "Missing required fields",
@@ -36,7 +37,7 @@ exports.trackEvent = async (req, res) => {
       await Analytics.findOneAndUpdate(
         {
           portfolioId,
-          visitorId,
+          sessionId,
           eventType: "session",
         },
         {
@@ -46,6 +47,12 @@ exports.trackEvent = async (req, res) => {
           $set: {
             ip,
             userAgent,
+            visitorId,
+            sessionId,
+          },
+          $setOnInsert: {
+            portfolioId,
+            eventType: "session",
           },
         },
         {
@@ -59,46 +66,16 @@ exports.trackEvent = async (req, res) => {
       });
     }
 
-    // =======================
-    // UNIQUE VIEW
-    // =======================
-    if (eventType === "view") {
-      const existingView = await Analytics.findOne({
-        portfolioId,
-        visitorId,
-        eventType: "view",
-      }).lean();
-
-      if (existingView) {
-        return res.status(200).json({
-          success: true,
-          skipped: true,
-        });
-      }
-    }
 
     // =======================
     // CLICK EVENT
     // =======================
     if (eventType === "click") {
-      const existingClick = await Analytics.findOne({
-        portfolioId,
-        visitorId,
-        eventType: "click",
-        meta,
-      }).lean();
-
-      if (existingClick) {
-        return res.status(200).json({
-          success: true,
-          skipped: true,
-        });
-      }
-
       await Analytics.create({
         portfolioId,
         eventType,
         visitorId,
+        sessionId,
         meta,
         ip,
         userAgent,
@@ -116,6 +93,7 @@ exports.trackEvent = async (req, res) => {
       portfolioId,
       eventType,
       visitorId,
+      sessionId,
       meta,
       duration,
       ip,
@@ -126,6 +104,13 @@ exports.trackEvent = async (req, res) => {
       success: true,
     });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(200).json({
+        success: true,
+        skipped: true,
+      });
+    }
+
     console.error(err);
 
     return res.status(500).json({
@@ -148,7 +133,7 @@ exports.getSummary = async (req, res) => {
         message: "Invalid portfolio id",
       });
     }
-    
+
     const portfolio = await Portfolio.findOne({
       _id: portfolioId,
       user: req.user.id,

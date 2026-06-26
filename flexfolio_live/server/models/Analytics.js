@@ -25,6 +25,12 @@ const analyticsSchema = new mongoose.Schema(
       index: true,
     },
 
+    sessionId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+
     // resume, github, linkedin, email, project_live, project_code, contact_form
     meta: {
       type: String,
@@ -102,7 +108,7 @@ analyticsSchema.index({
 analyticsSchema.index(
   {
     portfolioId: 1,
-    visitorId: 1,
+    sessionId: 1,
     eventType: 1,
   },
   {
