@@ -1,10 +1,12 @@
 "use client";
 
+import AnalyticsLocked from "@/components/analytics/AnalyticsLocked";
 import ChartCard from "@/components/analytics/ChartCard";
 import EngagementChart from "@/components/analytics/EngagementChart";
 import StatCard from "@/components/analytics/StatCard";
 import TopClicksChart from "@/components/analytics/TopClicksChart";
 import ViewsChart from "@/components/analytics/ViewsChart";
+import { usePlan } from "@/hooks/usePlan";
 import { getMyAnalyticsSummary } from "@/lib/api";
 import {
   AlertCircle,
@@ -23,6 +25,7 @@ const DEFAULT_THUMBNAIL =
   "https://res.cloudinary.com/dr38wac7n/image/upload/v1779525495/default_portfolio_shk797.png";
 
 export default function DashboardPage() {
+  const { plan, features } = usePlan();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -98,11 +101,12 @@ export default function DashboardPage() {
       value: stats.overview.totalClicks,
       icon: <MousePointerClick size={18} className="text-emerald-500" />,
     },
+    ...(plan === "pro" ?[
     {
       label: "Unique Visitors",
       value: stats.overview.uniqueVisitors,
       icon: <Users size={18} className="text-orange-500" />,
-    },
+    }] : []),
     {
       label: "Today Views",
       value: stats.overview.todayViews,
@@ -146,51 +150,57 @@ export default function DashboardPage() {
         )}
 
         {/* OVERVIEW */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {overviewCards.map((card) => (
-            <StatCard
-              key={card.label}
-              label={card.label}
-              value={card.value}
-              icon={card.icon}
-            />
-          ))}
-        </div>
+        {plan && features.analytics ? <div className="space-y-8">
+          <div className={`grid grid-cols-1 sm:grid-cols-2  gap-4 ${plan === "pro" ? "lg:grid-cols-5" :"lg:grid-cols-4"}`}>
+            {overviewCards.map((card) => (
+              <StatCard
+                key={card.label}
+                label={card.label}
+                value={card.value}
+                icon={card.icon}
+              />
+            ))}
+          </div>
 
-        {/* ===================== */}
-        {/* CHARTS SIDE BY SIDE */}
-        {/* ===================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* ===================== */}
+          {/* CHARTS SIDE BY SIDE */}
+          {/* ===================== */}
+          {plan === "pro" ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <ChartCard
-            title="Views Analytics"
-            loading={loading}
-          >
-            <ViewsChart
-              data={stats.chart}
-            />
-          </ChartCard>
+              <ChartCard
+                title="Views Analytics"
+                loading={loading}
+              >
+                <ViewsChart
+                  data={stats.chart}
+                />
+              </ChartCard>
 
-          <ChartCard
-            title="Engagement Overview (Seconds)"
-            loading={loading}
-          >
-            <EngagementChart
-              engagement={stats.engagement}
-            />
-          </ChartCard>
+              <ChartCard
+                title="Engagement Overview (Seconds)"
+                loading={loading}
+              >
+                <EngagementChart
+                  engagement={stats.engagement}
+                />
+              </ChartCard>
 
-          <ChartCard
-            title="Top Clicked Links"
-            loading={loading}
-            height="320px"
-          >
-            <TopClicksChart
-              topClicks={stats.topClicks}
-            />
-          </ChartCard>
+              <ChartCard
+                title="Top Clicked Links"
+                loading={loading}
+                height="320px"
+              >
+                <TopClicksChart
+                  topClicks={stats.topClicks}
+                />
+              </ChartCard>
 
-        </div>
+            </div>) : <AnalyticsLocked
+            title="Advanced Analytics"
+            description="Upgrade to Pro to unlock charts, engagement metrics and top clicked links."
+          />}
+        </div> : <AnalyticsLocked />}
 
         {/* PORTFOLIOS */}
         <div className="space-y-5">
@@ -257,10 +267,11 @@ export default function DashboardPage() {
                         {p.clicks?.toLocaleString() || 0}
                       </div>
 
-                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-gray-50 border border-gray-200/60 text-[13px] font-semibold text-gray-600 transition-colors duration-300 group-hover:bg-emerald-50/80 group-hover:border-emerald-200/60 group-hover:text-emerald-700">
+                      {plan === "pro" && (<div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-gray-50 border border-gray-200/60 text-[13px] font-semibold text-gray-600 transition-colors duration-300 group-hover:bg-emerald-50/80 group-hover:border-emerald-200/60 group-hover:text-emerald-700">
                         <Users size={14} strokeWidth={2.5} className="text-gray-400 group-hover:text-emerald-500 transition-colors" />
                         {p.uniqueVisitors?.toLocaleString() || 0}
                       </div>
+                      )}
                     </div>
                   </div>
                 </Link>

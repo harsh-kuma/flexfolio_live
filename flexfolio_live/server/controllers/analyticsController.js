@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Analytics = require("../models/Analytics");
 const Portfolio = require("../models/Portfolio");
+const User = require("../models/User");
 
 // =======================
 // TRACK EVENT
@@ -24,6 +25,14 @@ exports.trackEvent = async (req, res) => {
     }
 
     const portfolio = await Portfolio.findById(portfolioId).populate("user", "subscription");
+
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        error: "Portfolio not found",
+      });
+    }
+
     const plan = portfolio?.user?.subscription?.plan || "free";
 
     if (plan === "free") {
@@ -147,7 +156,7 @@ exports.getSummary = async (req, res) => {
     const portfolio = await Portfolio.findOne({
       _id: portfolioId,
       user: req.user.id,
-    }).select("_id");
+    }).populate("user", "subscription").select("_id");
 
     if (!portfolio) {
       return res.status(404).json({
@@ -156,11 +165,59 @@ exports.getSummary = async (req, res) => {
       });
     }
 
+    const plan = portfolio.user?.subscription?.plan || "free";
+
+    // Free Plan Users
+    if (plan === "free") {
+      return res.status(200).json({
+        success: true,
+        locked: true,
+      });
+    }
+
     const objectId = new mongoose.Types.ObjectId(portfolioId);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    //Basic Plan Users
+    if (plan === "basic") {
+      const [
+        totalViews,
+        totalClicks,
+        todayViews,
+      ] = await Promise.all([
+        Analytics.countDocuments({
+          portfolioId: objectId,
+          eventType: "view",
+        }),
+
+        Analytics.countDocuments({
+          portfolioId: objectId,
+          eventType: "click",
+        }),
+
+        Analytics.countDocuments({
+          portfolioId: objectId,
+          eventType: "view",
+          createdAt: {
+            $gte: today,
+          },
+        }),
+      ]);
+
+      return res.status(200).json({
+        success: true,
+
+        overview: {
+          totalViews,
+          totalClicks,
+          todayViews,
+        },
+      });
+    }
+
+    // pro plan
     const [
       totalViews,
       totalClicks,
@@ -182,6 +239,7 @@ exports.getSummary = async (req, res) => {
 
       Analytics.distinct("visitorId", {
         portfolioId: objectId,
+        eventType: "view",
       }),
 
       Analytics.countDocuments({
@@ -197,6 +255,7 @@ exports.getSummary = async (req, res) => {
           $match: {
             portfolioId: objectId,
             eventType: "session",
+            duration: { $gt: 0 },
           },
         },
         {
@@ -237,6 +296,9 @@ exports.getSummary = async (req, res) => {
           $sort: {
             count: -1,
           },
+        },
+        {
+          $limit: 10,
         },
       ]),
 
@@ -314,6 +376,9 @@ exports.getMyAnalyticsSummary = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    const user = await User.findById(userId).select("subscription.plan").lean();
+    const plan = user?.subscription?.plan || "free";
+
     // 1. Get all user portfolios with required fields
     const portfolios = await Portfolio.find({ user: userId, isPublished: true })
       .select(
@@ -345,10 +410,111 @@ exports.getMyAnalyticsSummary = async (req, res) => {
       });
     }
 
+    // Free plan
+    if (plan === "free") {
+      return res.status(200).json({
+        success: true,
+        locked: true,
+
+        overview: {
+          totalPortfolios: portfolioIds.length,
+        },
+        portfolios,
+      });
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 2. Run all global analytics in parallel
+    // Basic Analytics
+
+    if (plan === "basic") {
+      const [
+        totalViews,
+        totalClicks,
+        todayViews,
+        portfolioAnalytics,
+      ] = await Promise.all([
+        Analytics.countDocuments({
+          portfolioId: { $in: portfolioIds },
+          eventType: "view",
+        }),
+
+        Analytics.countDocuments({
+          portfolioId: { $in: portfolioIds },
+          eventType: "click",
+        }),
+
+        Analytics.countDocuments({
+          portfolioId: { $in: portfolioIds },
+          eventType: "view",
+          createdAt: { $gte: today },
+        }),
+
+        Analytics.aggregate([
+          {
+            $match: {
+              portfolioId: { $in: portfolioIds },
+            },
+          },
+          {
+            $group: {
+              _id: "$portfolioId",
+
+              views: {
+                $sum: {
+                  $cond: [
+                    { $eq: ["$eventType", "view"] },
+                    1,
+                    0,
+                  ],
+                },
+              },
+
+              clicks: {
+                $sum: {
+                  $cond: [
+                    { $eq: ["$eventType", "click"] },
+                    1,
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+        ]),
+      ]);
+
+      const analyticsMap = {};
+
+      portfolioAnalytics.forEach((item) => {
+        analyticsMap[item._id.toString()] = {
+          views: item.views,
+          clicks: item.clicks,
+        };
+      });
+
+      const portfolioList = portfolios.map((p) => ({
+        ...p,
+        views: analyticsMap[p._id.toString()]?.views || 0,
+        clicks: analyticsMap[p._id.toString()]?.clicks || 0,
+      }));
+
+      return res.status(200).json({
+        success: true,
+
+        overview: {
+          totalPortfolios: portfolioIds.length,
+          totalViews,
+          totalClicks,
+          todayViews,
+        },
+
+        portfolios: portfolioList,
+      });
+    }
+
+    // pro plan Advance analytics
     const [
       totalViews,
       totalClicks,
@@ -374,6 +540,7 @@ exports.getMyAnalyticsSummary = async (req, res) => {
       // UNIQUE VISITORS
       Analytics.distinct("visitorId", {
         portfolioId: { $in: portfolioIds },
+        eventType: "view",
       }),
 
       // TODAY VIEWS
@@ -389,6 +556,7 @@ exports.getMyAnalyticsSummary = async (req, res) => {
           $match: {
             portfolioId: { $in: portfolioIds },
             eventType: "session",
+            duration: { $gt: 0 },
           },
         },
         {
@@ -477,7 +645,13 @@ exports.getMyAnalyticsSummary = async (req, res) => {
             },
 
             uniqueVisitors: {
-              $addToSet: "$visitorId",
+              $addToSet: {
+                $cond: [
+                  { $eq: ["$eventType", "view"] },
+                  "$visitorId",
+                  "$$REMOVE",
+                ],
+              },
             },
           },
         },

@@ -27,11 +27,13 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
+import AnalyticsLocked from "@/components/analytics/AnalyticsLocked";
 import ChartCard from "@/components/analytics/ChartCard";
 import EngagementChart from "@/components/analytics/EngagementChart";
 import StatCard from "@/components/analytics/StatCard";
 import TopClicksChart from "@/components/analytics/TopClicksChart";
 import ViewsChart from "@/components/analytics/ViewsChart";
+import { usePlan } from "@/hooks/usePlan";
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest First" },
@@ -40,6 +42,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function InsightsPage() {
+  const { plan } = usePlan();
   const { id } = useParams();
   const observerRef = useRef();
   const sortRef = useRef();
@@ -74,6 +77,7 @@ export default function InsightsPage() {
   }, []);
 
   const fetchAnalytics = useCallback(async () => {
+    if (plan === "free") return;
     try {
       const res = await getSingleAnalyticsSummary(id);
       if (res?.success) {
@@ -82,7 +86,7 @@ export default function InsightsPage() {
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load analytics");
     }
-  }, [id]);
+  }, [id, plan]);
 
   const fetchMessages = useCallback(
     async (pageNo = 1, append = false) => {
@@ -110,7 +114,11 @@ export default function InsightsPage() {
 
     const initializeData = async () => {
       setLoading(true);
-      await Promise.all([fetchAnalytics(), fetchMessages()]);
+      if (plan === "free") {
+        await fetchMessages();
+      } else {
+        await Promise.all([fetchAnalytics(), fetchMessages()]);
+      }
       if (isMounted) setLoading(false);
     };
 
@@ -119,7 +127,7 @@ export default function InsightsPage() {
     return () => {
       isMounted = false;
     };
-  }, [fetchAnalytics, fetchMessages]);
+  }, [plan, fetchAnalytics, fetchMessages]);
 
   const loadMoreRef = useCallback(
     (node) => {
@@ -256,7 +264,12 @@ export default function InsightsPage() {
         </div>
 
         {/* ANALYTICS FALLBACK */}
-        {!analytics && !loading ? (
+        {plan === "free" ? (
+          <AnalyticsLocked
+            title="Advanced Analytics"
+            description="Upgrade to Pro to unlock views analytics, visitor tracking, engagement metrics and top clicked links."
+          />
+        ) : !analytics && !loading ? (
           <div className="flex items-center gap-3 bg-orange-50 border border-orange-200 p-4 rounded-2xl text-orange-700 shadow-sm">
             <AlertCircle size={20} />
             <p className="text-sm font-medium">
@@ -266,26 +279,35 @@ export default function InsightsPage() {
         ) : (
           <>
             {/* OVERVIEW STATS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${plan === "pro" ? "lg:grid-cols-5" : "lg:grid-cols-3"}`}>
               <StatCard label="Total Views" value={analytics?.overview?.totalViews} icon={<Eye size={18} className="text-blue-500" />} />
               <StatCard label="Total Clicks" value={analytics?.overview?.totalClicks} icon={<MousePointerClick size={18} className="text-emerald-500" />} />
-              <StatCard label="Unique Visitors" value={analytics?.overview?.uniqueVisitors} icon={<Users size={18} className="text-violet-500" />} />
               <StatCard label="Unread Messages" value={unread} icon={<Mail size={18} className="text-amber-500" />} />
-              <StatCard label="Avg Visit Time (Sec.)" value={analytics?.engagement?.averageVisitTime} icon={<Clock size={18} className="text-rose-500" />} />
+              {plan === "pro" && (<>
+                <StatCard label="Unique Visitors" value={analytics?.overview?.uniqueVisitors} icon={<Users size={18} className="text-violet-500" />} />
+                <StatCard label="Avg Visit Time (Sec.)" value={analytics?.engagement?.averageVisitTime} icon={<Clock size={18} className="text-rose-500" />} />
+              </>)}
             </div>
 
             {/* CHARTS ROW */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <ChartCard title="Views Analytics" loading={loading}>
-                <ViewsChart data={analytics?.chart ?? []} />
-              </ChartCard>
-              <ChartCard title="Engagement Overview" loading={loading}>
-                <EngagementChart engagement={analytics?.engagement ?? {}} />
-              </ChartCard>
-              <ChartCard title="Top Clicked Links" loading={loading} height="320px">
-                <TopClicksChart topClicks={analytics?.topClicks ?? []} />
-              </ChartCard>
-            </div>
+            {plan === "pro" ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <ChartCard title="Views Analytics" loading={loading}>
+                  <ViewsChart data={analytics?.chart ?? []} />
+                </ChartCard>
+                <ChartCard title="Engagement Overview" loading={loading}>
+                  <EngagementChart engagement={analytics?.engagement ?? {}} />
+                </ChartCard>
+                <ChartCard title="Top Clicked Links" loading={loading} height="320px">
+                  <TopClicksChart topClicks={analytics?.topClicks ?? []} />
+                </ChartCard>
+              </div>
+            ) : (
+              <AnalyticsLocked
+                title="Advanced Analytics"
+                description="Upgrade to Pro to unlock visitor analytics, engagement metrics and top clicked links."
+              />
+            )}
           </>
         )}
 
