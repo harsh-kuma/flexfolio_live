@@ -54,6 +54,25 @@ const analyticsSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+
+    country: {
+      type: String,
+      default: null,
+    },
+
+    deviceType: {
+      type: String,
+      enum: [
+        "desktop",
+        "mobile",
+        "tablet",
+        "smarttv",
+        "console",
+        "wearable",
+        "embedded",
+      ],
+      default: "desktop",
+    },
   },
   {
     timestamps: true,
@@ -97,6 +116,18 @@ analyticsSchema.index({
   duration: -1,
 });
 
+// Country analytics
+analyticsSchema.index({
+  portfolioId: 1,
+  country: 1,
+});
+
+// Device analytics
+analyticsSchema.index({
+  portfolioId: 1,
+  deviceType: 1,
+});
+
 /*
 |--------------------------------------------------------------------------
 | UNIQUE VIEW PROTECTION
@@ -130,7 +161,7 @@ analyticsSchema.index(
     createdAt: 1,
   },
   {
-    expireAfterSeconds: 60 * 60 * 24 * 15,
+    expireAfterSeconds: 60 * 60 * 24 * 30,
   }
 );
 

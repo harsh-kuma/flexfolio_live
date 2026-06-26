@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const Analytics = require("../models/Analytics");
 const Portfolio = require("../models/Portfolio");
 const User = require("../models/User");
+const geoip = require("geoip-lite");
+const UAParser = require("ua-parser-js");
 
 // =======================
 // TRACK EVENT
@@ -49,6 +51,13 @@ exports.trackEvent = async (req, res) => {
 
     const userAgent = req.headers["user-agent"] || null;
 
+    // Adding Functionalty for device and country ...
+    const realIp = ip?.replace("::ffff:", "") || null;
+    const geo = realIp ? geoip.lookup(realIp) : null;
+    const country = geo?.country || "Unknown";
+    const parser = new UAParser(userAgent);
+    const deviceType = parser.getDevice().type || "desktop";
+
     // =======================
     // SESSION TRACKING
     // =======================
@@ -68,6 +77,8 @@ exports.trackEvent = async (req, res) => {
             userAgent,
             visitorId,
             sessionId,
+            country,
+            deviceType,
           },
           $setOnInsert: {
             portfolioId,
@@ -98,6 +109,8 @@ exports.trackEvent = async (req, res) => {
         meta,
         ip,
         userAgent,
+        country,
+        deviceType,
       });
 
       return res.status(200).json({
@@ -117,6 +130,8 @@ exports.trackEvent = async (req, res) => {
       duration,
       ip,
       userAgent,
+      country,
+      deviceType,
     });
 
     return res.status(200).json({
@@ -226,6 +241,8 @@ exports.getSummary = async (req, res) => {
       sessionStats,
       topClicks,
       recentViews,
+      topCountries,
+      deviceStats,
     ] = await Promise.all([
       Analytics.countDocuments({
         portfolioId: objectId,
@@ -333,6 +350,55 @@ exports.getSummary = async (req, res) => {
           $limit: 15,
         },
       ]),
+
+      Analytics.aggregate([
+        {
+          $match: {
+            portfolioId: objectId,
+            eventType: "view",
+            country: {
+              $nin: [null, "", "Unknown"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$country",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+        {
+          $limit: 10,
+        },
+      ]),
+
+      Analytics.aggregate([
+        {
+          $match: {
+            portfolioId: objectId,
+            eventType: "view",
+            deviceType: {
+              $nin: [null, "", "unknown"],
+            }
+          },
+        },
+        {
+          $group: {
+            _id: "$deviceType",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: {
+            count: -1,
+          },
+        },
+      ])
     ]);
 
     return res.status(200).json({
@@ -358,6 +424,8 @@ exports.getSummary = async (req, res) => {
       },
 
       topClicks,
+      topCountries,
+      deviceStats,
 
       chart: recentViews.reverse(),
     });
@@ -407,6 +475,8 @@ exports.getMyAnalyticsSummary = async (req, res) => {
         topClicks: [],
         chart: [],
         portfolios: [],
+        topCountries: [],
+        deviceStats: [],
       });
     }
 
@@ -524,6 +594,8 @@ exports.getMyAnalyticsSummary = async (req, res) => {
       topClicks,
       recentViews,
       portfolioAnalytics,
+      topCountries,
+      deviceStats,
     ] = await Promise.all([
       // TOTAL VIEWS
       Analytics.countDocuments({
@@ -656,6 +728,51 @@ exports.getMyAnalyticsSummary = async (req, res) => {
           },
         },
       ]),
+
+      Analytics.aggregate([
+        {
+          $match: {
+            portfolioId: { $in: portfolioIds }, // objectId for getSummary
+            eventType: "view",
+            country: {
+              $nin: [null, "", "Unknown"],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$country",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { count: -1 },
+        },
+        {
+          $limit: 10,
+        },
+      ]),
+
+      Analytics.aggregate([
+        {
+          $match: {
+            portfolioId: { $in: portfolioIds }, // objectId for getSummary
+            eventType: "view",
+            deviceType: {
+              $nin: [null, "", "unknown"],
+            }
+          },
+        },
+        {
+          $group: {
+            _id: "$deviceType",
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { count: -1 },
+        },
+      ])
     ]);
 
     // 3. Convert analytics into map for fast lookup
@@ -711,6 +828,8 @@ exports.getMyAnalyticsSummary = async (req, res) => {
       },
 
       topClicks,
+      topCountries,
+      deviceStats,
       chart: recentViews.reverse(),
 
       portfolios: portfolioList,
