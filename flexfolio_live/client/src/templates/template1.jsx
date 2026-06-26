@@ -6,7 +6,7 @@ import { trackAnalyticsEvent } from "@/lib/api";
     if (working) {
       const visitorId = localStorage.getItem("visitorId");
       const sessionId = sessionStorage.getItem("sessionId");
-      if (!visitorId || !owner_key) return;
+      if (!visitorId || !sessionId || !owner_key) return;
       trackAnalyticsEvent({
         portfolioId: owner_key,
         visitorId,

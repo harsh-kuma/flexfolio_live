@@ -23,6 +23,16 @@ exports.trackEvent = async (req, res) => {
       });
     }
 
+    const portfolio = await Portfolio.findById(portfolioId).populate("user", "subscription");
+    const plan = portfolio?.user?.subscription?.plan || "free";
+
+    if (plan === "free") {
+      return res.status(200).json({
+        success: true,
+        skipped: true,
+      });
+    }
+
     const ip =
       req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
       req.socket.remoteAddress ||

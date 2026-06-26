@@ -225,8 +225,12 @@ exports.getPortfolio = async (req, res) => {
     const owner = await User.findById(portfolio.user).select("subscription.plan");
     let Safeportfolio = getSafePortfolio(portfolio);
 
+    const userPlan = owner?.subscription?.plan || "free";
+
     Safeportfolio.features = {
-      removeBranding : owner?.subscription?.plan !== "free",
+      removeBranding : userPlan !== "free",
+      analytics: userPlan !== "free",
+      advancedAnalytics: userPlan === "pro",
     };
     
     res.json(Safeportfolio);

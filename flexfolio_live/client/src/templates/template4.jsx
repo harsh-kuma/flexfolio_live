@@ -134,7 +134,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
     if (working) {
       const visitorId = localStorage.getItem("visitorId");
       const sessionId = sessionStorage.getItem("sessionId");
-      if (!visitorId || !owner_key) return;
+      if (!visitorId || !sessionId || !owner_key) return;
       trackAnalyticsEvent({
         portfolioId: owner_key,
         visitorId,
