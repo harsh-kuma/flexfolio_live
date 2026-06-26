@@ -29,6 +29,8 @@ import toast from "react-hot-toast";
 
 import AnalyticsLocked from "@/components/analytics/AnalyticsLocked";
 import ChartCard from "@/components/analytics/ChartCard";
+import CountryChart from "@/components/analytics/CountryChart";
+import DeviceChart from "@/components/analytics/DeviceChart";
 import EngagementChart from "@/components/analytics/EngagementChart";
 import StatCard from "@/components/analytics/StatCard";
 import TopClicksChart from "@/components/analytics/TopClicksChart";
@@ -300,6 +302,12 @@ export default function InsightsPage() {
                 </ChartCard>
                 <ChartCard title="Top Clicked Links" loading={loading} height="320px">
                   <TopClicksChart topClicks={analytics?.topClicks ?? []} />
+                </ChartCard>
+                <ChartCard title="Top Countries" loading={loading}>
+                  <CountryChart data={analytics?.topCountries ?? []}/>
+                </ChartCard>
+                <ChartCard title="Device Types" loading={loading} >
+                  <DeviceChart data={analytics?.deviceStats ?? []} />
                 </ChartCard>
               </div>
             ) : (

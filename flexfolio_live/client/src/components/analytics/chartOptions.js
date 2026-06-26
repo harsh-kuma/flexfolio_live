@@ -1,5 +1,4 @@
 import {
-  ArcElement,
   BarElement,
   CategoryScale,
   Chart as ChartJS,
@@ -18,7 +17,6 @@ if (!registered) {
     LinearScale,
     PointElement,
     LineElement,
-    ArcElement,
     Tooltip,
     Legend,
     BarElement
@@ -110,17 +108,6 @@ export const lineChartOptions = {
       grid: {
         color: "#f3f4f6",
       },
-    },
-  },
-};
-
-export const doughnutChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-
-  plugins: {
-    legend: {
-      position: "bottom",
     },
   },
 };

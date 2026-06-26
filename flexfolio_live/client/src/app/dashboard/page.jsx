@@ -2,6 +2,8 @@
 
 import AnalyticsLocked from "@/components/analytics/AnalyticsLocked";
 import ChartCard from "@/components/analytics/ChartCard";
+import CountryChart from "@/components/analytics/CountryChart";
+import DeviceChart from "@/components/analytics/DeviceChart";
 import EngagementChart from "@/components/analytics/EngagementChart";
 import StatCard from "@/components/analytics/StatCard";
 import TopClicksChart from "@/components/analytics/TopClicksChart";
@@ -45,6 +47,8 @@ export default function DashboardPage() {
       totalVisitTime: 0,
     },
     topClicks: [],
+    topCountries: [],
+    deviceStats: [],
   });
 
   // =====================
@@ -69,6 +73,8 @@ export default function DashboardPage() {
           totalVisitTime: 0,
         },
         topClicks: res.topClicks || [],
+        topCountries: res.topCountries || [],
+        deviceStats: res.deviceStats || [],
       });
     } catch (err) {
       console.error(err);
@@ -101,12 +107,12 @@ export default function DashboardPage() {
       value: stats.overview.totalClicks,
       icon: <MousePointerClick size={18} className="text-emerald-500" />,
     },
-    ...(plan === "pro" ?[
-    {
-      label: "Unique Visitors",
-      value: stats.overview.uniqueVisitors,
-      icon: <Users size={18} className="text-orange-500" />,
-    }] : []),
+    ...(plan === "pro" ? [
+      {
+        label: "Unique Visitors",
+        value: stats.overview.uniqueVisitors,
+        icon: <Users size={18} className="text-orange-500" />,
+      }] : []),
     {
       label: "Today Views",
       value: stats.overview.todayViews,
@@ -151,7 +157,7 @@ export default function DashboardPage() {
 
         {/* OVERVIEW */}
         {plan && features.analytics ? <div className="space-y-8">
-          <div className={`grid grid-cols-1 sm:grid-cols-2  gap-4 ${plan === "pro" ? "lg:grid-cols-5" :"lg:grid-cols-4"}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2  gap-4 ${plan === "pro" ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
             {overviewCards.map((card) => (
               <StatCard
                 key={card.label}
@@ -193,6 +199,24 @@ export default function DashboardPage() {
               >
                 <TopClicksChart
                   topClicks={stats.topClicks}
+                />
+              </ChartCard>
+
+              <ChartCard
+                title="Top Countries"
+                loading={loading}
+              >
+                <CountryChart
+                  data={stats.topCountries}
+                />
+              </ChartCard>
+
+              <ChartCard
+                title="Device Types"
+                loading={loading}
+              >
+                <DeviceChart
+                  data={stats.deviceStats}
                 />
               </ChartCard>
 
