@@ -82,6 +82,9 @@ app.use("/api/analytics", require("./routes/analyticsRoutes"));
 // For Custom domains
 app.use("/api/domains", require("./routes/domainRoutes"));
 
+// for ai generation
+app.use("/api/ai", require("./routes/aiRoutes"));
+
 // =========================
 // TEST ROUTE
 // =========================

@@ -222,4 +222,16 @@ export const getSingleAnalyticsSummary = async (portfolioId) => {
   return res.data;
 };
 
+
+// ai adding api...
+export const generateSiteByDocs = async (formData) => {
+  const res = await api.post(`/ai/generate`,formData);
+  return res.data;
+};
+
+export const getGenerateSiteDataById = async (id) => {
+  const res = await api.get(`/ai/generated/${id}`);
+  return res.data;
+};
+
 export default api;
