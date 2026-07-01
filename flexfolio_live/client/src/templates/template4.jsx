@@ -3,6 +3,7 @@ import { sendContactMessage, trackAnalyticsEvent } from "@/lib/api";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
+
 // Reusable Interactive Project Card
 const AnimatedProjectCard = ({ p ,trackClick}) => {
   const contentRef = useRef(null);
@@ -33,22 +34,22 @@ const AnimatedProjectCard = ({ p ,trackClick}) => {
   }, [expanded]);
 
   return (
-    <div className="relative group bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] hover:border-violet-500/50">
+    <div className="relative group bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] hover:border-violet-500/50 flex flex-col">
       {/* Animated Gradient Background on Hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-fuchsia-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
       <div className="relative z-10 flex justify-between items-start mb-4">
-        <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-violet-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+        <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-violet-400 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shrink-0">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
         </div>
         {p.year && (
-          <span className="bg-violet-500/10 text-violet-300 border border-violet-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.1)]">
+          <span className="bg-violet-500/10 text-violet-300 border border-violet-500/20 text-xs font-bold px-3 py-1 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.1)] shrink-0">
             {p.year}
           </span>
         )}
       </div>
 
-      {p.title && (<h3 className="relative z-10 font-bold text-slate-100 text-xl mb-3 group-hover:text-violet-300 transition-colors">{p.title}</h3>)}
+      {p.title && (<h3 className="relative z-10 font-bold text-slate-100 text-xl mb-3 group-hover:text-violet-300 transition-colors line-clamp-1">{p.title}</h3>)}
 
       {p.description && (
         <div className="relative z-10 flex-1 mb-6">
@@ -92,6 +93,93 @@ const AnimatedProjectCard = ({ p ,trackClick}) => {
   );
 };
 
+// Reusable Interactive Certificate Card
+const AnimatedCertificateCard = ({ cert, trackClick }) => {
+  const certificate_default = "https://res.cloudinary.com/dr38wac7n/image/upload/v1782923183/certificate_default_flexfolio_qhd3eu.png";
+  const [imgSrc, setImgSrc] = useState(cert.image?.url || certificate_default);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setImgLoaded(true);
+    }
+  }, [imgSrc]);
+
+  const handleImageError = () => {
+    if (imgSrc !== certificate_default) {
+      setImgSrc(certificate_default);
+    } else {
+      setImgLoaded(true);
+    }
+  };
+
+  return (
+    <div className="relative group bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_0_40px_-10px_rgba(139,92,246,0.3)] hover:border-violet-500/50 flex flex-col">
+      {/* Animated Gradient Background on Hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-fuchsia-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+      {/* Image Section */}
+      <div className="relative z-10 h-48 w-full bg-slate-950/80 rounded-2xl overflow-hidden border border-slate-800/50 p-2 mb-5 shrink-0">
+        {!imgLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <svg className="animate-spin h-6 w-6 text-violet-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )}
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt={cert.title}
+          onLoad={() => setImgLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full ${imgSrc === certificate_default ? "object-cover" : "object-contain"} transition-all duration-700 ease-in-out ${imgLoaded ? "opacity-100 group-hover:scale-105" : "opacity-0"}`}
+        />
+      </div>
+
+      {/* Content Section */}
+      <div className="relative z-10 flex flex-col flex-1">
+        <div className="flex justify-between items-start gap-3 mb-2">
+          <h3 className="font-bold text-slate-100 text-lg leading-tight line-clamp-2 group-hover:text-violet-300 transition-colors" title={cert.title}>
+            {cert.title}
+          </h3>
+          {cert.issueDate && (
+            <span className="bg-violet-500/10 text-violet-300 border border-violet-500/20 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap shrink-0 shadow-[0_0_10px_rgba(139,92,246,0.1)]">
+              {cert.issueDate}
+            </span>
+          )}
+        </div>
+
+        {cert.issuer && 
+        <p className="flex items-start gap-2 text-slate-400 text-xs font-medium mb-6 line-clamp-2 uppercase tracking-wider">
+          <svg className="w-4 h-4 shrink-0 text-fuchsia-400 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.315 48.315 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+          </svg>
+          {cert.issuer}
+        </p>}
+
+        {cert.credentialUrl && (
+          <a
+            href={cert.credentialUrl}
+            onClick={() => trackClick(`certificate:${cert.title}`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-auto flex items-center justify-center gap-2 w-full text-center bg-slate-800/50 hover:bg-slate-700/80 border border-slate-700 hover:border-violet-500/50 text-slate-200 py-2.5 rounded-xl text-sm font-semibold transition-all group-hover:shadow-[0_0_15px_rgba(139,92,246,0.2)]"
+          >
+            <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            View Credential
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
 export default function Template4Animated({ data, owner_key, working ,system_allow}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -110,6 +198,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
   const hasExperience = data?.experience?.length > 0;
   const hasProjects = data?.projects?.length > 0;
   const hasSkills = data?.skills?.length > 0;
+  const hasCertificates = data?.certificates?.length > 0; // Check for certificates
 
   const navLinks = [
     { id: "#hero", label: "Home", show: true },
@@ -117,6 +206,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
     { id: "#experience", label: "Experience", show: hasExperience },
     { id: "#projects", label: "Projects", show: hasProjects },
     { id: "#skills", label: "Skills", show: hasSkills },
+    { id: "#certificates", label: "Certificates", show: hasCertificates }, // Added to nav
     { id: "#contact", label: "Contact", show: true },
   ];
 
@@ -199,9 +289,6 @@ export default function Template4Animated({ data, owner_key, working ,system_all
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Body scroll lock for mobile menu
-
-
   return (
     <div className="relative bg-slate-950 text-slate-300 font-sans min-h-dvh pb-2 selection:bg-violet-500/30 selection:text-violet-200 overflow-hidden">
 
@@ -220,7 +307,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-violet-600 to-fuchsia-600 text-white flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(139,92,246,0.5)] group-hover:animate-spin-slow">
               {getInitials(data?.fullName || "F")}
             </div>
-            <span className="font-bold text-slate-100 hidden md:block group-hover:text-violet-400 transition-colors">
+            <span className="font-bold text-slate-100 hidden md:block group-hover:text-violet-400 transition-colors line-clamp-1">
               {data?.fullName?.split(" ")[0].toUpperCase() || "Portfolio"}
             </span>
           </div>
@@ -338,7 +425,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
             </div>
           </div>
 
-          {/* Floarting Hero Image */}
+          {/* Floating Hero Image */}
           {data?.image?.url && (
             <div className="relative flex justify-center lg:justify-end w-full lg:w-1/2">
               {/* Pulsing Aura Rings */}
@@ -465,15 +552,15 @@ export default function Template4Animated({ data, owner_key, working ,system_all
           </div>
         )}
 
-        {/* SKILLS (Floating Orbs) */}
+        {/* SKILLS */}
         {hasSkills && (
-          <div id="skills" className="scroll-mt-24 py-10">
+          <div id="skills" className="scroll-mt-24 py-10 relative">
             <div className="text-center mb-16">
               <span className="text-violet-400 font-bold tracking-widest uppercase text-sm border-b-2 border-violet-500/50 pb-1">Expertise</span>
               <h2 className="text-4xl md:text-5xl font-black text-white mt-4">Tech Arsenal</h2>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-4xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-6 max-w-4xl mx-auto relative z-10">
               {data?.skills?.map((skill, i) => (
                 <div
                   key={i}
@@ -485,6 +572,24 @@ export default function Template4Animated({ data, owner_key, working ,system_all
                     {skill}
                   </span>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CERTIFICATES */}
+        {hasCertificates && (
+          <div id="certificates" className="scroll-mt-24 py-10 relative">
+            <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-fuchsia-600/10 blur-[150px] rounded-full pointer-events-none transform -translate-y-1/2 -z-10"></div>
+
+            <div className="text-center mb-16">
+              <span className="text-violet-400 font-bold tracking-widest uppercase text-sm border-b-2 border-violet-500/50 pb-1">Achievements</span>
+              <h2 className="text-4xl md:text-5xl font-black text-white mt-4">Certifications</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {data?.certificates?.map((cert, i) => (
+                <AnimatedCertificateCard key={i} cert={cert} trackClick={trackClick}/>
               ))}
             </div>
           </div>
@@ -510,7 +615,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
 
                 <div className="space-y-6">
                   <div className="flex items-center gap-5 group">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-violet-400 group-hover:bg-violet-600 group-hover:text-white group-hover:scale-110 transition-all shadow-lg">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-violet-400 group-hover:bg-violet-600 group-hover:text-white group-hover:scale-110 transition-all shadow-lg shrink-0">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </div>
                     <div>
@@ -520,7 +625,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
                   </div>
 
                   <div className="flex items-center gap-5 group">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:scale-110 transition-all shadow-lg">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white group-hover:scale-110 transition-all shadow-lg shrink-0">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     </div>
                     <div>
@@ -592,7 +697,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
                 href="https://flexfolio.online"
                 target="_blank"
                 rel="noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-violet-400 hover:text-violet-300 transition-colors ml-1"
               >
                 Built with Flexfolio
               </a>}
@@ -603,7 +708,7 @@ export default function Template4Animated({ data, owner_key, working ,system_all
           <div className="flex gap-4">
             {data?.github && <a href={data.github} onClick={() => trackClick("github")} className="text-slate-500 hover:text-white transition-colors p-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg></a>}
             {data?.linkedin && <a href={data.linkedin} onClick={() => trackClick("linkedin")} className="text-slate-500 hover:text-[#0a66c2] transition-colors p-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}
-            {data?.email && <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="text-slate-500 hover:text-[#0a66c2] transition-colors p-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
+            {data?.email && <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="text-slate-500 hover:text-rose-400 transition-colors p-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
           </div>
         </div>
       </footer>

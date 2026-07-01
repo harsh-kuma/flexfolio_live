@@ -90,6 +90,88 @@ const DarkProjectCard = ({ p ,trackClick }) => {
   );
 };
 
+// Reusable Certificate Card styled for Dark Theme
+const DarkCertificateCard = ({ cert, trackClick }) => {
+  const certificate_default = "https://res.cloudinary.com/dr38wac7n/image/upload/v1782923183/certificate_default_flexfolio_qhd3eu.png";
+  const [imgSrc, setImgSrc] = useState(cert.image?.url || certificate_default);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setImgLoaded(true);
+    }
+  }, [imgSrc]);
+
+  const handleImageError = () => {
+    if (imgSrc !== certificate_default) {
+      setImgSrc(certificate_default);
+    } else {
+      setImgLoaded(true);
+    }
+  };
+
+  return (
+    <div className="bg-neutral-900 border border-neutral-800 hover:border-emerald-500/50 rounded-2xl shadow-lg hover:-translate-y-1 transition-all flex flex-col group overflow-hidden">
+      {/* Image Section with Loader */}
+      <div className="relative h-48 bg-neutral-950 overflow-hidden border-b border-neutral-800 p-2">
+        {!imgLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-neutral-950 z-10">
+            <svg className="animate-spin h-6 w-6 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )}
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt={cert.title}
+          onLoad={() => setImgLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full ${imgSrc === certificate_default ? "object-cover" : "object-contain"} transition-all duration-500 ease-in-out ${imgLoaded ? "opacity-100 group-hover:scale-105" : "opacity-0"}`}
+        />
+      </div>
+
+      {/* Content Section */}
+      <div className="p-6 flex flex-col flex-1">
+        <div className="flex justify-between items-start gap-3 mb-3">
+          <h3 className="font-bold text-neutral-100 text-lg leading-tight line-clamp-2" title={cert.title}>
+            {cert.title}
+          </h3>
+          {cert.issueDate && (
+            <span className="bg-neutral-800 text-emerald-400 text-xs font-mono px-2.5 py-1 rounded-md shrink-0 border border-neutral-700">
+              {cert.issueDate}
+            </span>
+          )}
+        </div>
+        {cert.issuer && 
+        <p className="flex gap-2 text-neutral-400 text-xs font-medium mb-6 line-clamp-2">
+          <svg className="w-4 h-4 shrink-0 text-emerald-500 mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.315 48.315 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+          </svg>
+          {cert.issuer}
+        </p>}
+
+        {cert.credentialUrl && (
+          <a
+            href={cert.credentialUrl}
+            onClick={() => trackClick(`certificate:${cert.title}`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-auto flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 py-2.5 rounded-lg text-sm font-medium transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            View Credential
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default function Template3({ data, owner_key, working ,system_allow}) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -108,6 +190,7 @@ export default function Template3({ data, owner_key, working ,system_allow}) {
   const hasExperience = data?.experience?.length > 0;
   const hasProjects = data?.projects?.length > 0;
   const hasSkills = data?.skills?.length > 0;
+  const hasCertificates = data?.certificates?.length > 0;
 
   const navLinks = [
     { id: "#hero", label: "Home", show: true },
@@ -115,6 +198,7 @@ export default function Template3({ data, owner_key, working ,system_allow}) {
     { id: "#experience", label: "Experience", show: hasExperience },
     { id: "#projects", label: "Projects", show: hasProjects },
     { id: "#skills", label: "Skills", show: hasSkills },
+    { id: "#certificates", label: "Certificates", show: hasCertificates },
     { id: "#contact", label: "Contact", show: true },
   ];
 
@@ -391,6 +475,18 @@ export default function Template3({ data, owner_key, working ,system_allow}) {
           </div>
         )}
 
+        {/* CERTIFICATES (Grid) */}
+        {hasCertificates && (
+          <div id="certificates" className="scroll-mt-24 py-16">
+            <h2 className="text-3xl font-bold text-white mb-10 text-center">Certifications</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {data?.certificates?.map((cert, i) => (
+                <DarkCertificateCard key={i} cert={cert} trackClick={trackClick} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* CONTACT (Minimal Form) */}
         <div id="contact" className="scroll-mt-24 py-16 max-w-3xl mx-auto">
           <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 md:p-12 shadow-2xl">
@@ -455,7 +551,7 @@ export default function Template3({ data, owner_key, working ,system_allow}) {
               href="https://flexfolio.online"
               target="_blank"
               rel="noreferrer"
-              className="text-blue-400 hover:text-blue-300 transition-colors"
+              className="text-blue-400 hover:text-blue-300 transition-colors ml-1"
             >
               Built with Flexfolio
             </a>}
