@@ -167,6 +167,15 @@ export default function FlexAIPage() {
     }
   };
 
+  const formatFileName = (name, max = 30) => {
+    const ext = name.includes(".") ? "." + name.split(".").pop() : "";
+    const base = ext ? name.slice(0, -ext.length) : name;
+
+    return base.length > max
+      ? `${base.slice(0, max)}...${ext}`
+      : name;
+  };
+
   if (!isValidTemplate) {
     return (
       <div>
@@ -262,8 +271,8 @@ export default function FlexAIPage() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`h-full min-h-[400px] border-2 border-dashed rounded-[24px] flex flex-col items-center justify-center p-10 text-center transition-all duration-200 ${isDragging
-                  ? "border-[#5b64f3] bg-[#f8f9ff]"
-                  : "border-[#e2e4f0] bg-[#fafafc] hover:bg-[#f8f9ff] hover:border-[#cbd0f9]"
+                ? "border-[#5b64f3] bg-[#f8f9ff]"
+                : "border-[#e2e4f0] bg-[#fafafc] hover:bg-[#f8f9ff] hover:border-[#cbd0f9]"
                 }`}
             >
               {!file ? (
@@ -295,7 +304,7 @@ export default function FlexAIPage() {
                     <FileIcon />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-1 w-full truncate px-4">
-                    {file.name}
+                    {formatFileName(file.name)}
                   </h3>
                   <p className="text-gray-500 mb-8 font-medium">
                     {formatFileSize(file.size)}
@@ -346,8 +355,8 @@ export default function FlexAIPage() {
           onClick={handleGenerate}
           disabled={!file || loading}
           className={`group w-full py-4 rounded-2xl flex items-center justify-center text-lg font-bold transition-all duration-500 ${!file || loading
-              ? "bg-[#e8ebf3] text-[#a0a5ba] cursor-not-allowed"
-              : "bg-gradient-to-r from-[#5b64f3] via-[#7c84ff] to-[#5b64f3] bg-[length:200%_auto] text-white shadow-md hover:shadow-xl hover:bg-right hover:-translate-y-0.5 active:scale-[0.99] active:translate-y-0"
+            ? "bg-[#e8ebf3] text-[#a0a5ba] cursor-not-allowed"
+            : "bg-gradient-to-r from-[#5b64f3] via-[#7c84ff] to-[#5b64f3] bg-[length:200%_auto] text-white shadow-md hover:shadow-xl hover:bg-right hover:-translate-y-0.5 active:scale-[0.99] active:translate-y-0"
             }`}
         >
           <SparkleIcon

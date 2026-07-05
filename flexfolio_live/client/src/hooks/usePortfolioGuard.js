@@ -4,9 +4,13 @@ import { useRouter } from "next/navigation";
 
 export const usePortfolioGuard = () => {
   const router = useRouter();
-  const { canCreatePortfolio } = usePlan();
+  const { canCreatePortfolio , user } = usePlan();
 
   const checkPortfolioAccess = () => {
+    if(!user){
+      router.push("/auth/login");
+      return false;
+    }
     if (!canCreatePortfolio()) {
       router.push("/pricing");
       return false;

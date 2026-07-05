@@ -543,7 +543,7 @@ export default function PortfolioManagePage() {
 
               <div className="mt-2 flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-2">
                 <span className="text-xs text-gray-500 uppercase tracking-wide">
-                  Email :
+                  Email:
                 </span>
 
                 <span className="text-sm font-medium text-gray-800 truncate ml-2">
