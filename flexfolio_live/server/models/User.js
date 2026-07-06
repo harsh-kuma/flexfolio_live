@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema(
     usage: {
       portfolios: {
         type: Number,
-        default: 0 
+        default: 0
       },
 
       domains: {
@@ -100,6 +100,14 @@ const userSchema = new mongoose.Schema(
       aiGenerations: {
         type: Number,
         default: 0
+      },
+
+      aiGenerationMonth: {
+        type: String,
+        default: () => {
+          const now = new Date();
+          return `${now.getFullYear()}-${now.getMonth() + 1}`;
+        },
       },
 
       portfolioViews: {

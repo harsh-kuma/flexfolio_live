@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const { checkPortfolioAccess } = usePortfolioGuard();
+  const { checkPortfolioAccess ,checkAiGenerationAllowed} = usePortfolioGuard();
   const [activeCard, setActiveCard] = useState(null);
   const [canHover, setCanHover] = useState(false);
 
@@ -23,6 +23,13 @@ export default function TemplatesPage() {
       return;
     }
     router.push(`/dashboard/builder?template=${key}`);
+  };
+
+  const handleFlexAI = (key) => {
+    if (!checkAiGenerationAllowed()) {
+      return;
+    }
+    router.push(`/dashboard/flex-ai?template=${key}`);
   };
 
   return (
@@ -77,7 +84,7 @@ export default function TemplatesPage() {
                           : "opacity-0 pointer-events-none"
                         }`}
                     >
-                      <Link href={`/dashboard/flex-ai?template=${key}`} className="group block w-full max-w-[200px]">
+                      <button onClick={() => handleFlexAI(key)} className="group block w-full max-w-[200px]">
                         <div className="relative flex w-full items-center justify-center overflow-hidden rounded-full p-[1.5px]">
                           <div className="absolute inset-[-1000%] animate-spin bg-[conic-gradient(from_90deg_at_50%_50%,#38bdf8_0%,#818cf8_25%,#c084fc_50%,#e879f9_75%,#38bdf8_100%)] opacity-70 transition-opacity duration-300 group-hover:opacity-100" style={{ animationDuration: "3s" }} />
                           <div className="relative flex w-full items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold transition-colors group-hover:bg-slate-50 dark:bg-slate-950 dark:group-hover:bg-slate-900">
@@ -86,7 +93,7 @@ export default function TemplatesPage() {
                             </span>
                           </div>
                         </div>
-                      </Link>
+                      </button>
 
                       {/* USE TEMPLATE */}
                       <button onClick={() => handleUseTemplate(key)} className="w-full max-w-[200px]">

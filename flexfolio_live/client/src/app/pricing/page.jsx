@@ -29,7 +29,7 @@ const PLANS = [
       "20 Media Files",
       "20 MB Storage",
       "500 Portfolio Views",
-      "5 AI Generations",
+      "3 AI Generations",
       "Contact Form",
     ],
   },
@@ -45,7 +45,7 @@ const PLANS = [
       "1 Custom Domain",
       "500 MB Storage",
       "10,000 Portfolio Views",
-      "100 AI Generations",
+      "10 AI Generations",
       "Basic Analytics & SEO",
       "Export to PDF",
     ],
@@ -61,7 +61,8 @@ const PLANS = [
       "Premium Templates",
       "5 Custom Domains",
       "5 GB Storage",
-      "Unlimited Views & AI",
+      "Unlimited Views",
+      "100 AI Generations",
       "Advanced Analytics",
       "Export PDF & JSON",
       "Remove Branding",
@@ -242,7 +243,7 @@ export default function PricingPage() {
                   { feature: "Media Files", free: "20", basic: "500", pro: "Unlimited" },
                   { feature: "Storage Limit", free: "20 MB", basic: "500 MB", pro: "5 GB" },
                   { feature: "Portfolio Views", free: "500", basic: "10,000", pro: "Unlimited" },
-                  { feature: "AI Generations", free: "5", basic: "100", pro: "Unlimited" },
+                  { feature: "AI Generations", free: "3", basic: "10", pro: "100" },
                 ].map((row, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                     <td className="p-4 pl-6 text-sm font-medium text-slate-700">{row.feature}</td>

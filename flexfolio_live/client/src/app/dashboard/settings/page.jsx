@@ -18,6 +18,7 @@ import {
   HardDrive,
   Lock,
   Shield,
+  Sparkles,
   Trash2
 } from "lucide-react";
 import Link from "next/link";
@@ -79,12 +80,12 @@ export default function SettingsPage() {
   const domainUsed = usage?.domains || 0;
   const maxDomains = features.maxDomains === -1 ? "Unlimited" : features.maxDomains;
   let domainUsagePercentage;
-  if(maxDomains !== 0){
+  if (maxDomains !== 0) {
     domainUsagePercentage = features.maxDomains === -1 ? 100 : Math.min((domainUsed / features.maxDomains) * 100, 100);
-  }else{
+  } else {
     domainUsagePercentage = 100;
   }
-  
+
 
   const mediaUsed = usage?.mediaFiles || 0;
   const maxMediaFiles = features.maxMediaFiles === -1 ? "Unlimited" : features.maxMediaFiles;
@@ -94,6 +95,11 @@ export default function SettingsPage() {
   const storageUsed = usage?.storageUsed || 0;
   const storageLimit = features.storageLimit === -1 ? "Unlimited" : features.storageLimit;
   const storageUsagePercentage = features.storageLimit === -1 ? 100 : Math.min((storageUsed / features.storageLimit) * 100, 100);
+
+
+  const aiGenerationUsed = usage?.aiGenerations || 0;
+  const aiGenerationLimit = features.aiGenerationLimit === -1 ? "Unlimited" : features.aiGenerationLimit;
+  const aiGenerationUsagePercentage = features.aiGenerationLimit === -1 ? 100 : Math.min((aiGenerationUsed / features.aiGenerationLimit) * 100, 100);
 
   // ----------------------------
   // VALIDATION LOGIC
@@ -381,7 +387,7 @@ export default function SettingsPage() {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
               {/* Domains Card */}
               <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-blue-200">
@@ -453,7 +459,7 @@ export default function SettingsPage() {
                     / {formatStorage(storageLimit)}
                   </span>
                 </div>
-                 <div className="flex-1 w-full">
+                <div className="flex-1 w-full">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-gray-500">{features.storageLimit === -1 ? "Unlimited" : `${Math.round(storageUsagePercentage)}%`}</span>
                   </div>
@@ -462,6 +468,43 @@ export default function SettingsPage() {
                       className="h-2.5 rounded-full transition-all duration-500 bg-emerald-600"
                       style={{ width: `${storageUsagePercentage}%` }}
                     ></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Generation Card */}
+              <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-amber-200">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-medium text-gray-500">AI Generations</p>
+                  <div className="flex items-center justify-center rounded-full bg-amber-50 text-amber-600 transition-colors group-hover:bg-amber-100">
+                    <Sparkles size={18} />
+                  </div>
+                </div>
+
+                <div className="flex items-baseline gap-1.5 mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {aiGenerationUsed}
+                  </h3>
+
+                  <span className="text-sm font-medium text-gray-500">
+                    / {aiGenerationLimit}
+                  </span>
+                </div>
+
+                <div className="flex-1 w-full">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-500">
+                      {features.aiGenerationLimit === -1
+                        ? "Unlimited"
+                        : `${Math.round(aiGenerationUsagePercentage)}%`}
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-gray-100 rounded-full h-2.5 mb-2 overflow-hidden">
+                    <div
+                      className="h-2.5 rounded-full transition-all duration-500 bg-amber-600"
+                      style={{ width: `${aiGenerationUsagePercentage}%` }}
+                    />
                   </div>
                 </div>
               </div>
@@ -496,7 +539,7 @@ export default function SettingsPage() {
                 </span>
               </div>
 
-              {plan !== "pro" && ( 
+              {plan !== "pro" && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <Link href="/pricing" className="bg-[#5642E6] hover:bg-[#4a39c7] text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
                     <Crown size={16} /> Upgrade to Pro
@@ -518,6 +561,11 @@ export default function SettingsPage() {
 
                 <li className="flex items-center gap-3 text-sm text-gray-700">
                   <Check size={18} className="text-green-500 shrink-0" />
+                  {aiGenerationLimit} AI Generations
+                </li>
+
+                <li className="flex items-center gap-3 text-sm text-gray-700">
+                  <Check size={18} className="text-green-500 shrink-0" />
                   {features.maxDomains === -1
                     ? "Unlimited Domains"
                     : `${features.maxDomains} Custom Domains`}
@@ -535,7 +583,7 @@ export default function SettingsPage() {
                   {features.contactForm
                     ? <Check size={18} className="text-green-500 shrink-0" />
                     : <Lock size={18} className="text-gray-300 shrink-0" />}
-                  Contact Form
+                  Contact Form Integration
                 </li>
 
                 <li className={`flex items-center gap-3 text-sm ${features.removeBranding

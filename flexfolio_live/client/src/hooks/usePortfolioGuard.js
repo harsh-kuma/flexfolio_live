@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export const usePortfolioGuard = () => {
   const router = useRouter();
-  const { canCreatePortfolio , user } = usePlan();
+  const { canCreatePortfolio , user , canAiGenerationAllowed } = usePlan();
 
   const checkPortfolioAccess = () => {
     if(!user){
@@ -19,5 +19,18 @@ export const usePortfolioGuard = () => {
     return true;
   };
 
-  return { checkPortfolioAccess };
+  const checkAiGenerationAllowed = () => {
+    if(!user){
+      router.push("/auth/login");
+      return false;
+    }
+    if (!canAiGenerationAllowed()) {
+      router.push("/pricing");
+      return false;
+    }
+
+    return true;
+  };
+
+  return { checkPortfolioAccess ,checkAiGenerationAllowed };
 };

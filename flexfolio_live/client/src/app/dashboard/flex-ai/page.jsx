@@ -1,6 +1,8 @@
 "use client";
 
 import DashboardPortfolioNotFound from "@/components/dashboard/layout/portfolio/DashboardPortfolioNotFound";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { usePortfolioGuard } from "@/hooks/usePortfolioGuard";
 import { generateSiteByDocs } from "@/lib/api";
 import { verifyTemplate } from "@/lib/verifyTemplate";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -77,6 +79,7 @@ const AI_STEPS = [
 
 export default function FlexAIPage() {
   const router = useRouter();
+  const { fetchUser } = useAuth();
   const params = useSearchParams();
   const type = params.get("template");
   const isValidTemplate = verifyTemplate(type);
@@ -87,6 +90,7 @@ export default function FlexAIPage() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const {checkAiGenerationAllowed} = usePortfolioGuard();
 
   useEffect(() => {
     let interval;
@@ -143,6 +147,9 @@ export default function FlexAIPage() {
   };
 
   const handleGenerate = async () => {
+    if(!checkAiGenerationAllowed()){
+      return;
+    }
     if (!file) {
       setError("Please select a resume to continue.");
       return;
@@ -156,6 +163,7 @@ export default function FlexAIPage() {
       setError("");
 
       const res = await generateSiteByDocs(formData);
+      await fetchUser();
       let generatedId = "";
       if (res.generatedId) {
         generatedId = res.generatedId;

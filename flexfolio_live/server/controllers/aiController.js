@@ -2,6 +2,8 @@ const parseResume = require("../services/resumeParser");
 const flexAiService = require("../services/flexAiService");
 const AIGeneratedPortfolio = require("../models/AIGeneratedPortfolio");
 const mongoose = require("mongoose");
+const User = require("../models/User");
+const { checkAiUsage } = require("../utils/aiUsage");
 
 exports.generatePortfolioData = async (req, res) => {
   try {
@@ -14,6 +16,19 @@ exports.generatePortfolioData = async (req, res) => {
     const text = await parseResume(req.file.buffer);
     const cleanedText = text.trim();
 
+    const user = await User.findById(req.user.id);
+
+    const usage = checkAiUsage(user);
+
+    // Save if the month changed
+    await user.save();
+
+    if (!usage.canGenerate) {
+      return res.status(403).json({
+        success: false,
+        message: "Monthly AI generation limit reached.",
+      });
+    }
     if (!cleanedText) {
       return res.status(400).json({
         success: false,
@@ -43,6 +58,9 @@ exports.generatePortfolioData = async (req, res) => {
       resumeName: req.file.originalname,
       data,
     });
+
+    user.usage.aiGenerations += 1;
+    await user.save();
 
     return res.json({
       success: true,

@@ -29,6 +29,16 @@ export const usePlan = () => {
     return usage.domains < limit;
   };
 
+  const canAiGenerationAllowed = () => {
+    const limit = features.aiGenerationLimit;
+
+    if (limit === -1) {
+      return true;
+    }
+
+    return usage.aiGenerations < limit;
+  };
+
   return {
     user,
     plan,
@@ -36,5 +46,6 @@ export const usePlan = () => {
     features,
     canCreatePortfolio,
     canAddDomain,
+    canAiGenerationAllowed,
   };
 };

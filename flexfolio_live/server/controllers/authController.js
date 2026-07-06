@@ -14,7 +14,7 @@ const crypto = require("crypto");
 const deleteCloudinaryAsset = require("../utils/deleteCloudinaryAsset");
 const { canDeleteDomain } = require("../utils/domainCleanup");
 const deleteAssetsFromObject = require("../utils/deleteAssetsFromObject");
-
+const { checkAiUsage } = require("../utils/aiUsage");
 const createToken = (user) => {
   return jwt.sign(
     {
@@ -280,6 +280,9 @@ exports.getMe = async (req, res) => {
         message: "User Not Found",
       });
     }
+
+    const aiUsage = checkAiUsage(getuser);
+    await getuser.save();
 
     const user = getSafeUser(getuser);
 
