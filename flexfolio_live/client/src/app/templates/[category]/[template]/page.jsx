@@ -13,15 +13,15 @@ export const dummyData = {
   fullName: "Alex Carter",
   title: "Senior Full Stack Developer",
   bio: `Full Stack Developer with 4+ years of experience building scalable and high-performance web applications using the MERN stack. Passionate about clean code, modern UI, and future-ready solutions.`,
-  about:`I’m a Full Stack Developer who enjoys building modern, scalable, and user-focused web applications. Over the years, I’ve worked on a variety of projects ranging from dynamic frontend interfaces to complex backend systems, always aiming to deliver smooth performance and clean user experiences.
+  about: `I’m a Full Stack Developer who enjoys building modern, scalable, and user-focused web applications. Over the years, I’ve worked on a variety of projects ranging from dynamic frontend interfaces to complex backend systems, always aiming to deliver smooth performance and clean user experiences.
 
 My primary expertise lies in the MERN stack, where I build responsive frontend applications with React and develop powerful backend services using Node.js, Express, and MongoDB. Beyond web development, I’m deeply interested in system design, DevOps practices, and AI integrations that help create smarter and more efficient applications.`,
 
-  image:{
-    url:"https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
+  image: {
+    url: "https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/flexfolio/wdjs1gdw66a7sqzewjr6.png",
   },
 
-  email: "alex@flexfolio.com",
+  email: "alex@flexfolio.online",
   phone: "+91 XXXXXXXXXX",
   location: "Jaipur, India",
 
@@ -103,6 +103,30 @@ Designed RESTful APIs, implemented authentication systems, and optimized databas
 Worked on production systems handling large traffic, ensuring reliability and scalability. 
 Collaborated with cross-functional teams to deliver high-quality features and improve overall system architecture.`
     }
+  ],
+
+  certificates: [
+    {
+      title: "Full Stack Web Development",
+      issuer: "Coursera",
+      issueDate: "2025",
+      credentialUrl: "",
+      image: ""
+    },
+    {
+      title: "AWS Cloud Practitioner",
+      issuer: "Amazon Web Services",
+      issueDate: "2025",
+      credentialUrl: "",
+      image: ""
+    },
+    {
+      title: "Google UX Design Professional Certificate",
+      issuer: "Google",
+      issueDate: "2024",
+      credentialUrl: "",
+      image: ""
+    },
   ]
 };
 
@@ -117,7 +141,7 @@ export default function TemplatePreview() {
   const key = `${params.category}~${params.template}`;
   const template = templates[key];
 
-  if (!template) return <TemplateNotFound/>;
+  if (!template) return <TemplateNotFound />;
 
   const Template = template.component;
 
@@ -141,8 +165,8 @@ export default function TemplatePreview() {
     <button
       onClick={() => setDevice(type)}
       className={`p-2 rounded-lg transition ${device === type
-          ? "bg-black text-white"
-          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+        ? "bg-black text-white"
+        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
         }`}
     >
       <Icon size={18} />
@@ -162,17 +186,17 @@ export default function TemplatePreview() {
       {/* HEADER */}
       <div className="flex items-center justify-between px-4 md:px-8 py-3 bg-white shadow sticky top-0 z-50">
         <div
-            onClick={() => router.push("/")}
-            className="cursor-pointer flex items-center"
-          >
-            <Image
-              src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781678227/flexfolio-full_xkooln.png"
-              alt="FlexFolio"
-              width={100}
-              height={40}
-              priority
-              className="object-contain"
-            />
+          onClick={() => router.push("/")}
+          className="cursor-pointer flex items-center"
+        >
+          <Image
+            src="https://res.cloudinary.com/dr38wac7n/image/upload/v1781678227/flexfolio-full_xkooln.png"
+            alt="FlexFolio"
+            width={100}
+            height={40}
+            priority
+            className="object-contain"
+          />
         </div>
 
         <div className="hidden md:flex items-center gap-2">

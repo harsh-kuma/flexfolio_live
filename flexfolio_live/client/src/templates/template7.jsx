@@ -16,6 +16,33 @@ const stagger = {
 };
 
 const ProjectCard = ({ p, trackClick }) => {
+  const contentRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [height, setHeight] = useState("0px");
+  const [showButton, setShowButton] = useState(false);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+
+    // 48px is roughly 2 lines of text with text-sm and leading-relaxed
+    const isOverflowing = el.scrollHeight > 48;
+    setShowButton(isOverflowing);
+
+    setHeight(expanded ? `${el.scrollHeight}px` : "48px");
+  }, [expanded, p.description]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const el = contentRef.current;
+      if (!el) return;
+      setHeight(expanded ? `${el.scrollHeight}px` : "48px");
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [expanded]);
+
   return (
     <motion.div
       variants={fadeUp}
@@ -41,9 +68,27 @@ const ProjectCard = ({ p, trackClick }) => {
         </div>
 
         {p.description && (
-          <p className="text-sm text-neutral-400 leading-relaxed font-light mb-4 line-clamp-2 group-hover:line-clamp-none transition-all duration-300">
-            {p.description}
-          </p>
+          <div className="mb-4 relative">
+            <div ref={contentRef} style={{ height }} className="overflow-hidden transition-all duration-500 ease-in-out relative">
+              <p className="text-sm text-neutral-400 leading-relaxed font-light">
+                {p.description}
+              </p>
+              {!expanded && showButton && (
+                <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-[#0a0a0a] group-hover:from-[#111111] to-transparent transition-colors duration-300"></div>
+              )}
+            </div>
+            {showButton && (
+              <button
+                onClick={(e) => { e.preventDefault(); setExpanded(!expanded); }}
+                className="text-neutral-300 text-[11px] font-semibold mt-2 hover:text-white focus:outline-none flex items-center gap-1 uppercase tracking-wider transition-colors"
+              >
+                {expanded ? "View Less" : "View More"}
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-500 ${expanded ? 'rotate-180' : ''}`}>
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            )}
+          </div>
         )}
 
         <div className="flex flex-wrap gap-2 mb-4 mt-auto">
@@ -74,7 +119,79 @@ const ProjectCard = ({ p, trackClick }) => {
   );
 };
 
-export default function Template4({ data, owner_key, working ,system_allow}) {
+const CertificateCard = ({ cert, trackClick }) => {
+  const certificate_default = "https://res.cloudinary.com/dr38wac7n/image/upload/v1782923183/certificate_default_flexfolio_qhd3eu.png";
+  const [imgSrc, setImgSrc] = useState(cert.image?.url || certificate_default);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) setImgLoaded(true);
+  }, [imgSrc]);
+
+  const handleImageError = () => {
+    if (imgSrc !== certificate_default) setImgSrc(certificate_default);
+    else setImgLoaded(true);
+  };
+
+  return (
+    <motion.div variants={fadeUp} className="group bg-[#0a0a0a] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 hover:bg-[#111111] transition-all flex flex-col relative">
+      {/* Subtle hover gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/0 to-amber-500/0 group-hover:from-yellow-500/5 group-hover:to-amber-500/5 transition-all duration-500 pointer-events-none z-0" />
+      
+      <div className="relative h-48 sm:h-52 bg-white/5 border-b border-white/5 overflow-hidden z-10">
+        {!imgLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/5">
+            <svg className="animate-spin h-5 w-5 text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )}
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt={cert.title}
+          onLoad={() => setImgLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full ${imgSrc === certificate_default ? "object-cover" : "object-contain"} transition-transform duration-700 ease-in-out ${imgLoaded ? "opacity-100 group-hover:scale-105" : "opacity-0"}`}
+        />
+      </div>
+      
+      <div className="p-5 flex flex-col flex-1 z-10">
+        <div className="flex justify-between items-start gap-3 mb-2">
+          <h3 className="text-base font-semibold text-neutral-100 line-clamp-2">{cert.title}</h3>
+          {cert.issueDate && (
+            <span className="text-[10px] font-medium text-neutral-500 bg-white/5 px-2 py-0.5 rounded-md border border-white/5 shrink-0 whitespace-nowrap">
+              {cert.issueDate}
+            </span>
+          )}
+        </div>
+        
+        {cert.issuer && (
+          <p className="text-sm text-neutral-400 font-light mb-5">{cert.issuer}</p>
+        )}
+        
+        {cert.credentialUrl && (
+          <a
+            href={cert.credentialUrl}
+            onClick={() => trackClick(`certificate:${cert.title}`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-auto flex items-center justify-center gap-1.5 w-full bg-white/5 hover:bg-white/10 text-white border border-white/5 py-2.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-all"
+          >
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            View Credential
+          </a>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+export default function Template4({ data, owner_key, working, system_allow }) {
   const [activeSection, setActiveSection] = useState("#hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainRef = useRef(null);
@@ -83,6 +200,7 @@ export default function Template4({ data, owner_key, working ,system_allow}) {
   const hasExperience = data?.experience?.length > 0;
   const hasProjects = data?.projects?.length > 0;
   const hasSkills = data?.skills?.length > 0;
+  const hasCertificates = data?.certificates?.length > 0;
 
   const navLinks = [
     { id: "#hero", label: "Overview", show: true, icon: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" },
@@ -90,8 +208,23 @@ export default function Template4({ data, owner_key, working ,system_allow}) {
     { id: "#experience", label: "Experience", show: hasExperience, icon: "M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" },
     { id: "#projects", label: "Projects", show: hasProjects, icon: "M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" },
     { id: "#skills", label: "Tech Stack", show: hasSkills, icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" },
+    { id: "#certificates", label: "Certificates", show: hasCertificates, icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" },
     { id: "#contact", label: "Contact", show: true, icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" },
   ];
+
+  // Prevent background scrolling when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   // Scroll Spy logic
   useEffect(() => {
@@ -252,7 +385,7 @@ export default function Template4({ data, owner_key, working ,system_allow}) {
         <div className="mt-8 pt-8 border-t border-white/5 flex gap-3">
           {data?.linkedin && <a href={data.linkedin} onClick={() => trackClick("linkedin")} target="_blank" rel="noreferrer" className="p-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-md transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}
           {data?.github && <a href={data.github} onClick={() => trackClick("github")} target="_blank" rel="noreferrer" className="p-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-md transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg></a>}
-          {data?.email && <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="p-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-md transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
+          {data?.email && <a href={`mailto:${data.email}`} onClick={() => trackClick("email")} className="p-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-md transition-colors"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a>}
         </div>
       </aside>
 
@@ -319,9 +452,9 @@ export default function Template4({ data, owner_key, working ,system_allow}) {
                   <motion.div key={i} variants={fadeUp} className="group bg-[#0a0a0a] border border-white/5 p-6 rounded-2xl hover:border-white/10 hover:bg-[#111111] transition-all">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 overflow-hidden">
                             {exp.companyLogo ? (
-                              <img src={exp.companyLogo} alt="logo" className="w-6 h-6 object-contain" />
+                              <img src={exp.companyLogo} alt="logo" className="w-full h-full object-cover" />
                             ) : (
                               <span className="text-white font-bold">{exp.company?.[0] || "C"}</span>
                             )}
@@ -381,6 +514,23 @@ export default function Template4({ data, owner_key, working ,system_allow}) {
                   </span>
                 ))}
               </motion.div>
+            </motion.div>
+          </section>
+        )}
+
+        {/* CERTIFICATES SECTION */}
+        {hasCertificates && (
+          <section id="certificates" className="scroll-mt-32 py-16 border-b border-white/5">
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}>
+              <motion.h2 variants={fadeUp} className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span> Certificates
+              </motion.h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {data.certificates.map((cert, i) => (
+                  <CertificateCard key={i} cert={cert} trackClick={trackClick} />
+                ))}
+              </div>
             </motion.div>
           </section>
         )}

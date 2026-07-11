@@ -54,7 +54,7 @@ const ProjectCard = ({ p, trackClick }) => {
           {p.title}
         </h3>
       )}
-      
+
       {p.description && (
         <div className="flex-1 mb-5 relative">
           <div ref={contentRef} style={{ height }} className="overflow-hidden transition-all duration-500 ease-in-out relative">
@@ -105,7 +105,91 @@ const ProjectCard = ({ p, trackClick }) => {
   );
 };
 
-export default function Template6({ data, owner_key, working ,system_allow}) {
+// Adapted Component for Certificates (Dark Theme for Template 6)
+const CertificateCard = ({ cert, trackClick }) => {
+  const certificate_default = "https://res.cloudinary.com/dr38wac7n/image/upload/v1782923183/certificate_default_flexfolio_qhd3eu.png";
+  const [imgSrc, setImgSrc] = useState(cert.image?.url || certificate_default);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setImgLoaded(true);
+    }
+  }, [imgSrc]);
+
+  const handleImageError = () => {
+    if (imgSrc !== certificate_default) {
+      setImgSrc(certificate_default);
+    } else {
+      setImgLoaded(true);
+    }
+  };
+
+  return (
+    <div className="group relative bg-[#0f1117]/80 backdrop-blur-2xl border border-white/5 rounded-2xl transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_30px_-10px_rgba(245,158,11,0.15)] flex flex-col overflow-hidden z-10 before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500 before:-z-10">
+      {/* Image Section */}
+      <div className="relative h-48 sm:h-52 bg-white/5 overflow-hidden border-b border-white/5">
+        {!imgLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/5 z-10">
+            <svg className="animate-spin h-6 w-6 text-slate-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )}
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt={cert.title}
+          onLoad={() => setImgLoaded(true)}
+          onError={handleImageError}
+          className={`w-full h-full ${imgSrc === certificate_default ? "object-cover" : "object-contain"} transition-transform duration-700 ease-in-out ${imgLoaded ? "opacity-100 group-hover:scale-105" : "opacity-0"}`}
+        />
+      </div>
+
+      {/* Content Section */}
+      <div className="p-5 sm:p-6 flex flex-col flex-1">
+        <div className="flex justify-between items-start gap-3 mb-3">
+          <h3 className="font-semibold text-white text-base sm:text-lg leading-tight line-clamp-2 group-hover:text-amber-400 transition-colors duration-300" title={cert.title}>
+            {cert.title}
+          </h3>
+          {cert.issueDate && (
+            <span className="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-md shrink-0 uppercase tracking-wider">
+              {cert.issueDate}
+            </span>
+          )}
+        </div>
+
+        {cert.issuer && (
+          <p className="flex items-center gap-2 text-slate-400 text-xs sm:text-sm mb-5 line-clamp-2 font-light">
+            <svg className="w-4 h-4 shrink-0 text-amber-500/70" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.315 48.315 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+            </svg>
+            {cert.issuer}
+          </p>
+        )}
+
+        {cert.credentialUrl && (
+          <a
+            href={cert.credentialUrl}
+            onClick={() => trackClick(`certificate:${cert.title}`)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-auto flex items-center justify-center gap-2 w-full bg-white/5 hover:bg-white/10 text-white border border-white/5 hover:border-amber-500/30 py-2.5 rounded-lg text-[11px] sm:text-xs font-semibold uppercase tracking-wider transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            View Credential
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default function Template6({ data, owner_key, working, system_allow }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -130,6 +214,7 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
   const hasExperience = data?.experience?.length > 0;
   const hasProjects = data?.projects?.length > 0;
   const hasSkills = data?.skills?.length > 0;
+  const hasCertificates = data?.certificates?.length > 0;
 
   const isSingleExperience = data?.experience?.length === 1;
   const aboutExpLayoutClass = (hasAbout && hasExperience && isSingleExperience)
@@ -142,6 +227,7 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
     { id: "#experience", label: "Experience", show: hasExperience },
     { id: "#projects", label: "Work", show: hasProjects },
     { id: "#skills", label: "Skills", show: hasSkills },
+    { id: "#certificates", label: "Certificates", show: hasCertificates },
     { id: "#contact", label: "Contact", show: true },
   ];
 
@@ -231,7 +317,7 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
       {/* FLOATING NAVBAR */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? "py-3 sm:py-4" : "py-5 sm:py-6"}`}>
         <div className={`mx-auto flex justify-between items-center transition-all duration-300 ${scrolled ? "max-w-[95%] sm:max-w-4xl px-4 py-2 sm:py-2.5 bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-full shadow-lg" : "max-w-7xl px-5 md:px-10"}`}>
-          
+
           <div className="flex items-center gap-2.5 cursor-pointer group" onClick={() => scrollTo("#hero")}>
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-white group-hover:text-black transition-all duration-300">
               {getInitials(data?.fullName || "F")}
@@ -276,31 +362,31 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
 
         {/* Mobile Menu Overlay */}
         {menuOpen && (
-            <>
-           <div
+          <>
+            <div
               className="fixed inset-0 h-dvh w-screen bg-black/40  z-40 md:hidden"
               onClick={() => setMenuOpen(false)}
             ></div>
-          <div className="absolute top-full left-3 right-3 mt-2 bg-[#0f1117]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-xl flex flex-col items-center py-4 gap-1 z-50 md:hidden overflow-hidden">
-            {navLinks.filter(link => link.show).map((link) => (
-              <button
-                key={link.id}
-                className="text-slate-300 font-semibold text-xs uppercase tracking-widest hover:text-white hover:bg-white/5 w-full text-center py-3 transition-colors rounded-lg mx-2"
-                onClick={() => scrollTo(link.id)}
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
+            <div className="absolute top-full left-3 right-3 mt-2 bg-[#0f1117]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-xl flex flex-col items-center py-4 gap-1 z-50 md:hidden overflow-hidden">
+              {navLinks.filter(link => link.show).map((link) => (
+                <button
+                  key={link.id}
+                  className="text-slate-300 font-semibold text-xs uppercase tracking-widest hover:text-white hover:bg-white/5 w-full text-center py-3 transition-colors rounded-lg mx-2"
+                  onClick={() => scrollTo(link.id)}
+                >
+                  {link.label}
+                </button>
+              ))}
+            </div>
           </>
         )}
       </nav>
 
       <main className="max-w-7xl mx-auto px-5 md:px-10 pt-28 sm:pt-32 pb-16 relative z-10">
-        
+
         {/* HERO SECTION */}
         <div id="hero" className="scroll-mt-32 flex flex-col items-center text-center gap-6 sm:gap-8 py-8 md:py-12">
-          
+
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[10px] sm:text-xs font-semibold uppercase tracking-widest backdrop-blur-md shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Available for work
           </div>
@@ -314,7 +400,7 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
                 </span>
               )}
             </h1>
-            
+
             {data?.bio && (
               <p className="text-slate-400 text-sm sm:text-base md:text-lg leading-relaxed font-light max-w-2xl mx-auto px-4 sm:px-0">
                 {data?.bio}
@@ -354,29 +440,29 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
         {/* ABOUT & EXPERIENCE (Bento Grid Style) */}
         {(hasAbout || hasExperience) && (
           <div className={aboutExpLayoutClass}>
-            
+
             {hasAbout && (
               <div id="about" className="scroll-mt-28 h-full">
                 <div className="bg-[#0f1117]/60 backdrop-blur-xl border border-white/5 rounded-[1.5rem] p-6 sm:p-8 md:p-10 h-full flex flex-col relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px] -z-10 group-hover:bg-blue-500/15 transition-colors duration-700"></div>
-                  
+
                   <div className="flex items-center gap-3 mb-5 sm:mb-6">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
                     <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">Background</h2>
                   </div>
-                  
+
                   <div className="text-slate-400 leading-relaxed text-sm sm:text-base font-light space-y-4 flex-1">
                     <p>{data?.about}</p>
                   </div>
 
                   {data?.image?.url && (
-                     <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/5 flex items-center gap-4">
-                        <img src={data.image.url} alt="Profile" className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-white/10 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500" />
-                        <div>
-                          <p className="text-white text-sm sm:text-base font-semibold">{data.fullName}</p>
-                          <p className="text-slate-500 text-xs sm:text-sm">{data.title}</p>
-                        </div>
-                     </div>
+                    <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/5 flex items-center gap-4">
+                      <img src={data.image.url} alt="Profile" className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border border-white/10 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500" />
+                      <div>
+                        <p className="text-white text-sm sm:text-base font-semibold">{data.fullName}</p>
+                        <p className="text-slate-500 text-xs sm:text-sm">{data.title}</p>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -386,38 +472,42 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
               <div id="experience" className="scroll-mt-28 h-full">
                 <div className="bg-[#0f1117]/60 backdrop-blur-xl border border-white/5 rounded-[1.5rem] p-6 sm:p-8 md:p-10 h-full relative overflow-hidden">
                   <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -z-10"></div>
-                  
+
                   <div className="flex items-center gap-3 mb-6 sm:mb-8">
                     <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
                     <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight uppercase">Experience</h2>
                   </div>
 
-                  <div className="space-y-6 sm:space-y-8 relative before:absolute before:inset-0 before:ml-[1.125rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
-                    {data?.experience?.map((exp, i) => (
-                      <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                        <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 bg-[#0f1117] text-slate-400 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_0_3px_rgba(15,17,23,1)] z-10 transition-colors duration-300 group-hover:border-blue-500 group-hover:text-blue-400">
-                          {exp.companyLogo ? (
-                            <img src={exp.companyLogo} alt={exp.company} className="w-10 h-10 object-contain shrink-0 rounded-full p-1" />
-                          ) :(
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                          )}
-                          </div>
-                        
-                        <div className="w-[calc(100%-3.5rem)] md:w-[calc(50%-2rem)] bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 p-4 sm:p-5 rounded-xl transition-all duration-300">
-                          <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
-                            <h3 className="font-semibold text-white text-sm sm:text-base">{exp.role}</h3>
-                            {exp.startDate && (
-                              <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider bg-black/40 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded">
-                                {formatDate(exp.startDate)} - {exp.current ? "Present" : formatDate(exp.endDate)}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-blue-400 font-medium text-xs sm:text-sm mb-2">{exp.company}</p>
-                          {exp.description && (<p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-light">{exp.description}</p>)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <div className={`space-y-6 sm:space-y-8 relative before:absolute before:inset-0 before:ml-[1.125rem] before:-translate-x-px before:h-full before:w-[2px] before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent ${!isSingleExperience ? 'md:before:mx-auto md:before:translate-x-0' : ''}`}>
+  {data?.experience?.map((exp, i) => (
+    <div key={i} className={`relative flex items-center justify-between group is-active ${!isSingleExperience ? 'md:justify-normal md:odd:flex-row-reverse' : ''}`}>
+      
+      {/* Timeline Node / Logo */}
+      <div className={`flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/10 bg-[#0f1117] text-slate-400 shrink-0 shadow-[0_0_0_3px_rgba(15,17,23,1)] z-10 transition-colors duration-300 group-hover:border-blue-500 group-hover:text-blue-400 overflow-hidden ${!isSingleExperience ? 'md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2' : ''}`}>
+        {exp.companyLogo ? (
+          <img src={exp.companyLogo} alt={exp.company} className="w-full h-full object-cover" />
+        ) :(
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        )}
+      </div>
+      
+      {/* Content Card */}
+      <div className={`w-[calc(100%-3.5rem)] bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 p-4 sm:p-5 rounded-xl transition-all duration-300 ${!isSingleExperience ? 'md:w-[calc(50%-2rem)]' : 'md:w-[calc(100%-4rem)]'}`}>
+        <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+          <h3 className="font-semibold text-white text-sm sm:text-base">{exp.role}</h3>
+          {exp.startDate && (
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider bg-black/40 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded">
+              {formatDate(exp.startDate)} - {exp.current ? "Present" : formatDate(exp.endDate)}
+            </span>
+          )}
+        </div>
+        <p className="text-blue-400 font-medium text-xs sm:text-sm mb-2">{exp.company}</p>
+        {exp.description && (<p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-light">{exp.description}</p>)}
+      </div>
+
+    </div>
+  ))}
+</div>
                 </div>
               </div>
             )}
@@ -461,13 +551,29 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
           </div>
         )}
 
+        {/* CERTIFICATES SECTION */}
+        {hasCertificates && (
+          <div id="certificates" className="scroll-mt-28 py-8 md:py-12 mb-6 sm:mb-8">
+            <div className="flex flex-col items-center text-center gap-2 sm:gap-3 mb-8 sm:mb-10 md:mb-12">
+              <span className="text-amber-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest">Achievements</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Certificates</h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
+              {data?.certificates?.map((cert, i) => (
+                <CertificateCard key={i} cert={cert} trackClick={trackClick} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* CONTACT ME SECTION */}
         <div id="contact" className="scroll-mt-28 py-8 md:py-12">
           <div className="bg-[#0f1117]/80 backdrop-blur-2xl border border-white/10 rounded-[1.5rem] sm:rounded-[2.5rem] p-6 sm:p-8 md:p-12 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent -z-10"></div>
-            
+
             <div className="grid lg:grid-cols-5 gap-8 md:gap-12 lg:gap-16 items-center">
-              
+
               <div className="lg:col-span-2 space-y-6 sm:space-y-8">
                 <div>
                   <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-lg sm:rounded-xl flex items-center justify-center text-white mb-4 sm:mb-5 border border-white/10">
@@ -565,18 +671,18 @@ export default function Template6({ data, owner_key, working ,system_allow}) {
       <footer className="border-t border-white/5 bg-[#050505] py-6 sm:py-8 relative z-10">
         <div className="max-w-7xl mx-auto px-5 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex flex-col items-center sm:items-start gap-1 sm:gap-1.5 text-center sm:text-left">
-             <p className="text-xs sm:text-sm font-semibold text-white tracking-tight">
-               {data?.fullName || "Portfolio"} © {new Date().getFullYear()}
-             </p>
-             {(!system_allow?.removeBranding || !system_allow) &&
-             <p className="text-[10px] sm:text-xs text-slate-500 font-light flex items-center justify-center sm:justify-start gap-1">
-               Powered by
-               <a href="https://flexfolio.online" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-white transition-colors underline decoration-white/20 underline-offset-2 sm:underline-offset-4">
-                 Flexfolio
-               </a>
-             </p>}
+            <p className="text-xs sm:text-sm font-semibold text-white tracking-tight">
+              {data?.fullName || "Portfolio"} © {new Date().getFullYear()}
+            </p>
+            {(!system_allow?.removeBranding || !system_allow) &&
+              <p className="text-[10px] sm:text-xs text-slate-500 font-light flex items-center justify-center sm:justify-start gap-1">
+                Powered by
+                <a href="https://flexfolio.online" target="_blank" rel="noreferrer" className="text-slate-300 hover:text-white transition-colors underline decoration-white/20 underline-offset-2 sm:underline-offset-4">
+                  Flexfolio
+                </a>
+              </p>}
           </div>
-          
+
           <div className="flex gap-3 sm:gap-4">
             {data?.linkedin && <a href={data.linkedin} onClick={() => trackClick("linkedin")} target="_blank" rel="noreferrer" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg></a>}
             {data?.github && <a href={data.github} onClick={() => trackClick("github")} target="_blank" rel="noreferrer" className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg></a>}
