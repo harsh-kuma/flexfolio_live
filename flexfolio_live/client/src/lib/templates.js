@@ -5,7 +5,7 @@ import Template4 from "@/templates/template4";
 import Template5 from "@/templates/template5";
 import Template6 from "@/templates/template6";
 import Template7 from "@/templates/template7";
-
+import Template8 from "@/templates/template8";
 export const templates = { 
   "developer-minimal~template1": {
     name:"Basic Resume type Template",
@@ -55,5 +55,12 @@ export const templates = {
     category: "developer",
     id: "template7",
     component: Template7,
+  },
+  "developer~template8": {
+    name:"Basic Resume type Template",
+    image:"https://res.cloudinary.com/dr38wac7n/image/upload/v1778401266/Screenshot_2026-05-18_141750_zxwn6e",
+    category: "developer",
+    id: "template8",
+    component: Template8,
   },
 };
